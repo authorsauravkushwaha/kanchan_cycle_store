@@ -1,7 +1,7 @@
 name: Deploy website to GitHub Pages
 on:
   push:
-    branches: [main]
+    branches: [main, arena/d7b52c7a-kanchan-cycle-store]
   workflow_dispatch:
 permissions:
   contents: read

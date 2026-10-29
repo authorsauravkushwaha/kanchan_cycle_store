@@ -1,0 +1,4 @@
+# Preview until the owner confirms the final details and production domain.
+# The production build generates the final robots policy from src/config/shop.ts.
+User-agent: *
+Disallow: /

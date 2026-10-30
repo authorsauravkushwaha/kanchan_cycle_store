@@ -37,6 +37,45 @@ header/inline-script/secret checks:
 - If `VITE_SUPABASE_URL` is set, the exact project host appears in `connect-src`
   and `img-src` — the build fails instead of shipping a broken or over-broad CSP.
 - No private keys, GitHub tokens, AWS keys or Supabase secret keys in tracked files.
+- `vercel.json` and `public/_headers` describe the *same* policy. A host reads only
+  one of them, so before this check a header could be tightened in one file and
+  silently left weak in the other.
+- `Cross-Origin-Resource-Policy: same-origin` is present, so other sites cannot
+  embed this site's images or scripts as subresources.
+
+## Automated scanning: dependencies, secrets, code
+
+None of these can be enabled from a file alone; each needs one owner click or a
+merged workflow. This is what is committed and what remains.
+
+| Capability | Committed here | Still needs the owner |
+| --- | --- | --- |
+| Dependency CVEs | `npm audit --audit-level=moderate` in CI, weekly schedule | — |
+| Dependency updates | `.github/dependabot.yml`: npm + GitHub Actions, weekly, grouped PRs | Enable **Dependabot alerts** in Settings → Code security; confirm the first PR arrives |
+| SAST / code scanning | `.github/workflows/codeql.yml`: CodeQL `security-and-quality`, JS/TS, every PR + weekly | Check Security → Code scanning after the first `main` run; triage findings |
+| Secret scanning | `security:check` regex scan of tracked files (private keys, `ghp_`, `AKIA`, `sb_secret_`) | Enable **Secret scanning** and **Push protection** in Settings → Code security; rotate anything found |
+| Action supply chain | Every `uses:` pinned to a commit SHA; Dependabot keeps pins current | Review Dependabot PRs rather than auto-merging them |
+| Production headers | `npm run security:headers -- https://DOMAIN` compares live responses to `vercel.json` | Run it after each deploy; add `--require-hsts` once HSTS is on |
+
+Run the live check manually or from **Actions → Live header verification**. It is
+the only control that tests production rather than intent, because GitHub Pages
+serves none of these headers no matter what the repository says.
+
+### Staged HSTS rollout
+
+HSTS stays off until every intended hostname answers on HTTPS (control #47). When
+that is true:
+
+1. Add `Strict-Transport-Security: max-age=300` to `vercel.json` and
+   `public/_headers` (both, or the drift check fails — by design).
+2. Deploy, then run `npm run security:headers -- https://DOMAIN --require-hsts`.
+3. After a week with no HTTP-only client complaints, raise to `max-age=31536000`.
+4. Only after confirming no other subdomain needs plain HTTP, add
+   `includeSubDomains`; add `preload` only if the owner accepts the removal cost,
+   which is months.
+
+Never enable HSTS as a repo change you cannot undo quickly: browsers honour it
+before they ever see the new config.
 
 ## Manual checks still required before launch
 
@@ -56,7 +95,11 @@ header/inline-script/secret checks:
    loads only when the visitor taps “load map”.
 7. **Dependency review**: `npm audit --omit=dev` before each release; the runtime
    dependencies are React, React Router, Lucide and two self-hosted fonts.
-8. **Backups**: export the `products` table and keep a copy outside the repo.
+   Dependabot proposes updates weekly — read the diff before merging, and never
+   batch a major bump with unrelated work.
+8. **Code scanning triage**: after the first CodeQL run on `main`, dismiss findings
+   with a written reason or fix them; an unread alert queue is the same as none.
+9. **Backups**: export the `products` table and keep a copy outside the repo.
    Never commit customer exports (`*.csv` of personal data) — see `.gitignore`.
 
 ## Deliberate non-goals

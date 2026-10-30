@@ -57,6 +57,7 @@ npm run test:e2e         # Browser, keyboard, mobile, offline-relevant and axe c
 npm run test:pwa         # Production service-worker and offline tests (build first)
 npm run check            # Unit tests + production build
 npm run security:check   # Run after build: headers, CSP, PWA and secret patterns
+npm run security:headers -- https://YOUR-DOMAIN  # Check headers the live site actually sends
 npm run icons            # Regenerate the Android icon set from vector artwork
 ```
 

@@ -1,0 +1,55 @@
+name: CodeQL
+
+# Static analysis (SAST) for the TypeScript/React source.
+#
+# This complements the regex/header checks in `npm run security:check`:
+# CodeQL reasons about data flow (untrusted input reaching a dangerous sink),
+# which is the class of bug a hand-written checker cannot prove absent.
+# The source has no dangerous sinks today; this keeps it that way.
+#
+# The repository is public, so code scanning is free. On a private repository
+# this workflow needs GitHub Advanced Security, otherwise the upload step fails.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Weekly, so newly published query packs catch old code.
+    - cron: '41 4 * * 1'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: codeql-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  analyze:
+    name: Analyze JavaScript/TypeScript
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      actions: read
+      security-events: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@4bfa242aa49c5f7c6770b98670d354a7dfac05f8 # v3
+        with:
+          languages: javascript-typescript
+          # The site is plain TS/JS built by Vite; CodeQL does not need a build.
+          build-mode: none
+          queries: security-and-quality
+
+      - name: Perform CodeQL analysis
+        uses: github/codeql-action/analyze@4bfa242aa49c5f7c6770b98670d354a7dfac05f8 # v3
+        with:
+          category: /language:javascript-typescript

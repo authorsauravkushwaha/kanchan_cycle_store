@@ -8,7 +8,8 @@ import assert from 'node:assert/strict';
 
 const config = JSON.parse(await readFile('vercel.json', 'utf8'));
 const headers = Object.fromEntries(config.headers[0].headers.map(({ key, value }) => [key, value]));
-for (const key of ['Content-Security-Policy', 'X-Content-Type-Options', 'Referrer-Policy', 'Permissions-Policy', 'X-Frame-Options', 'Cache-Control']) assert.ok(headers[key], `Missing ${key}`);
+for (const key of ['Content-Security-Policy', 'X-Content-Type-Options', 'Referrer-Policy', 'Permissions-Policy', 'X-Frame-Options', 'Cross-Origin-Opener-Policy', 'Cross-Origin-Resource-Policy', 'Cache-Control']) assert.ok(headers[key], `Missing ${key}`);
+assert.equal(headers['Cross-Origin-Resource-Policy'], 'same-origin', 'CORP must not allow cross-origin embedding of this site\'s files');
 const csp = headers['Content-Security-Policy'];
 for (const directive of [
   "default-src 'none'", "script-src 'self'", "style-src 'self'", "manifest-src 'self'",
@@ -16,6 +17,24 @@ for (const directive of [
 ]) assert.ok(csp.includes(directive), directive);
 assert.ok(!/unsafe-inline|unsafe-eval|https?:\/\/\*/.test(csp), 'CSP must not allow unsafe inline/eval/wildcards');
 assert.ok(!/connect-src[^;]*\bhttps:(?!\/\/)/.test(csp), 'connect-src must not allow every HTTPS origin');
+
+// vercel.json and public/_headers must describe the same policy: a host reads
+// exactly one of them, so drift silently weakens production while CI stays green.
+const headerFile = await readFile('public/_headers', 'utf8');
+const filePolicy = {};
+let inGlobalBlock = false;
+for (const rawLine of headerFile.split('\n')) {
+  const line = rawLine.trim();
+  if (!line || line.startsWith('#')) continue;
+  if (!/^\s/.test(rawLine)) { inGlobalBlock = line === '/*'; continue; }
+  const match = /^([A-Za-z-]+):\s*(.*)$/.exec(line);
+  if (inGlobalBlock && match) filePolicy[match[1].toLowerCase()] = match[2].trim();
+}
+for (const [name, value] of Object.entries(headers)) {
+  const lower = name.toLowerCase();
+  assert.ok(filePolicy[lower], `public/_headers is missing ${name} (present in vercel.json)`);
+  assert.equal(filePolicy[lower].toLowerCase(), value.toLowerCase(), `${name} differs between vercel.json and public/_headers`);
+}
 
 // The SPA rewrite must never shadow the PWA files: a manifest served as HTML
 // silently disables installation, and a shadowed sw.js disables offline support.

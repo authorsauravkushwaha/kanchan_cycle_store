@@ -4,9 +4,8 @@
  * Never turn an unknown price, stock level, service or offer into a claim.
  * Only the values in this file need editing for routine business updates.
  *
- * Design note: this website is deliberately image-light. The only photographs
- * on the site are the owner's own pictures of the Kolaghat shop (see shopPhotos).
- * There are no stock photographs, no illustrations and no product images.
+ * Design note: the owner-uploaded portrait is the sole photograph rendered on
+ * the website; it is used only as the immersive homepage hero image.
  */
 export type Language = 'bn' | 'en';
 export type Localized = { bn: string; en: string };
@@ -85,48 +84,7 @@ export interface Category {
   availabilityConfirmed: boolean;
 }
 
-/**
- * The owner's own photographs of the shop in Kolaghat, supplied October 2026.
- * Every caption describes only what is visible in the picture.
- */
-export const shopPhotos = {
-  storefront: {
-    src: '/images/shop/storefront.webp', smallSrc: '/images/shop/storefront-480.webp', smallWidth: 480, width: 960, height: 1200,
-    alt: { bn: 'কাঞ্চন সাইকেল স্টোর্সের সিঁড়ি ও সাইনবোর্ড, সামনে বাচ্চাদের সাইকেল', en: 'The steps and signboard of Kanchan Cycle Stores, with children’s cycles in front' },
-    caption: { bn: 'কোলাঘাট–যাশর রোডে আমাদের দোকান', en: 'Our shop on Kolaghat - Jashar Road' },
-  },
-  display: {
-    src: '/images/shop/bicycle-display.webp', smallSrc: '/images/shop/bicycle-display-400.webp', smallWidth: 400, width: 800, height: 600,
-    alt: { bn: 'দোকানের প্রবেশপথে সাজিয়ে রাখা নতুন সাইকেল', en: 'New bicycles lined up at the shop entrance' },
-    caption: { bn: 'প্রবেশপথে সাজানো নতুন সাইকেল', en: 'New cycles on display at the entrance' },
-  },
-  showroom: {
-    src: '/images/shop/showroom-row.webp', smallSrc: '/images/shop/showroom-row-400.webp', smallWidth: 400, width: 800, height: 600,
-    alt: { bn: 'দোকানের ভিতরে সারি সারি সাইকেল ও সবুজ দেয়াল', en: 'Rows of bicycles inside the shop against a green wall' },
-    caption: { bn: 'ভিতরে সারি সারি সাইকেল', en: 'Rows of cycles inside the showroom' },
-  },
-  kidsCity: {
-    src: '/images/shop/kids-and-city.webp', smallSrc: '/images/shop/kids-and-city-400.webp', smallWidth: 400, width: 800, height: 600,
-    alt: { bn: 'দোকানের দেয়ালের পাশে বাচ্চাদের ও সিটির সাইকেল', en: 'Children’s and city cycles along the shop wall' },
-    caption: { bn: 'বাচ্চাদের ও দৈনন্দিন ব্যবহারের সাইকেল', en: 'Kids’ and everyday city cycles' },
-  },
-  stryder: {
-    src: '/images/shop/stryder-corner.webp', smallSrc: '/images/shop/stryder-corner-400.webp', smallWidth: 400, width: 800, height: 600,
-    alt: { bn: 'দোকানে রাখা স্ট্রাইডার ব্র্যান্ডের বাচ্চাদের সাইকেল', en: 'A Stryder children’s cycle displayed in the shop' },
-    caption: { bn: 'বাচ্চাদের ব্র্যান্ডেড সাইকেল, দোকানে দেখে নিন', en: 'Branded kids’ cycles, ready to see in person' },
-  },
-  workshop: {
-    src: '/images/shop/workshop.webp', smallSrc: '/images/shop/workshop-400.webp', smallWidth: 400, width: 800, height: 600,
-    alt: { bn: 'সাইকেল মেরামতের ওয়ার্কশপ: যন্ত্রপাতি, কম্প্রেসর ও যন্ত্রাংশের তাক', en: 'The repair workshop with tools, a compressor and shelves of spare parts' },
-    caption: { bn: 'মেরামতের ওয়ার্কশপ', en: 'The repair workshop' },
-  },
-  sign: {
-    src: '/images/shop/hero-sprint-board.webp', smallSrc: '/images/shop/hero-sprint-board-400.webp', smallWidth: 400, width: 800, height: 600,
-    alt: { bn: 'কাঞ্চন সাইকেল স্টোর্সের বাইরের সাইনবোর্ড', en: 'The shop’s signboard facing the road' },
-    caption: { bn: 'রাস্তার ধারে আমাদের সাইনবোর্ড', en: 'Our signboard by the road' },
-  },
-} satisfies Record<string, ShopPhoto>;
-
+/** Verified business details, customer services and contact actions. */
 export const shop = {
   name: { bn: 'কাঞ্চন সাইকেল স্টোর্স', en: 'Kanchan Cycle Stores' },
   tagline: { bn: 'আপনার পথে, আপনার পাশে।', en: 'Your ride. Your neighbourhood.' },
@@ -137,10 +95,12 @@ export const shop = {
       en: 'New cycles, accessories and repairs — talk to the shop in Kolaghat.',
     },
   },
-  /** The single real photograph used in the hero. */
-  heroPhoto: shopPhotos.storefront,
-  /** Ordered gallery shown on the About page. All photographs are the shop’s own. */
-  gallery: [shopPhotos.display, shopPhotos.showroom, shopPhotos.kidsCity, shopPhotos.workshop, shopPhotos.stryder, shopPhotos.sign],
+  /** The owner-uploaded portrait is the only photograph shown on the website. */
+  heroPhoto: {
+    src: '/images/kanchan-store-hero.jpeg', smallSrc: '/images/kanchan-store-hero.jpeg', smallWidth: 1024, width: 1024, height: 1536,
+    alt: { bn: 'কোলাঘাটে কাঞ্চন সাইকেল স্টোর্সের ভিতরে দোকানদার', en: 'The shopkeeper inside Kanchan Cycle Stores in Kolaghat' },
+    caption: { bn: 'কাঞ্চন সাইকেল স্টোর্স, কোলাঘাট', en: 'Kanchan Cycle Stores, Kolaghat' },
+  },
   contact: {
     // Supplied by the business owner in the project brief.
     phone: '+917076884950',

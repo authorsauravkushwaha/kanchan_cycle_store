@@ -7,7 +7,7 @@
  *  2. Call, WhatsApp and directions keep working from the cached offline page.
  *  3. New deployments replace the cache cleanly (no permanently stale catalog).
  *
- * It only stores the app shell, the shop's own photographs and the offline
+ * It only stores the app shell, the owner-uploaded hero image and the offline
  * fallback. No enquiry, shortlist or personal data is ever cached here.
  */
 const VERSION = 'kanchan-v1';
@@ -34,9 +34,7 @@ const PRECACHE = [
   `${BASE}icons/icon-512.png`,
   `${BASE}icons/icon-maskable-512.png`,
   `${BASE}icons/apple-touch-icon.png`,
-  `${BASE}images/shop/storefront-480.webp`,
-  `${BASE}images/shop/showroom-row-400.webp`,
-  `${BASE}images/shop/workshop-400.webp`,
+  `${BASE}images/kanchan-store-hero.jpeg`,
   ...PRECACHE_ASSETS.map(path => `${BASE}${path}`),
 ];
 
@@ -72,8 +70,8 @@ async function trimCache(cacheName, maxEntries) {
 }
 
 /**
- * Cache-first for every same-origin GET: build files, fonts, images and the
- * shop's photographs. Unknown destinations (some browsers report an empty
+ * Cache-first for every same-origin GET: build files, fonts and the hero image.
+ * Unknown destinations (some browsers report an empty
  * destination for module imports) are covered too, instead of slipping through
  * to a failing network request.
  */

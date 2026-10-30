@@ -17,8 +17,7 @@ export function ProductCard({ product }: { product: Product }) {
   const category = categoryFor(product.category);
   const specPreview = [product.specifications.frameSize, product.specifications.wheelSize,
     product.specifications.geared !== null ? product.specifications.geared ? t('catalog.geared') : t('catalog.nongeared') : null].filter(Boolean).join(' · ');
-  return <article className={`product-card ${product.photoUrl ? 'has-photo' : ''}`}>
-    {product.photoUrl && <img className="product-photo" src={product.photoUrl} alt={productName(product)} loading="lazy" decoding="async" width={480} height={360} />}
+  return <article className="product-card">
     <div className="product-card-body">
       <div className="product-card-top"><span className="product-category">{l(category.name)}</span>{product.brand && <span className="product-brand">{product.brand}</span>}</div>
       <h3><Link to={`/cycles/${product.slug}`}>{productName(product)}<ArrowUpRight size={18} aria-hidden="true" /></Link></h3>
@@ -36,8 +35,7 @@ export function ProductCard({ product }: { product: Product }) {
 export function ProductGrid({ products }: { products: Product[] }) { return <div className="product-grid">{products.map(product => <ProductCard key={product.id} product={product} />)}</div>; }
 export function AccessoryCard({ product }: { product: Product }) {
   const { t, price, productName, language } = useLanguage();
-  return <article className={`product-card accessory-card ${product.photoUrl ? 'has-photo' : ''}`}>
-    {product.photoUrl && <img className="product-photo" src={product.photoUrl} alt={productName(product)} loading="lazy" decoding="async" width={480} height={360} />}
+  return <article className="product-card accessory-card">
     <div className="product-card-body">
       <div className="product-card-top"><span className="product-category">{t('nav.accessories')}</span><Tag size={16} aria-hidden="true" /></div>
       <h3><Link to={`/cycles/${product.slug}`}>{productName(product)}<ArrowUpRight size={18} aria-hidden="true" /></Link></h3>

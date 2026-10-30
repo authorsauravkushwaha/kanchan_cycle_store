@@ -38,7 +38,7 @@ test.describe('installed-app behaviour', () => {
       ['/cycles', 'পছন্দের সাইকেল খুঁজুন'],
       ['/recommendation', 'কোন সাইকেলটি আপনার জন্য?'],
       ['/list', 'আমার পছন্দের তালিকা'],
-      ['/', 'আপনার পছন্দের সাইকেল'],
+      ['/', 'আপনার যাত্রা শুরু হোক সঠিক সাইকেলে'],
     ];
     for (const [path, heading] of routes) {
       await page.goto(path);

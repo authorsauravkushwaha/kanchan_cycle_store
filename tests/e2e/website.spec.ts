@@ -17,18 +17,18 @@ const text = async (href: string | null | Promise<string | null>) => new URL((aw
 test('Bengali is the default; English and reload persistence work', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('html')).toHaveAttribute('lang', 'bn');
-  await expect(page.locator('h1')).toContainText('আপনার পছন্দের সাইকেল');
+  await expect(page.locator('h1')).toContainText('আপনার যাত্রা শুরু হোক সঠিক সাইকেলে');
   await page.locator('.site-header').getByRole('button', { name: 'EN', exact: true }).click();
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
-  await expect(page.locator('h1')).toContainText('Your kind of bicycle');
+  await expect(page.locator('h1')).toContainText('Every Journey Begins With the Right Bicycle.');
   await expect(page.locator('.desktop-nav')).toContainText('Repair & service');
   await page.reload();
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
-  await expect(page.locator('h1')).toContainText('Your kind of bicycle');
+  await expect(page.locator('h1')).toContainText('Every Journey Begins With the Right Bicycle.');
 });
 
 test('all public routes, unique titles, footer links and 404 work', async ({ page }) => {
-  const routes = [['/', 'আপনার পছন্দের সাইকেল'], ['/cycles', 'পছন্দের সাইকেল'], ['/accessories', 'সাইকেলের অ্যাক্সেসরিজ'], ['/services', 'সাইকেলের সমস্যার'], ['/recommendation', 'কোন সাইকেলটি'], ['/offers', 'সঠিক পছন্দ'], ['/about', 'পরিচয় হোক'], ['/contact', 'কাছের দোকানেই'], ['/privacy', 'গোপনীয়তার নীতি'], ['/list', 'আমার পছন্দের তালিকা']];
+  const routes = [['/', 'আপনার যাত্রা শুরু হোক সঠিক সাইকেলে'], ['/cycles', 'পছন্দের সাইকেল'], ['/accessories', 'সাইকেলের অ্যাক্সেসরিজ'], ['/services', 'সাইকেলের সমস্যার'], ['/recommendation', 'কোন সাইকেলটি'], ['/offers', 'সঠিক পছন্দ'], ['/about', 'পরিচয় হোক'], ['/contact', 'কাছের দোকানেই'], ['/privacy', 'গোপনীয়তার নীতি'], ['/list', 'আমার পছন্দের তালিকা']];
   const titles = new Set<string>();
   for (const [path, heading] of routes) {
     await page.goto(path);
@@ -42,7 +42,7 @@ test('all public routes, unique titles, footer links and 404 work', async ({ pag
   await expect(page.locator('h1')).toContainText('এই পথটা');
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex, follow');
   await page.getByRole('link', { name: 'হোমপেজে ফিরুন' }).click();
-  await expect(page.locator('h1')).toContainText('আপনার পছন্দের সাইকেল');
+  await expect(page.locator('h1')).toContainText('আপনার যাত্রা শুরু হোক সঠিক সাইকেলে');
   await page.locator('.site-footer').getByRole('link', { name: 'গোপনীয়তার নীতি' }).click();
   await expect(page.locator('h1')).toHaveText('গোপনীয়তার নীতি');
 });
@@ -236,7 +236,7 @@ test('mobile drawer is keyboard accessible and bottom actions stay usable', asyn
 test('English navigation and localized validation work across the site', async ({ page }) => {
   await page.goto('/');
   await page.locator('.site-header').getByRole('button', { name: 'EN', exact: true }).click();
-  const routes = [['/', 'Your kind of bicycle'], ['/cycles', 'Find your kind of bicycle'], ['/accessories', 'Bicycle accessories'], ['/services', 'Tell us what’s playing up'], ['/recommendation', 'What’s your kind of bicycle?'], ['/offers', 'The right choice comes first'], ['/about', 'A little about us'], ['/contact', 'Your local shop is a message away'], ['/privacy', 'Privacy policy']];
+  const routes = [['/', 'Every Journey Begins With the Right Bicycle.'], ['/cycles', 'Find your kind of bicycle'], ['/accessories', 'Bicycle accessories'], ['/services', 'Tell us what’s playing up'], ['/recommendation', 'What’s your kind of bicycle?'], ['/offers', 'The right choice comes first'], ['/about', 'A little about us'], ['/contact', 'Your local shop is a message away'], ['/privacy', 'Privacy policy']];
   for (const [path, heading] of routes) {
     await page.goto(path);
     await expect(page.locator('h1')).toContainText(heading);
@@ -274,7 +274,7 @@ test('primary pages pass automated WCAG A/AA checks on desktop and mobile', asyn
   }
 });
 
-test('only the shop’s own photographs load and pages do not produce application errors', async ({ page }) => {
+test('only the uploaded hero image loads and pages do not produce application errors', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', error => errors.push(error.message));
   for (const path of ['/', '/cycles', '/accessories', '/services', '/recommendation', '/offers', '/about', '/contact', '/privacy']) {
@@ -286,11 +286,10 @@ test('only the shop’s own photographs load and pages do not produce applicatio
     });
     const broken = await page.evaluate(() => Array.from(document.images).filter(img => img.complete && img.naturalWidth === 0).map(img => img.src));
     expect(broken, path).toEqual([]);
-    // No stock photography: every image on every page comes from /images/shop/.
-    const foreign = await page.evaluate(() => Array.from(document.images)
-      .map(img => new URL(img.currentSrc || img.src, location.origin).pathname)
-      .filter(src => !src.includes('/images/shop/')));
-    expect(foreign, path).toEqual([]);
+    // The supplied portrait is the only photograph, and it appears only in the home hero.
+    const photographs = await page.evaluate(() => Array.from(document.images)
+      .map(img => new URL(img.currentSrc || img.src, location.origin).pathname));
+    expect(photographs, path).toEqual(path === '/' ? ['/images/kanchan-store-hero.jpeg'] : []);
   }
   expect(errors).toEqual([]);
 });

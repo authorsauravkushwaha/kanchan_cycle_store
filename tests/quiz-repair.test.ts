@@ -44,3 +44,16 @@ describe('repair enquiry validation', () => {
     expect(localToday(new Date(2026, 9, 29, 0, 15))).toBe('2026-10-29');
   });
 });
+describe('untrusted repair form values', () => {
+  const valid = { ...emptyRepair, name: 'Test User', phone: '7076884950', bikeType: 'city', service: 'general', date: '2026-10-30', time: '10:30' };
+  it('rejects forged select values and oversized notes', () => {
+    const errors = validateRepair({ ...valid, bikeType: '<script>', service: '__proto__', source: 'unknown', details: 'x'.repeat(1001) }, '2026-10-30');
+    expect(errors).toMatchObject({ bikeType: 'form.errorBike', service: 'form.errorService', source: 'form.errorSource', details: 'form.errorDetails' });
+  });
+  it('rejects unexpected runtime types without crashing', () => {
+    expect(validateRepair({ ...valid, details: null, name: 42 } as unknown as typeof valid, '2026-10-30')).toMatchObject({ name: 'form.errorName', details: 'form.errorDetails' });
+  });
+  it('rejects oversized phone numbers and control characters', () => {
+    expect(validateRepair({ ...valid, phone: '1'.repeat(23), details: 'hi\u0000there' }, '2026-10-30')).toMatchObject({ phone: 'form.errorPhone', details: 'form.errorDetails' });
+  });
+});

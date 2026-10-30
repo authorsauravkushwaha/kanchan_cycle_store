@@ -16,23 +16,7 @@
     <meta property="og:locale" content="bn_IN" />
     <meta property="og:locale:alternate" content="en_IN" />
     <link rel="icon" type="image/svg+xml" href="%BASE_URL%favicon.svg" />
-    <script>
-      // Restore a deep link after a GitHub Pages 404 redirect, before React boots.
-      (function () {
-        try {
-          var saved = sessionStorage.getItem('kanchan-route');
-          if (!saved) return;
-          sessionStorage.removeItem('kanchan-route');
-          var route = JSON.parse(saved);
-          var base = '%BASE_URL%';
-          if (typeof route.path !== 'string' || !/^\/(?!\/)/.test(route.path) || route.path.indexOf('\\') !== -1) return;
-          var search = typeof route.search === 'string' ? route.search : '';
-          var hash = typeof route.hash === 'string' ? route.hash : '';
-          var next = new URL(base + route.path.slice(1) + search + hash, location.origin);
-          if (next.origin === location.origin && next.pathname.indexOf(base) === 0) history.replaceState(null, '', next.pathname + next.search + next.hash);
-        } catch (e) { /* The site also works when browser storage is unavailable. */ }
-      })();
-    </script>
+    <script src="%BASE_URL%route-restore.js" defer></script>
     <title>কাঞ্চন সাইকেল স্টোর্স | কোলাঘাটের সাইকেল, অ্যাক্সেসরিজ ও মেরামত</title>
   </head>
   <body>

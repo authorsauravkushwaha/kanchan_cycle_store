@@ -37,14 +37,12 @@ if (canIndex && websiteUrl) {
 }
 // A host rewrite takes precedence on Vercel/Netlify. GitHub Pages uses this
 // same-origin redirect to preserve deep links and refreshes under its base path.
-const redirect = `<!doctype html><html lang="bn"><head><meta charset="utf-8"><meta name="robots" content="noindex"><title>কাঞ্চন সাইকেল স্টোর্স</title><script>
-(function(){var base=${JSON.stringify(basePath)};var path=window.location.pathname;var route=path.indexOf(base)===0?path.slice(base.length):path.replace(/^\\//,'');try{sessionStorage.setItem('kanchan-route',JSON.stringify({path:'/'+route,search:location.search,hash:location.hash}));}catch(e){}location.replace(location.origin+base);})();
-</script></head><body><p>পেজটি খোলা হচ্ছে… / Opening the page…</p><a href="${basePath}">কাঞ্চন সাইকেল স্টোর্স / Kanchan Cycle Stores</a></body></html>`;
+const redirect = `<!doctype html><html lang="bn"><head><meta charset="utf-8"><meta name="robots" content="noindex"><title>কাঞ্চন সাইকেল স্টোর্স</title><script src="${basePath}pages-redirect.js" defer></script></head><body><p>পেজটি খোলা হচ্ছে… / Opening the page…</p><a href="${basePath}">কাঞ্চন সাইকেল স্টোর্স / Kanchan Cycle Stores</a></body></html>`;
 await writeFile(resolve(dist, '404.html'), redirect);
 // Also include a root fallback for static hosts that need one before build.
 await writeFile(resolve(dist, '_redirects'), '/* /index.html 200\n');
 let index = await readFile(resolve(dist, 'index.html'), 'utf8');
-if (!index.includes('kanchan-route')) throw new Error('Missing GitHub Pages route restoration script in index.html.');
+if (!index.includes('route-restore.js')) throw new Error('Missing GitHub Pages route restoration script in index.html.');
 // Discover the home LCP photograph (the shop’s own photo) and critical Bengali fonts before the JS bundle.
 const assets = await readdir(resolve(dist, 'assets'));
 const preloads: string[] = [];
@@ -52,7 +50,8 @@ for (const pattern of [/hind-siliguri-bengali-400-normal-.*\.woff2$/, /hind-sili
   const file = assets.find(name => pattern.test(name));
   if (file) preloads.push(`<link rel="preload" href="${basePath}assets/${file}" as="font" type="font/woff2" crossorigin>`);
 }
-const homeImagePreload = `<script>(function(){var b=${JSON.stringify(basePath)};var p=location.pathname;if(p===b||p===b+'index.html'){var l=document.createElement('link');l.rel='preload';l.as='image';l.href=b+'images/shop/storefront-480.webp';l.imageSrcset=b+'images/shop/storefront-480.webp 480w, '+b+'images/shop/storefront.webp 960w';l.imageSizes='(max-width: 760px) 92vw, 42vw';l.fetchPriority='high';document.head.appendChild(l);}})();</script>`;
+// Static preload requires no inline script; browsers may ignore it on non-home routes.
+const homeImagePreload = `<link rel="preload" href="${basePath}images/shop/storefront-480.webp" as="image" imagesrcset="${basePath}images/shop/storefront-480.webp 480w, ${basePath}images/shop/storefront.webp 960w" imagesizes="(max-width: 760px) 92vw, 42vw">`;
 index = index.replace('</head>', `${preloads.join('\n')}\n${homeImagePreload}\n</head>`);
 await writeFile(resolve(dist, 'index.html'), index);
 console.log(`Routes: ${routes.length}; base path: ${basePath}; GitHub Pages refresh fallback and critical preloads generated.`);

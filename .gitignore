@@ -14,3 +14,17 @@ coverage/
 image-search/
 *.log
 .DS_Store
+# Local credentials, key material and private exports
+*.pem
+*.key
+*.p12
+*.pfx
+*.sqlite
+*.sqlite3
+*.db
+*.bak
+*.dump
+backups/
+private/
+.vercel/
+.npmrc

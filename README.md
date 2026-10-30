@@ -155,3 +155,7 @@ tests/                      Isolated fixtures, unit/component/browser tests
 ## Quality checks
 
 See [TESTING.md](TESTING.md) for the executed checks and remaining real-device/owner checks. Automated accessibility tests are not a substitute for a full assistive-technology audit. No Lighthouse score or public deployment is claimed without an actual measurement/deployment.
+
+## Security deployment
+
+See [SECURITY_REPORT.md](SECURITY_REPORT.md) for the 100-control audit, hosting limitations, required dashboard settings and recovery runbook. Run `npm run security:check` after `npm run build`; production security headers in `vercel.json` **do not apply to GitHub Pages**.

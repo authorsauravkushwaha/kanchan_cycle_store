@@ -131,6 +131,31 @@ For an accessory, use `kind: 'accessory'` and `category: 'accessories'`. Its det
 - [ ] Keep hours identical on the website, Google Maps and WhatsApp. When you are
       ready, ask for `hours.confirmed: true`.
 
+### Account and code security (one-time setup)
+
+These are not content settings and cannot be done from the repository. Each is a
+switch in GitHub or your hosting dashboard.
+
+- [ ] Turn on **two-factor authentication** for GitHub, the hosting account, the
+      domain registrar and the DNS provider. This is the single most important
+      item on this page.
+- [ ] In GitHub → Settings → Code security, enable **Dependabot alerts**,
+      **Secret scanning** and **Push protection**. The scheduled update workflows
+      are already in the repository; these switches are not.
+- [ ] After the first run on `main`, open **Security → Code scanning** and read the
+      CodeQL results. Fix or dismiss each one with a sentence explaining why.
+- [ ] Review Dependabot pull requests weekly. Read the diff; do not auto-merge a
+      major version bump.
+- [ ] Protect the `main` branch: require a pull request, require the
+      `Security checks` and `CodeQL` checks to pass, and block force pushes.
+- [ ] After deploying, run **Actions → Live header verification** with your real
+      URL. A pass means the security headers are actually being sent — repository
+      settings alone do not prove that.
+- [ ] Do not enable HSTS (`Strict-Transport-Security`) until the site answers on
+      HTTPS for every address you use. See `docs/SECURITY-NOTES.md`.
+- [ ] Keep a private copy of the Supabase `products` table export, outside this
+      repository and outside `public/`.
+
 ### Do not
 
 - [ ] Do not use `/owner` on a shared or borrowed phone — it has no password and

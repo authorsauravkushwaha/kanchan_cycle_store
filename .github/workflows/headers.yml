@@ -1,0 +1,51 @@
+name: Live header verification
+
+# Deployment headers cannot be proven from the repository: GitHub Pages ignores
+# both vercel.json and public/_headers, so `npm run security:check` can pass while
+# production sends none of the policy. This workflow asks the live site.
+#
+# Deliberately manual (or on a weekly schedule once the production host is
+# header-capable): against GitHub Pages it will report every header as missing,
+# which is true but not a new regression. Run it after each real deployment.
+
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: Deployed URL to check (defaults to the SITE_URL repository variable)
+        required: false
+        type: string
+      require_hsts:
+        description: Fail if Strict-Transport-Security is absent (only after HTTPS is confirmed everywhere)
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Verify production headers
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - name: Check live headers
+        env:
+          TARGET: ${{ inputs.url || vars.SITE_URL }}
+          REQUIRE_HSTS: ${{ inputs.require_hsts }}
+        run: |
+          if [ -z "$TARGET" ]; then
+            echo "::error::No URL given. Pass the url input or set the SITE_URL repository variable."
+            exit 2
+          fi
+          if [ "$REQUIRE_HSTS" = "true" ]; then
+            node scripts/verify-headers.mjs "$TARGET" --require-hsts
+          else
+            node scripts/verify-headers.mjs "$TARGET"
+          fi

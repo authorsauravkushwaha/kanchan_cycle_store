@@ -37,6 +37,10 @@
           "value": "same-origin"
         },
         {
+          "key": "Cross-Origin-Resource-Policy",
+          "value": "same-origin"
+        },
+        {
           "key": "Cache-Control",
           "value": "no-cache, must-revalidate"
         }

@@ -2,24 +2,29 @@ name: Security checks
 on:
   pull_request:
   push:
-    branches: [main, arena/178b7af6-kanchan-cycle-store]
+    branches: [main, 'arena/**']
   schedule:
     - cron: '19 4 * * 1'
 permissions:
   contents: read
+# Actions are pinned to commit SHAs, not floating tags: a moved tag is a
+# supply-chain path into the job that runs npm with the repository token.
+# Dependabot (.github/dependabot.yml) keeps these pins current.
 jobs:
   verify:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           persist-credentials: false
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npm audit --audit-level=moderate
+      - name: Audit runtime and build dependencies
+        run: npm audit --audit-level=moderate
       - run: npm run check
       - name: Static security checks
         run: npm run security:check

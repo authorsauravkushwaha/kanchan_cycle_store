@@ -1,0 +1,56 @@
+# Automated dependency and supply-chain updates.
+#
+# Why this file exists: `npm audit` only tells us about CVEs that are already
+# published. Dependabot is what keeps the list from growing, and it is also the
+# only thing that maintains the commit-SHA pins on the actions used in
+# .github/workflows/*.yml (a SHA pin without an updater silently rots).
+#
+# Dependabot security *alerts* and secret scanning are repository settings, not
+# files. See docs/SECURITY-NOTES.md for the owner checklist.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '04:30'
+      timezone: Asia/Kolkata
+    open-pull-requests-limit: 5
+    versioning-strategy: increase
+    commit-message:
+      prefix: chore(deps)
+    groups:
+      # Runtime React stack moves together; separate PRs are noise here.
+      react:
+        patterns:
+          - react
+          - react-dom
+          - react-router*
+          - '@types/react*'
+      # Fonts and icons are content, not code: one PR for all of them.
+      assets:
+        patterns:
+          - '@fontsource*'
+          - lucide-react
+      # Everything else that is only used while building/testing.
+      dev-tooling:
+        dependency-type: development
+        update-types:
+          - minor
+          - patch
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '04:30'
+      timezone: Asia/Kolkata
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: chore(ci)
+    groups:
+      actions:
+        patterns:
+          - '*'

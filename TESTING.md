@@ -7,16 +7,16 @@ This is **not** a public deployment or a field-data Core Web Vitals report.
 
 | Check | Result |
 |---|---|
-| `npm test` | **40 passed** across 7 files (config honesty, catalogue filtering, quiz/repair messages, inventory mapping, shortlist storage/message, stock-desk CSV/JSON, product cards) |
+| `npm test` | **46 passed** across 8 files (config honesty, catalogue filtering, quiz/repair messages, inventory mapping, shortlist storage/message, stock-desk CSV/JSON, product cards, reversible scroll math and motion preference) |
 | `npm run build` | Passed: TypeScript, production build, catalogue validation, PWA artefact checks, SEO files |
-| `npm run test:e2e` | **12 passed**: bilingual navigation, routes, catalogue, shortlist flow, repair, quiz, drawer, install sheet, responsive overflow, axe, image policy |
+| `npm run test:e2e` | **18 passed**: bilingual navigation, routes, catalogue, shortlist flow, repair, quiz, drawer, install sheet, responsive overflow, axe, image policy, reversible scroll, bicycle rotation, pause/persistence, reduced motion, lazy-route enhancement |
 | `npm run test:pwa` | **2 passed** against `vite preview`: manifest, service-worker control, every route opened offline, offline fallback page |
 | `npm run security:check` | Passed after build: CSP (including `manifest-src`/`worker-src`), no inline scripts, PWA files, secret patterns |
 | Offline route sweep | `/`, `/cycles`, `/list`, `/services`, `/recommendation` and the 404 all render from cache with the offline banner; call and WhatsApp links still work |
 | Axe WCAG 2 A/AA + 2.1 AA | 0 violations on Home, Cycles, My list, Services, Recommendation and Contact at 1440 px and 390 px; an ad-hoc run on `/owner` and the open install sheet also returned 0 |
 | Responsive overflow sweep | No horizontal overflow at 320, 360, 390, 768, 1024 and 1440 px across `/`, `/cycles`, `/list`, `/services`, `/recommendation`, `/contact`, `/about` |
-| Bundle size (gzip) | Initial JS **125.8 kB**, CSS **19.5 kB**; `/owner` is a separate 6.9 kB chunk |
-| Service worker precache | 18 hashed JS/CSS files + shell, icons and shop photographs |
+| Bundle size (gzip) | Initial JS **128.3 kB**, CSS **23.4 kB**; lazy bicycle scene **3.0 kB** JS; `/owner` is a separate 7.0 kB chunk |
+| Service worker precache | 20 hashed JS/CSS files + shell, icons and shop portrait |
 
 ### What the PWA work fixed
 
@@ -41,8 +41,8 @@ This is **not** a public deployment or a field-data Core Web Vitals report.
 
 | Check | Result |
 |---|---|
-| `npm run check` | Passed: TypeScript, 40 unit/component tests, production build, catalog validation, PWA and SEO generation |
-| `npm run test:e2e` | Passed: 12 Playwright browser tests |
+| `npm run check` | Passed: TypeScript, 46 unit/component tests, production build, catalog validation, PWA and SEO generation |
+| `npm run test:e2e` | Passed: 18 Playwright browser tests |
 | `npm run test:pwa` | Passed: 2 production service-worker/offline tests |
 | `npm audit --audit-level=moderate` | 0 vulnerabilities |
 | Axe WCAG 2 A/AA + 2.1 AA, primary pages at 1440px and 390px | 0 violations on Home, Cycles, My list, Services, Recommendation and Contact |
@@ -63,6 +63,9 @@ This is **not** a public deployment or a field-data Core Web Vitals report.
 - Mobile drawer open/close, Escape key, focus return and persistent WhatsApp/Call/Directions bar.
 - Only the shop's own photographs load (any image outside `/images/shop/` fails the test), they decode successfully and no application JavaScript errors occur on the public routes.
 - Click-to-load map uses the supplied coordinates; no map iframe is created before the visitor chooses it.
+- Scroll-linked bicycle rotation returns to the same pose on scroll-up; reading progress resets to zero at the top.
+- Bicycle view rotation/reset, explicit pause with reload persistence, and OS-level reduced motion keep content visible and disable decorative transforms.
+- Lazy-loaded routes still receive reveal/tilt enhancement; mobile visitors keep native scrolling and a reachable pause control.
 
 Fictional catalog records used by browser tests are injected only into the test browser. They are not part of `src/config/shop.ts` or the public build.
 

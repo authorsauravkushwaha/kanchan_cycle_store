@@ -1,45 +1,39 @@
-import { ArrowRight, Bike, Check, MapPin, MessageCircle, Wrench } from 'lucide-react';
+import { lazy, Suspense } from 'react';
+import { ArrowDown, ArrowRight, Bike, Check, MapPin, MessageCircle, Wrench } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { asset, shop } from '../config/shop';
+import { shop } from '../config/shop';
 import { useLanguage } from '../i18n';
 import { CallButton, DirectionsButton, TextLink, WhatsAppButton } from './UI';
+const CycleScene = lazy(() => import('./CycleScene').then(module => ({ default: module.CycleScene })));
 
 export function HeroSection() {
   const { t, l } = useLanguage();
   const benefits = [{ icon: Bike }, { icon: MapPin }, { icon: Wrench }];
   return <>
-    <section className="hero-immersive" aria-labelledby="hero-title">
-      <img className="hero-background" src={asset(shop.heroPhoto.src)} alt={l(shop.heroPhoto.alt)} width={shop.heroPhoto.width} height={shop.heroPhoto.height} fetchPriority="high" decoding="async" />
-      <div className="hero-shade" aria-hidden="true" />
-      <div className="container hero-stage">
-        <div className="hero-content hero-glass-panel" data-reveal>
-          <p className="eyebrow hero-eyebrow"><span />{t('hero.eyebrow')}</p>
+    <section className="hero-neu" aria-labelledby="hero-title" data-scroll-scene="hero">
+      <div className="hero-ambient-grid" aria-hidden="true" />
+      <div className="container hero-neu-grid">
+        <div className="hero-copy">
+          <p className="eyebrow hero-eyebrow"><span className="location-dot" />{t('hero.eyebrow')}</p>
           <h1 id="hero-title">{t('hero.title1')}</h1>
           <p className="hero-description">{t('hero.description')}</p>
-          <div className="hero-actions"><WhatsAppButton placement="hero" /><DirectionsButton /></div>
+          <div className="hero-actions"><Link to="/cycles" className="btn btn-primary hero-explore">{t('action.viewCycles')}<ArrowRight size={18} aria-hidden="true" /></Link><DirectionsButton /></div>
           <p className="hero-note"><span><Check size={13} strokeWidth={2.5} aria-hidden="true" /></span>{t('hero.note')}</p>
+          <a href="#about-store" className="hero-scroll-cue"><span className="scroll-cue-icon"><ArrowDown size={16} aria-hidden="true" /></span>{l({ bn: 'স্ক্রল করুন। নতুন পথ দেখুন।', en: 'A little scroll. A new perspective.' })}</a>
         </div>
-        <div className="hero-floating-card" data-reveal aria-label={l({ bn: 'দোকানের পরিষেবা', en: 'At the shop' })}>
-          <div className="hero-card-heading"><span className="hero-live-dot" /><span>{l({ bn: 'আপনার কাছের সাইকেল স্টোর', en: 'YOUR LOCAL CYCLE STORE' })}</span></div>
-          <ul>{benefits.map(({ icon: Icon }, index) => <li key={index}><Icon size={17} aria-hidden="true" /><span>{l([
-            { bn: 'সাইকেল বিক্রি', en: 'Bicycle sales' },
-            { bn: 'অ্যাক্সেসরিজ', en: 'Accessories' },
-            { bn: 'মেরামত ও সার্ভিসিং', en: 'Repair & servicing' },
-          ][index])}</span></li>)}</ul>
-          <Link to="/about" className="hero-card-link">{l({ bn: 'দোকান সম্পর্কে', en: 'About the store' })}<ArrowRight size={15} aria-hidden="true" /></Link>
-        </div>
-        <span className="hero-scroll-cue" aria-hidden="true"><span />{l({ bn: 'নিচে দেখুন', en: 'SCROLL TO EXPLORE' })}</span>
+        <Suspense fallback={<div className="cycle-scene" aria-hidden="true"><div className="scene-orbit" /><div className="scene-platform" /></div>}><CycleScene /></Suspense>
       </div>
+      <div className="container hero-bottom-line"><span>{l({ bn: 'ছোট্ট দোকান। অনেকটা পথ।', en: 'A LOCAL SHOP. A WORLD OF POSSIBILITIES.' })}</span><span aria-hidden="true">{l({ bn: 'কোলাঘাট · পশ্চিমবঙ্গ', en: 'KOLAGHAT · WEST BENGAL' })}<span className="tiny-cross">+</span></span></div>
     </section>
-    <section className="benefits benefits-glass" aria-label={l({ bn: 'দোকানে আপনার জন্য', en: 'Here for your next ride' })}><div className="container benefits-grid">{benefits.map(({ icon: Icon }, index) => <div className="benefit" key={index}><span className="benefit-icon"><Icon size={23} strokeWidth={1.5} aria-hidden="true" /></span><div><h2>{l([
+    <section className="benefits benefits-neu" aria-label={l({ bn: 'দোকানে আপনার জন্য', en: 'Here for your next ride' })}><div className="container benefits-grid">{benefits.map(({ icon: Icon }, index) => <div className="benefit" key={index} data-reveal><span className="benefit-icon"><Icon size={25} strokeWidth={1.5} aria-hidden="true" /></span><div><h2>{l([
       { bn: 'পছন্দমতো সাইকেল', en: 'A ride that feels like you' },
       { bn: 'অ্যাক্সেসরিজের খোঁজ', en: 'Accessories for the ride' },
-      { bn: 'মেরামত নিয়ে কথা বলুন', en: 'Ask about a repair' },
+      { bn: 'মেরামত নিয়ে কথা বলুন', en: 'Care for every kilometre' },
     ][index])}</h2><p>{l([
       { bn: 'আপনার প্রয়োজনের কথা জানান', en: 'Tell us what you are looking for' },
       { bn: 'দোকানে উপলব্ধতা জেনে নিন', en: 'Ask what is available in store' },
       { bn: 'পরিষেবা সম্পর্কে জেনে নিন', en: 'Ask what help is available' },
-    ][index])}</p></div></div>)}</div></section>
+    ][index])}</p></div><span className="benefit-index" aria-hidden="true">0{index + 1}</span></div>)}</div></section>
   </>;
 }
 

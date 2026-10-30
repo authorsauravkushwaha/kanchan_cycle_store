@@ -21,7 +21,7 @@ All routine settings live in **`src/config/shop.ts`**. Do not publish a detail m
 | Bicycle catalog | Empty; useful enquiry state instead of fake products | Add verified names, brands, specifications, prices and stock. Product cards stay text-only — the site has no product images. |
 | Accessories | Enquiry topics only; no claimed inventory | Add real accessory records or confirm the enquiry topics are useful. |
 | Repair services | Six possible topics, all marked as requiring availability confirmation | Set `confirmed: true` only for services actually offered. Add a price only when verified. |
-| Shop photographs | Six of the owner's own photographs are used (hero + About gallery), each labelled দোকানের ছবি | Confirm you are happy with the selection, captions and crops. |
+| Shop photograph | Your own portrait is the only photograph on the site: it is the large first-screen image in the homepage hero, labelled দোকানের মালিক / The shopkeeper | Confirm you are happy with the crop and caption, or send a replacement portrait (1024 × 1536, face in the upper third). |
 | Offers | No discounts published; useful buying tips shown | Add only genuine, owner-approved offers with `verified: true`. |
 | Reviews | No names, ratings or testimonials fabricated | Supply authentic reviews with permission and a genuine source URL, or a real review link. |
 | Production domain | `websiteUrl: null`; preview noindex | Set the actual HTTPS URL after deployment. |
@@ -65,7 +65,7 @@ For an accessory, use `kind: 'accessory'` and `category: 'accessories'`. Its det
 ## Before announcing the website
 
 1. Confirm hours, service availability and all product information with the shop.
-2. Review the shop photographs in `public/images/shop/`: the hero uses `storefront`, and the About gallery uses six of your own pictures. Replace any picture you would rather not show, and check each caption is accurate.
+2. Review the portrait in `public/images/kanchan-store-hero.jpeg` (also the social preview image). It now leads the homepage hero, so check the crop on a desktop and a phone; replace the file to use a different photo and keep the 2:3 crop.
 3. Check the Bengali and English versions on a small Android phone.
 4. Test WhatsApp, phone and Google Maps using the shop’s actual devices. **Do not send test messages to customers.**
 5. Confirm that no fictional products, offers, reviews, social links or business claims appear.

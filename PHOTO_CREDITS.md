@@ -8,7 +8,7 @@ stock photographs, no AI-generated images and no product images.
 
 | Asset | Where it appears | What it shows (caption) |
 |---|---|---|
-| `public/images/kanchan-store-hero.jpeg` (1024 × 1536) | Homepage hero, right-hand portrait on the first screen; also the Open Graph / social preview image | The shopkeeper inside Kanchan Cycle Stores in Kolaghat |
+| `public/images/kanchan-store-hero.jpeg` (1024 × 1536) | Homepage hero — full-bleed background behind the whole first screen (the caption floats over it); also the Open Graph / social preview image | The shopkeeper inside Kanchan Cycle Stores in Kolaghat |
 
 The portrait is loaded eagerly because it is now the first thing a visitor sees. It is the only
 `<img>` on the homepage, so `tests/e2e/website.spec.ts` still expects exactly one photograph
@@ -26,8 +26,9 @@ under the homepage shop story reuses the same caption as text, not as a second i
 
 ## Replacing or adding a photograph
 
-1. Export a portrait JPEG at 1024 × 1536 (2:3) — the hero frame crops with `object-position: center 22%`, so
-   keep the face in the upper third and leave headroom above the hair.
+1. Export a portrait JPEG at 1024 × 1536 (2:3) — the hero background crops with `object-position: 50% 26%`
+   on desktop and lifts the backdrop above the fold on phones, so keep the face in the upper third and
+   leave headroom above the hair.
 2. Replace `public/images/kanchan-store-hero.jpeg` (keep the file name; the config, Open Graph tags and
    tests all point at it).
 3. Update `shop.heroPhoto` in `src/config/shop.ts` if the dimensions or the bilingual `alt` and

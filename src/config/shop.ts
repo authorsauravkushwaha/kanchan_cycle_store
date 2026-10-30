@@ -5,7 +5,7 @@
  * Only the values in this file need editing for routine business updates.
  *
  * Design note: the owner-uploaded portrait is the sole photograph rendered on
- * the website; it is used only as the immersive homepage hero image.
+ * the website; it is used only as the full-bleed background of the homepage hero.
  */
 export type Language = 'bn' | 'en';
 export type Localized = { bn: string; en: string };
@@ -95,7 +95,7 @@ export const shop = {
       en: 'New cycles, accessories and repairs — talk to the shop in Kolaghat.',
     },
   },
-  /** The owner-uploaded portrait is the only photograph shown on the website. */
+  /** The owner-uploaded portrait fills the homepage hero background; it is the only photograph on the site. */
   heroPhoto: {
     src: '/images/kanchan-store-hero.jpeg', smallSrc: '/images/kanchan-store-hero.jpeg', smallWidth: 1024, width: 1024, height: 1536,
     alt: { bn: 'কোলাঘাটে কাঞ্চন সাইকেল স্টোর্সের ভিতরে দোকানদার', en: 'The shopkeeper inside Kanchan Cycle Stores in Kolaghat' },

@@ -68,27 +68,64 @@ html { scroll-padding-top: 108px; }
 .mobile-drawer { background: var(--surface); }
 .drawer-links a { border-color: var(--line); }
 
-/* Hero: a dimensional illustration on a sculpted display plinth. */
-.hero-neu { position: relative; isolation: isolate; overflow: hidden; background: radial-gradient(ellipse at 76% 40%, #f5f7ef 0, transparent 53%), var(--surface); }
-.hero-ambient-grid { position: absolute; inset: 0; z-index: -1; background-image: radial-gradient(#647b591f .8px, transparent .8px); background-size: 24px 24px; mask-image: linear-gradient(90deg, transparent 35%, #000 80%); }
-.hero-neu-grid { display: grid; grid-template-columns: .94fr 1.06fr; gap: 30px; align-items: center; padding-top: 52px; padding-bottom: 42px; min-height: 650px; }
-.hero-copy { position: relative; z-index: 5; padding-bottom: 12px; }
-.hero-eyebrow { width: fit-content; max-width: 100%; padding: 9px 13px; border-radius: 999px; background: var(--surface); box-shadow: inset 3px 3px 7px #cfd8ca, inset -3px -3px 7px #fbfff7; font-size: 9px; letter-spacing: 1.2px; margin-bottom: 25px; }
-.hero-eyebrow > .location-dot:first-child { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 3px #d6e0ce; flex-shrink: 0; opacity: 1; }
-.hero-neu h1 { color: var(--green-dark); font-weight: 750; font-size: clamp(44px, 4.6vw, 66px); line-height: 1.06; letter-spacing: -3px; max-width: 11ch; text-wrap: balance; }
+/* Hero: the shopkeeper's own photograph fills the whole first screen. The copy
+   sits on a deep-green scrim that fades away across his shoulder, so the shop
+   behind him stays visible edge to edge. */
+.hero-neu {
+  position: relative; isolation: isolate; overflow: hidden;
+  display: flex; flex-direction: column; justify-content: space-between;
+  min-height: clamp(560px, 80vh, 780px);
+  background: #071d14; color: #f3f8ec;
+}
+.hero-backdrop { position: absolute; inset: 0; z-index: -1; overflow: hidden; background: #071d14; }
+.hero-backdrop-image { width: 100%; height: 100%; object-fit: cover; object-position: 50% 26%; }
+.hero-backdrop-scrim {
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(93deg, #061a11f2 0%, #061a11e6 28%, #061a11bd 45%, #061a1180 60%, #061a1133 80%, #061a1105 100%),
+    linear-gradient(180deg, #061a1133 0%, #061a1100 24%, #061a1100 58%, #061a1199 100%);
+}
+.hero-neu-grid {
+  flex: 1 1 auto; display: grid; grid-template-columns: minmax(0, 1.12fr) minmax(0, .88fr);
+  gap: 40px; align-items: center; padding-top: 64px; padding-bottom: 40px;
+  min-height: clamp(500px, 68vh, 680px);
+}
+.hero-copy { position: relative; z-index: 5; max-width: 640px; padding-bottom: 12px; text-shadow: 0 1px 26px #03130c80; }
+.hero-eyebrow { width: fit-content; max-width: 100%; padding: 9px 14px; border-radius: 999px; border: 1px solid #ffffff2e; background: #ffffff14; color: #eaf3e2; box-shadow: none; backdrop-filter: blur(8px); font-size: 9px; letter-spacing: 1.3px; margin-bottom: 25px; }
+.hero-eyebrow > .location-dot:first-child { width: 6px; height: 6px; border-radius: 50%; background: var(--yellow); box-shadow: 0 0 0 3px #ffffff1f; flex-shrink: 0; opacity: 1; }
+.hero-neu h1 { color: #f8fbf3; font-weight: 750; font-size: clamp(44px, 4.6vw, 66px); line-height: 1.06; letter-spacing: -3px; max-width: 11ch; text-wrap: balance; }
 html[lang='bn'] .hero-neu h1 { font-size: clamp(37px, 3.6vw, 51px); line-height: 1.38; letter-spacing: -.7px; max-width: 15ch; font-weight: 600; }
-.hero-neu .hero-description { max-width: 43ch; font-size: 14px; line-height: 1.9; color: var(--muted); margin-top: 22px; }
+.hero-neu .hero-description { max-width: 43ch; font-size: 14px; line-height: 1.9; color: #d3e1cb; margin-top: 22px; }
 .hero-actions { margin-top: 27px; gap: 14px; }
 .hero-actions .btn { font-size: 12px; padding-inline: 18px; min-height: 50px; }
-.hero-note { color: var(--muted); font-size: 11px; margin-top: 20px; }
-.hero-note > span { background: var(--surface); color: var(--green); box-shadow: inset 2px 2px 4px #c9d4c3, inset -2px -2px 4px #fff; }
-.hero-scroll-cue { position: static; display: inline-flex; align-items: center; gap: 11px; margin-top: 35px; color: var(--muted); font-size: 10px; letter-spacing: .2px; }
-.scroll-cue-icon { display: grid; place-items: center; width: 31px; height: 41px; border: 1px solid #f7faf2; border-radius: 18px; box-shadow: var(--neo-sm); color: var(--green); }
-.hero-scroll-cue:hover { color: var(--green); }
+.hero-actions .hero-ghost { color: #f3f8ec; border-color: #ffffff40; background: #ffffff12; backdrop-filter: blur(8px); }
+.hero-actions .hero-ghost:hover { color: #fff; border-color: #ffffff73; background: #ffffff20; }
+.hero-note { color: #c5d7bb; font-size: 11px; margin-top: 20px; }
+.hero-note > span { background: #ffffff1a; color: var(--yellow); box-shadow: none; }
+.hero-scroll-cue { position: static; display: inline-flex; align-items: center; gap: 11px; margin-top: 35px; color: #b3c8a8; font-size: 10px; letter-spacing: .2px; }
+.scroll-cue-icon { display: grid; place-items: center; width: 31px; height: 41px; border: 1px solid #ffffff2b; border-radius: 18px; background: #ffffff0f; box-shadow: none; color: #f3f8ec; }
+.hero-scroll-cue:hover { color: #fff; }
 .hero-scroll-cue svg { transform: translateY(calc(var(--scene-progress, 0) * 7px)); }
 html[data-scroll-direction='up'] .hero-scroll-cue svg { transform: rotate(180deg) translateY(calc(var(--scene-progress, 0) * 7px)); }
-.hero-bottom-line { display: flex; justify-content: space-between; gap: 20px; padding-block: 19px; border-top: 1px solid #d6dfd1; color: var(--muted); font-size: 8px; font-weight: 650; letter-spacing: 1.6px; }
-.tiny-cross { font-size: 18px; margin-left: 24px; color: var(--green); }
+.hero-caption {
+  position: relative; z-index: 5; justify-self: end; align-self: end;
+  display: flex; flex-direction: column; gap: 7px; width: min(302px, 100%);
+  padding: 22px 24px; border: 1px solid #ffffff29; border-radius: 22px;
+  background: linear-gradient(150deg, #0a2b1dcc, #061a11b8);
+  backdrop-filter: blur(16px) saturate(1.15);
+  box-shadow: 0 24px 54px -34px #000000e6, inset 0 1px 0 #ffffff1a;
+  text-shadow: 0 1px 14px #03130c80; margin-bottom: 12px;
+  /* Keep clear of the floating journey controls pinned to the right edge. */
+  margin-right: clamp(0px, 4vw, 58px);
+}
+.hero-caption-role { font-size: 8.5px; font-weight: 700; letter-spacing: 2.4px; color: var(--yellow); }
+.hero-caption strong { font-size: 17px; line-height: 1.4; font-weight: 650; color: #fbfdf7; }
+html[lang='bn'] .hero-caption strong { font-size: 19px; font-weight: 600; }
+.hero-caption-place { display: inline-flex; align-items: center; gap: 6px; font-size: 10.5px; color: #c3d5b9; }
+.hero-caption-link { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 9px; padding-top: 13px; border-top: 1px solid #ffffff1f; font-size: 9.5px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; color: #eef5e7; min-height: 24px; }
+.hero-caption-link:hover { color: var(--yellow); }
+.hero-bottom-line { display: flex; justify-content: space-between; gap: 20px; padding-block: 19px; border-top: 1px solid #ffffff26; color: #b9cbaf; font-size: 8px; font-weight: 650; letter-spacing: 1.6px; }
+.tiny-cross { font-size: 18px; margin-left: 24px; color: var(--yellow); }
 .cycle-scene { position: relative; height: 550px; min-width: 0; perspective: 1100px; transform-style: preserve-3d; --tilt-x: 0deg; --tilt-y: 0deg; }
 .scene-orbit { position: absolute; width: 420px; height: 420px; max-width: 85%; aspect-ratio: 1; border-radius: 50%; left: 10%; top: 43px; border: 1px solid #d9e1d3; box-shadow: inset 7px 7px 19px #d3dbcd, inset -7px -7px 19px #fbfff6; transform: rotateX(calc(12deg + var(--scene-lean, 0deg))) rotateY(-12deg); }
 .orbit-two { width: 340px; height: 340px; max-width: 70%; top: 83px; left: 17%; border: 1px dashed #cad5c3; box-shadow: none; opacity: .7; }
@@ -121,23 +158,6 @@ html[data-scroll-direction='up'] .hero-scroll-cue svg { transform: rotate(180deg
 .scene-reset { width: 34px; padding: 7px; }
 .scene-rotate:hover, .scene-reset:hover { box-shadow: var(--neo-inset); }
 .scene-disclaimer { position: absolute; right: 0; bottom: -8px; font-size: 8px; color: var(--muted); }
-
-/* The owner's own portrait leads the hero; the photograph is the first thing
-   a visitor sees, framed like a printed shop portrait on the page. */
-.hero-portrait { position: relative; margin: 0; min-width: 0; align-self: stretch; display: flex; align-items: center; }
-.hero-portrait-frame { position: relative; width: 100%; height: clamp(430px, 45vw, 566px); border-radius: 32px; overflow: hidden; background: var(--soft); box-shadow: 15px 19px 42px -24px #5d70585c, -10px -10px 28px #ffffffb3, inset 0 0 0 1px #ffffff70; }
-.hero-portrait-frame img { width: 100%; height: 100%; object-fit: cover; object-position: center 22%; }
-.hero-portrait-veil { position: absolute; inset: 0; background: linear-gradient(180deg, #0b2a1f1a 0%, #0b2a1f00 26%, #0b2a1f00 46%, #08231ac4 100%); }
-.hero-portrait-caption { position: absolute; left: 26px; right: 26px; bottom: 24px; display: flex; flex-direction: column; gap: 5px; }
-.hero-portrait-role { font-size: 8px; font-weight: 650; letter-spacing: 2.2px; color: #f0d386; }
-.hero-portrait-caption strong { font-size: 17px; line-height: 1.35; font-weight: 650; color: #fbfdf7; text-shadow: 0 1px 12px #06241a80; }
-html[lang='bn'] .hero-portrait-caption strong { font-size: 19px; font-weight: 600; }
-.hero-portrait-place { display: inline-flex; align-items: center; gap: 6px; font-size: 10px; color: #dbe5d5; }
-.hero-portrait-badge { position: absolute; top: 22px; right: 22px; display: inline-flex; align-items: center; gap: 11px; padding: 12px 16px; border: 1px solid #f9fcf5; border-radius: 16px; background: linear-gradient(135deg, #f3f7edf5, #e6ecdfef); box-shadow: 8px 10px 22px #4f645066, -5px -5px 15px #ffffffa6; }
-.hero-portrait-badge-icon { display: grid; place-items: center; width: 35px; height: 35px; border-radius: 50%; color: var(--green-dark); background: var(--yellow); box-shadow: 3px 3px 7px #c7c9a7, -3px -3px 7px #ffffe9; }
-.hero-portrait-badge small { display: block; font-size: 7px; font-weight: 650; letter-spacing: 1.3px; color: var(--muted); }
-.hero-portrait-badge strong { display: block; margin-top: 2px; font-size: 11px; color: var(--green-dark); }
-.hero-portrait-badge:hover { background: var(--surface-light); }
 
 /* The illustrated bicycle keeps its interactive stage below the hero. */
 .ride-showcase { position: relative; overflow: hidden; border-bottom: 1px solid #d8e0d3; background: radial-gradient(ellipse at 71% 48%, #f5f7ef 0, transparent 58%), var(--surface); }
@@ -252,7 +272,8 @@ html[lang='bn'] .hero-portrait-caption strong { font-size: 19px; font-weight: 60
 
 @media (max-width: 1180px) {
   .site-header .desktop-nav a { padding-inline: 8px; }
-  .hero-neu-grid { gap: 15px; }
+  .hero-neu-grid { gap: 26px; }
+  .hero-caption { margin-right: 64px; width: min(286px, 100%); }
   .hero-neu h1 { font-size: 55px; }
   .cycle-scene { height: 510px; }
   .scene-bicycle { top: 82px; }
@@ -263,12 +284,11 @@ html[lang='bn'] .hero-portrait-caption strong { font-size: 19px; font-weight: 60
   .scene-view-label { display: none; }
   .home-about-grid { gap: 45px; }
   .benefit-index { display: none; }
-  .hero-portrait-frame { height: clamp(400px, 42vw, 500px); }
   .ride-showcase-grid { gap: 30px; }
 }
 @media (max-width: 1040px) {
   .header-inner { height: 76px; }
-  .hero-neu-grid { min-height: 610px; }
+  .hero-neu-grid { min-height: clamp(460px, 60vh, 580px); }
   .hero-neu h1 { font-size: 47px; letter-spacing: -2px; }
   html[lang='bn'] .hero-neu h1 { font-size: 37px; }
   .hero-eyebrow { font-size: 8px; letter-spacing: .6px; }
@@ -290,16 +310,23 @@ html[lang='bn'] .hero-portrait-caption strong { font-size: 19px; font-weight: 60
   .benefit p { font-size: 9px; }
   .category-grid { gap: 22px; }
   .journey-controls { right: 10px; bottom: 95px; }
-  .hero-portrait-frame { height: 430px; }
-  .hero-portrait-badge { padding: 10px 12px; }
-  .hero-portrait-badge-icon { width: 31px; height: 31px; }
   .ride-showcase .cycle-scene { height: 455px; }
 }
 @media (max-width: 760px) {
   .section { padding-block: 58px; }
   .header-inner { height: 70px; }
-  .hero-neu-grid { grid-template-columns: 1fr; gap: 0; padding-top: 37px; padding-bottom: 24px; }
+  .hero-neu { min-height: 0; }
+  /* Lift the backdrop above the fold so his face clears the copy below. */
+  .hero-backdrop { inset: -16% 0 0; }
+  .hero-backdrop-image { object-position: 50% 0; }
+  .hero-backdrop-scrim {
+    background:
+      linear-gradient(180deg, #061a1133 0%, #061a1100 16%, #061a1147 32%, #061a11bf 54%, #061a11ee 74%, #061a11fb 100%);
+  }
+  .hero-neu-grid { grid-template-columns: 1fr; gap: 0; align-items: end; padding-top: 168px; padding-bottom: calc(84px + env(safe-area-inset-bottom)); min-height: min(720px, calc(100svh - 96px)); }
+  .hero-bottom-line { display: none; }
   .hero-copy { max-width: 540px; }
+  .hero-caption { display: none; }
   .hero-eyebrow { margin-bottom: 20px; font-size: 8px; }
   .hero-neu h1 { font-size: clamp(43px, 8.4vw, 58px); max-width: 12ch; line-height: 1.07; letter-spacing: -2px; }
   html[lang='bn'] .hero-neu h1 { font-size: clamp(35px, 7.5vw, 45px); max-width: 17ch; line-height: 1.4; }
@@ -332,13 +359,6 @@ html[lang='bn'] .hero-portrait-caption strong { font-size: 19px; font-weight: 60
   .benefit-index { display: block; font-size: 9px; }
   .home-about-grid { grid-template-columns: 1fr; gap: 30px; }
   .about-offer-grid { grid-template-columns: 1fr; gap: 20px; }
-  .hero-portrait { margin-top: 22px; align-self: auto; }
-  .hero-portrait-frame { height: min(112vw, 470px); border-radius: 26px; }
-  .hero-portrait-caption { left: 20px; right: 20px; bottom: 19px; }
-  .hero-portrait-caption strong { font-size: 16px; }
-  html[lang='bn'] .hero-portrait-caption strong { font-size: 17px; }
-  .hero-portrait-badge { top: 14px; right: 14px; padding: 9px 11px; gap: 9px; }
-  .hero-portrait-badge-icon { width: 29px; height: 29px; }
   .ride-showcase-grid { grid-template-columns: 1fr; gap: 12px; }
   .ride-showcase-copy { max-width: 540px; }
   .ride-showcase .cycle-scene { height: 440px; margin-inline: auto; }
@@ -389,13 +409,6 @@ html[lang='bn'] .hero-portrait-caption strong { font-size: 19px; font-weight: 60
   .category-card { gap: 15px; padding: 20px 17px; }
   .category-icon { width: 47px; height: 47px; border-radius: 15px; }
   .category-number { right: 15px; top: 15px; font-size: 9px; }
-  .hero-portrait-frame { height: min(116vw, 430px); }
-  .hero-portrait-caption { left: 16px; right: 16px; bottom: 16px; }
-  .hero-portrait-caption strong { font-size: 15px; }
-  html[lang='bn'] .hero-portrait-caption strong { font-size: 16px; }
-  .hero-portrait-badge { top: 11px; right: 11px; padding: 8px 10px; }
-  .hero-portrait-badge small { font-size: 6px; }
-  .hero-portrait-badge strong { font-size: 10px; }
   .ride-showcase .cycle-scene { height: 385px; }
 }
 @media (max-width: 350px) {
@@ -408,6 +421,39 @@ html[lang='bn'] .hero-portrait-caption strong { font-size: 19px; font-weight: 60
   .scene-float-top { right: -2px; }
   .scene-orbit { width: 225px; height: 225px; }
   .orbit-two { width: 180px; height: 180px; }
+}
+
+/* Short phones (landscape, or small screens in split view) need a tighter hero:
+   the same full-bleed photograph, with secondary cues dropped so the headline
+   and both actions stay reachable. */
+@media (max-width: 760px) and (max-height: 720px) {
+  .hero-neu-grid { padding-top: 76px; padding-bottom: calc(74px + env(safe-area-inset-bottom)); min-height: max(420px, calc(100svh - 150px)); }
+  .hero-eyebrow { display: none; }
+  .hero-neu h1 { font-size: clamp(30px, 8vw, 40px); line-height: 1.1; letter-spacing: -1.5px; }
+  html[lang='bn'] .hero-neu h1 { font-size: clamp(27px, 7.2vw, 35px); line-height: 1.32; }
+  .hero-neu .hero-description { font-size: 12.5px; line-height: 1.75; margin-top: 14px; }
+  .hero-actions { margin-top: 17px; flex-direction: row; flex-wrap: nowrap; gap: 10px; }
+  .hero-actions .btn { width: auto; flex: 1 1 0; min-width: 0; min-height: 46px; font-size: 10px; padding-inline: 10px; gap: 6px; }
+  .hero-actions .btn svg { width: 15px; height: 15px; }
+  .hero-note, .hero-scroll-cue { display: none; }
+}
+
+/* A phone held sideways has almost no height, so the hero sheds its padding and
+   switches to the horizontal scrim: the headline stays on the left, the
+   shopkeeper stays visible on the right, and the actions stay above the bar. */
+@media (max-width: 900px) and (max-height: 520px) {
+  .hero-backdrop { inset: 0; }
+  .hero-backdrop-image { object-position: 50% 30%; }
+  .hero-backdrop-scrim { background: linear-gradient(93deg, #061a11f5 0%, #061a11ea 38%, #061a11bd 58%, #061a1199 76%, #061a1173 100%); }
+  .hero-neu-grid { padding-top: 34px; padding-bottom: calc(92px + env(safe-area-inset-bottom)); min-height: 0; }
+  .hero-copy { max-width: 62%; }
+  .hero-eyebrow { display: none; }
+  .hero-neu h1 { font-size: clamp(26px, 4.6vw, 34px); line-height: 1.14; letter-spacing: -1px; max-width: 16ch; }
+  html[lang='bn'] .hero-neu h1 { font-size: clamp(23px, 4vw, 29px); line-height: 1.36; max-width: 19ch; }
+  .hero-neu .hero-description { font-size: 11.5px; line-height: 1.7; margin-top: 10px; max-width: 46ch; }
+  .hero-actions { margin-top: 14px; gap: 9px; }
+  .hero-actions .btn { width: auto; min-height: 42px; font-size: 10px; padding-inline: 12px; }
+  .hero-note, .hero-scroll-cue { display: none; }
 }
 
 /* Both OS preference and the explicit pause switch stop all decorative motion.

@@ -286,7 +286,7 @@ test('only the uploaded hero image loads and pages do not produce application er
     });
     const broken = await page.evaluate(() => Array.from(document.images).filter(img => img.complete && img.naturalWidth === 0).map(img => img.src));
     expect(broken, path).toEqual([]);
-    // The supplied portrait is the only photograph, shown in the homepage shop story.
+    // The supplied portrait is the only photograph; it fills the homepage hero background.
     const photographs = await page.evaluate(() => Array.from(document.images)
       .map(img => new URL(img.currentSrc || img.src, location.origin).pathname));
     expect(photographs, path).toEqual(path === '/' ? ['/images/kanchan-store-hero.jpeg'] : []);

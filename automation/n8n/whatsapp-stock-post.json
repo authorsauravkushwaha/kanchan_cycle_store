@@ -1,0 +1,78 @@
+{
+  "name": "Kanchan · WhatsApp stock post (manual)",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "c1b2c3d4-0001-4000-8000-000000000001",
+      "name": "When you click Test workflow",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.SUPABASE_URL }}/rest/v1/products",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "select", "value": "slug,name_bn,name_en,price,availability,featured" },
+            { "name": "published", "value": "eq.true" },
+            { "name": "availability", "value": "eq.in-stock" },
+            { "name": "order", "value": "featured.desc,sort_order.asc" },
+            { "name": "limit", "value": "12" }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $env.SUPABASE_SERVICE_KEY }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $env.SUPABASE_SERVICE_KEY }}" },
+            { "name": "Accept", "value": "application/json" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c1b2c3d4-0002-4000-8000-000000000002",
+      "name": "Read in-stock products",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [220, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Produces copy the owner can paste into WhatsApp Business status,\n// a Facebook post or a shop notice. It never sends anything by itself.\nconst products = Array.isArray($input.first().json) ? $input.first().json : [];\nconst bnDigits = s => String(s).replace(/\\d/g, d => '০১২৩৪৫৬৭৮৯'[+d]);\nconst money = n => '₹' + bnDigits(new Intl.NumberFormat('en-IN').format(n));\nconst lines = products.slice(0, 10).map((p, i) => {\n  const price = p.price === null || p.price === undefined ? 'দাম জানতে মেসেজ করুন' : money(p.price);\n  return `${bnDigits(i + 1)}. ${p.name_bn} — ${price}`;\n});\nconst post = [\n  '🚲 কাঞ্চন সাইকেল স্টোর্স, কোলাঘাট',\n  '',\n  'এই সপ্তাহে স্টকে আছে:',\n  ...lines,\n  '',\n  '📍 কোলাঘাট–যাশর রোড',\n  '📞 +91 70768 84950',\n  '',\n  'দাম ও স্টক দোকান থেকে নিশ্চিত করে নিন।',\n  '(তালিকা আজকের — বদলাতে পারে)'\n].join('\\n');\nreturn [{ json: { count: products.length, post } }];"
+      },
+      "id": "c1b2c3d4-0003-4000-8000-000000000003",
+      "name": "Build Bengali status text",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 0]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            { "id": "copy", "name": "copy", "value": "={{ $json.post }}", "type": "string" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c1b2c3d4-0004-4000-8000-000000000004",
+      "name": "Copy this message",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [680, 0]
+    }
+  ],
+  "connections": {
+    "When you click Test workflow": { "main": [[{ "node": "Read in-stock products", "type": "main", "index": 0 }]] },
+    "Read in-stock products": { "main": [[{ "node": "Build Bengali status text", "type": "main", "index": 0 }]] },
+    "Build Bengali status text": { "main": [[{ "node": "Copy this message", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" },
+  "pinData": {},
+  "active": false,
+  "versionId": "c1b2c3d4-0005-4000-8000-000000000005",
+  "meta": { "templateCredsSetupCompleted": false },
+  "tags": []
+}

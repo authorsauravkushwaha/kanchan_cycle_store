@@ -1,18 +1,19 @@
 import { ArrowRight, Bike, Check, Info, MessagesSquare, Ruler, ScanEye, Wrench } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { shop, verifiedOffers, verifiedProducts } from '../config/shop';
+import { shop, verifiedOffers } from '../config/shop';
 import { useLanguage } from '../i18n';
 import { SEO } from '../components/SEO';
 import { BuyingGuide, FinalCTA, HeroSection, MaintenanceTips, ReviewSection } from '../components/HeroSection';
 import { CategoryCard } from '../components/CategoryCard';
 import { EmptyState, SectionHeading, ShopStrip, TextLink, WhatsAppButton } from '../components/UI';
 import { ProductGrid } from '../components/ProductCard';
+import { useCatalog } from '../inventory';
 import { MapSection } from '../components/MapSection';
 
 export default function Home() {
   const { t, l } = useLanguage();
-  const products = verifiedProducts('cycle');
-  const featured = products.filter(product => product.featured).slice(0, 4);
+  const { cycles } = useCatalog();
+  const featured = cycles.filter(product => product.featured).slice(0, 4);
   const offers = verifiedOffers();
   const visitIcons = [ScanEye, MessagesSquare, Ruler, Wrench];
   return <>

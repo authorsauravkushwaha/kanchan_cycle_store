@@ -1,0 +1,86 @@
+{
+  "name": "Kanchan · Weekly catalogue health",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "weeksInterval": 1,
+              "triggerAtDayOfWeek": 1,
+              "triggerAtHour": 10,
+              "triggerAtMinute": 0
+            }
+          ]
+        }
+      },
+      "id": "b1b2c3d4-0001-4000-8000-000000000001",
+      "name": "Every Monday 10 AM",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.SUPABASE_URL }}/rest/v1/products",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "select", "value": "id,slug,name_bn,name_en,category,price,photo_url,published,updated_at" },
+            { "name": "order", "value": "sort_order.asc,id.asc" }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $env.SUPABASE_SERVICE_KEY }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $env.SUPABASE_SERVICE_KEY }}" },
+            { "name": "Accept", "value": "application/json" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b1b2c3d4-0002-4000-8000-000000000002",
+      "name": "Read catalogue (Supabase)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [220, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Weekly housekeeping. No sales claims, no automatic price changes —\n// only what the owner should check before the weekend rush.\nconst products = Array.isArray($input.first().json) ? $input.first().json : $input.all().map(i => i.json);\nconst DAY = 86400000;\nconst stale = products.filter(p => p.published && p.updated_at && (Date.now() - new Date(p.updated_at).getTime()) > 45 * DAY);\nconst noPhoto = products.filter(p => p.published && !p.photo_url);\nconst noPrice = products.filter(p => p.published && (p.price === null || p.price === undefined));\nconst byCategory = {};\nfor (const p of products.filter(p => p.published)) byCategory[p.category] = (byCategory[p.category] || 0) + 1;\n\nconst report = [\n  `Published products: ${products.filter(p => p.published).length}`,\n  `Drafts: ${products.filter(p => !p.published).length}`,\n  '',\n  `Prices to confirm: ${noPrice.length}`,\n  noPrice.slice(0, 15).map(p => `• ${p.name_bn || p.name_en} (${p.slug})`).join('\\n'),\n  '',\n  `Stock not touched for 45+ days: ${stale.length}`,\n  stale.slice(0, 15).map(p => `• ${p.name_bn || p.name_en} — last update ${new Date(p.updated_at).toISOString().slice(0, 10)}`).join('\\n'),\n  '',\n  `Products without a photo: ${noPhoto.length}`,\n  '',\n  `By category: ${Object.entries(byCategory).map(([k, v]) => `${k} ${v}`).join(' · ')}`,\n  '',\n  'Tip: photos and corrected prices are the two changes that most improve a phone visitor’s confidence.'\n].filter(Boolean).join('\\n');\n\nreturn [{ json: { products: products.length, stale: stale.length, noPhoto: noPhoto.length, report } }];"
+      },
+      "id": "b1b2c3d4-0003-4000-8000-000000000003",
+      "name": "Build weekly report",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 0]
+    },
+    {
+      "parameters": {
+        "fromEmail": "={{ $env.SHOP_ALERT_FROM }}",
+        "toEmail": "={{ $env.SHOP_ALERT_TO }}",
+        "subject": "Kanchan catalogue health — {{ $json.stale }} stale, {{ $json.noPhoto }} without photo",
+        "text": "={{ $json.report }}",
+        "options": {}
+      },
+      "id": "b1b2c3d4-0004-4000-8000-000000000004",
+      "name": "Email the weekly report",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [680, 0]
+    }
+  ],
+  "connections": {
+    "Every Monday 10 AM": { "main": [[{ "node": "Read catalogue (Supabase)", "type": "main", "index": 0 }]] },
+    "Read catalogue (Supabase)": { "main": [[{ "node": "Build weekly report", "type": "main", "index": 0 }]] },
+    "Build weekly report": { "main": [[{ "node": "Email the weekly report", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" },
+  "pinData": {},
+  "active": false,
+  "versionId": "b1b2c3d4-0005-4000-8000-000000000005",
+  "meta": { "templateCredsSetupCompleted": false },
+  "tags": []
+}

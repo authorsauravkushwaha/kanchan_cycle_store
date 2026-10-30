@@ -1,5 +1,5 @@
 import { Bell, Bike, Flashlight, LockKeyhole, ShieldCheck, Wind } from 'lucide-react';
-import { verifiedProducts } from '../config/shop';
+import { useCatalog } from '../inventory';
 import { useLanguage } from '../i18n';
 import { SEO } from '../components/SEO';
 import { EmptyState, PageHero, WhatsAppButton } from '../components/UI';
@@ -8,7 +8,7 @@ import { FinalCTA } from '../components/HeroSection';
 
 export default function Accessories() {
   const { t, l } = useLanguage();
-  const products = verifiedProducts('accessory');
+  const { accessories: products } = useCatalog();
   const topics = [{ key: 'helmet', icon: ShieldCheck }, { key: 'light', icon: Flashlight }, { key: 'lock', icon: LockKeyhole }, { key: 'bell', icon: Bell }, { key: 'pump', icon: Wind }, { key: 'other', icon: Bike }] as const;
   return <>
     <SEO title={t('nav.accessories')} description="seo.accessoriesDescription" />

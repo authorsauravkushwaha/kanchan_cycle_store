@@ -1,0 +1,88 @@
+{
+  "id": "./",
+  "name": "কাঞ্চন সাইকেল স্টোর্স — Kanchan Cycle Stores",
+  "short_name": "কাঞ্চন সাইকেল",
+  "description": "কোলাঘাটের সাইকেলের দোকান। নতুন সাইকেল, অ্যাক্সেসরিজ ও মেরামত — এক ট্যাপে WhatsApp করুন বা পথ দেখে আসুন।",
+  "lang": "bn-IN",
+  "dir": "ltr",
+  "start_url": "./?source=pwa",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
+  "orientation": "portrait-primary",
+  "background_color": "#faf9f4",
+  "theme_color": "#14432f",
+  "categories": [
+    "shopping",
+    "lifestyle",
+    "travel"
+  ],
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "সব সাইকেল দেখুন",
+      "short_name": "সাইকেল",
+      "description": "দোকানে থাকা সাইকেলের তালিকা ও দাম",
+      "url": "./cycles?source=shortcut",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "আমার পছন্দের তালিকা",
+      "short_name": "আমার তালিকা",
+      "description": "পছন্দ করা সাইকেল একসাথে WhatsApp-এ পাঠান",
+      "url": "./list?source=shortcut",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "মেরামতের জন্য লিখুন",
+      "short_name": "মেরামত",
+      "description": "সমস্যা লিখে ওয়ার্কশপে পাঠান",
+      "url": "./services?source=shortcut#repair-form",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}

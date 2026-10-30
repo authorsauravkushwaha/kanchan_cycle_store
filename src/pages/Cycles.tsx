@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { ArrowRight, Bike } from 'lucide-react';
-import { verifiedProducts } from '../config/shop';
+import { useCatalog } from '../inventory';
 import { useLanguage } from '../i18n';
 import { defaultFilters, filterProducts, hasFilters, parseFilters } from '../lib/catalog';
 import type { CatalogFilters } from '../lib/catalog';
@@ -37,8 +37,9 @@ export default function Cycles() {
   };
   const update = (key: keyof CatalogFilters, value: string) => apply({ ...currentFilters.current, [key]: value });
   const reset = () => apply({ ...defaultFilters });
-  const products = useMemo(() => filterProducts(verifiedProducts('cycle'), filters, language), [filters, language]);
-  const allProducts = verifiedProducts('cycle');
+  const { cycles } = useCatalog();
+  const products = useMemo(() => filterProducts(cycles, filters, language), [cycles, filters, language]);
+  const allProducts = cycles;
   return <>
     <SEO title={t('nav.cycles')} description="seo.cyclesDescription" />
     <PageHero eyebrow={t('catalog.eyebrow')} title={t('catalog.title')} description={t('catalog.description')}><Breadcrumbs items={[{ label: t('nav.cycles') }]} /></PageHero>

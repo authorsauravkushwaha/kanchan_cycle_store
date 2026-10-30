@@ -28,7 +28,7 @@ test('Bengali is the default; English and reload persistence work', async ({ pag
 });
 
 test('all public routes, unique titles, footer links and 404 work', async ({ page }) => {
-  const routes = [['/', 'আপনার পছন্দের সাইকেল'], ['/cycles', 'পছন্দের সাইকেল'], ['/accessories', 'সাইকেলের অ্যাক্সেসরিজ'], ['/services', 'সাইকেলের সমস্যার'], ['/recommendation', 'কোন সাইকেলটি'], ['/offers', 'সঠিক পছন্দ'], ['/about', 'পরিচয় হোক'], ['/contact', 'কাছের দোকানেই'], ['/privacy', 'গোপনীয়তার নীতি']];
+  const routes = [['/', 'আপনার পছন্দের সাইকেল'], ['/cycles', 'পছন্দের সাইকেল'], ['/accessories', 'সাইকেলের অ্যাক্সেসরিজ'], ['/services', 'সাইকেলের সমস্যার'], ['/recommendation', 'কোন সাইকেলটি'], ['/offers', 'সঠিক পছন্দ'], ['/about', 'পরিচয় হোক'], ['/contact', 'কাছের দোকানেই'], ['/privacy', 'গোপনীয়তার নীতি'], ['/list', 'আমার পছন্দের তালিকা']];
   const titles = new Set<string>();
   for (const [path, heading] of routes) {
     await page.goto(path);
@@ -115,6 +115,34 @@ test('real catalog UI filters, searches, sorts and creates product enquiries', a
   await expect(page.getByRole('heading', { name: 'No matches this time' })).toBeVisible();
 });
 
+test('a phone visitor can save cycles to a list and send one WhatsApp enquiry', async ({ page }) => {
+  await useTestCatalog(page);
+  await page.goto('/cycles');
+  const cards = page.locator('.product-card');
+  await cards.nth(0).getByRole('button', { name: 'তালিকায় রাখুন' }).click();
+  await expect(cards.nth(0).getByRole('button', { name: /তালিকায় যোগ হয়েছে/ })).toBeVisible();
+  await cards.nth(1).getByRole('button', { name: 'তালিকায় রাখুন' }).click();
+  await expect(page.locator('.site-header .list-badge')).toHaveText('2');
+  await page.locator('.site-header a[href="/list"]').click();
+  await expect(page).toHaveURL(/\/list$/);
+  await expect(page.locator('.list-item')).toHaveCount(2);
+  await expect(page.locator('.list-total')).toContainText('দোকান থেকে জানতে হবে');
+  await page.getByLabel('আপনার নাম (ঐচ্ছিক)').fill('পরীক্ষা কুমার');
+  const link = page.locator('.list-whatsapp');
+  const message = await text(link.getAttribute('href'));
+  expect(message).toContain('পরীক্ষামূলক সিটি সাইকেল');
+  expect(message).toContain('পরীক্ষামূলক শিশুদের সাইকেল');
+  expect(message).toContain('পরীক্ষা কুমার');
+  expect(message).toContain('দাম জানতে চাই');
+  await page.reload();
+  await expect(page.locator('.list-item')).toHaveCount(2);
+  // The list lives only on this phone; no personal data is written to storage.
+  const stored = JSON.stringify(await page.evaluate(() => ({ ...localStorage })));
+  expect(stored).not.toContain('পরীক্ষা কুমার');
+  await page.getByRole('button', { name: 'তালিকা মুছুন' }).click();
+  await expect(page.getByRole('heading', { name: 'তালিকা এখন খালি' })).toBeVisible();
+});
+
 test('repair form validates in Bengali and prepares a WhatsApp enquiry, not a booking', async ({ page }) => {
   await page.context().route('https://wa.me/**', route => route.fulfill({ status: 200, contentType: 'text/html', body: '<title>Test WhatsApp interception</title>' }));
   await page.goto('/services?service=brakes#repair-form');
@@ -192,10 +220,17 @@ test('mobile drawer is keyboard accessible and bottom actions stay usable', asyn
   await expect(page.getByRole('dialog')).not.toBeVisible();
   const bar = page.locator('.mobile-action-bar');
   await expect(bar).toBeVisible();
-  await expect(bar.locator('a')).toHaveCount(3);
+  await expect(bar.locator('a')).toHaveCount(4);
   await expect(bar.locator('a').nth(0)).toHaveAttribute('href', /wa\.me\/917076884950/);
   await expect(bar.locator('a').nth(1)).toHaveAttribute('href', 'tel:+917076884950');
   await expect(bar.locator('a').nth(2)).toHaveAttribute('href', /22\.4452382/);
+  await expect(bar.locator('a').nth(3)).toHaveAttribute('href', '/list');
+  // The install explanation is reachable without the browser's install prompt.
+  await page.locator('.site-footer').getByRole('button', { name: 'অ্যাপ হিসেবে রাখুন' }).first().click();
+  await expect(page.getByRole('dialog')).toBeVisible();
+  await expect(page.getByRole('dialog')).toContainText('দোকানটি ফোনে অ্যাপের মতো রাখুন');
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('dialog')).toHaveCount(0);
 });
 
 test('English navigation and localized validation work across the site', async ({ page }) => {
@@ -217,7 +252,7 @@ test('English navigation and localized validation work across the site', async (
 test('small phones, tablets and desktops have no horizontal overflow', async ({ page }) => {
   for (const width of [320, 360, 390, 768, 1024, 1440]) {
     await page.setViewportSize({ width, height: 900 });
-    for (const path of ['/', '/cycles', '/services', '/recommendation', '/contact', '/about']) {
+    for (const path of ['/', '/cycles', '/list', '/services', '/recommendation', '/contact', '/about']) {
       await page.goto(path);
       await expect(page.locator('h1')).toBeVisible();
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth);
@@ -230,7 +265,7 @@ test('primary pages pass automated WCAG A/AA checks on desktop and mobile', asyn
   test.setTimeout(90000);
   for (const width of [1440, 390]) {
     await page.setViewportSize({ width, height: 900 });
-    for (const path of ['/', '/cycles', '/services', '/recommendation', '/contact']) {
+    for (const path of ['/', '/cycles', '/list', '/services', '/recommendation', '/contact']) {
       await page.goto(path);
       await page.evaluate(() => document.fonts.ready);
       const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).exclude('iframe').analyze();

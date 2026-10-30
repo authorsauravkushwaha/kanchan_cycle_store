@@ -2,11 +2,12 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it } from 'vitest';
 import { LanguageProvider } from '../src/i18n';
+import { ShortlistProvider } from '../src/shortlist';
 import { ProductCard } from '../src/components/ProductCard';
 import { fixtureProducts } from './fixtures';
 describe('honest product cards', () => {
   it('shows contact-for-price and contact-for-stock, never zero or in-stock', () => {
-    render(<MemoryRouter><LanguageProvider><ProductCard product={fixtureProducts[1]} /></LanguageProvider></MemoryRouter>);
+    render(<MemoryRouter><LanguageProvider><ShortlistProvider><ProductCard product={fixtureProducts[1]} /></ShortlistProvider></LanguageProvider></MemoryRouter>);
     expect(screen.getByText('দাম জানতে যোগাযোগ করুন')).toBeInTheDocument();
     expect(screen.getByText('স্টক জানতে যোগাযোগ করুন')).toBeInTheDocument();
     expect(screen.queryByText('স্টক আছে')).not.toBeInTheDocument();
@@ -18,7 +19,7 @@ describe('honest product cards', () => {
     expect(enquiry).toHaveAttribute('rel', 'noopener noreferrer');
   });
   it('formats verified Indian prices and keeps unverified stock explicit', () => {
-    render(<MemoryRouter><LanguageProvider><ProductCard product={fixtureProducts[0]} /></LanguageProvider></MemoryRouter>);
+    render(<MemoryRouter><LanguageProvider><ShortlistProvider><ProductCard product={fixtureProducts[0]} /></ShortlistProvider></LanguageProvider></MemoryRouter>);
     const expected = new Intl.NumberFormat('bn-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(5499);
     expect(screen.getByText(expected)).toBeInTheDocument();
     expect(screen.getByText('স্টক জানতে যোগাযোগ করুন')).toBeInTheDocument();

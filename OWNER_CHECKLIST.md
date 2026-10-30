@@ -75,3 +75,66 @@ For an accessory, use `kind: 'accessory'` and `category: 'accessories'`. Its det
 9. Keep stock, prices, hours and offers up to date. Unknown information should go back to `null`, not a guessed value.
 
 **No public deployment, real WhatsApp delivery, verified product inventory, or confirmed appointment is claimed by this project build.**
+
+---
+
+## Android launch checklist (2026 update)
+
+### Before you tell anyone the address
+
+- [ ] Deploy to a real HTTPS domain and open it in **Chrome on an Android phone**.
+- [ ] Tap **অ্যাপ ইনস্টল করুন** (or ⋮ → Install app). Confirm the icon is the wheel
+      mark and the app opens without the browser bar.
+- [ ] Put the phone in **airplane mode**, reopen the app: the shop page or the
+      offline page must appear, and **কল করুন** / **WhatsApp** must still work.
+- [ ] Confirm the WhatsApp number receives a test message from that phone.
+- [ ] Check the bottom bar with the phone's gesture navigation on: nothing is
+      hidden behind the Android bar.
+- [ ] Increase the Android font size once and check the header and bottom bar.
+- [ ] Ask one family member to install it and send a shortlist, then reply from
+      the shop phone. That is the whole customer journey.
+
+### Catalogue (choose one)
+
+**A. Static catalogue** — for a shop that changes stock rarely.
+
+- [ ] Add verified records to `shop.catalog` in `src/config/shop.ts`.
+- [ ] `npm run check`, deploy.
+
+**B. Live catalogue with Supabase** — recommended if stock changes weekly.
+
+- [ ] Follow `docs/SUPABASE.md` (create project → run `supabase/schema.sql` →
+      allowlist your email → set the two environment variables).
+- [ ] Add the exact Supabase host to the CSP in `vercel.json` and
+      `public/_headers`, or the build will stop and tell you.
+- [ ] Open `/owner` on your phone, add 10 real products, export CSV, import into
+      the `products` table, set `published = true`.
+- [ ] Check the public `/cycles` page on a phone with mobile data off (cached
+      catalogue) and on (live catalogue).
+
+### Product data rules (unchanged, and enforced)
+
+- [ ] A price is a real, checked number or **empty**. Empty shows “ask the shop”.
+- [ ] Stock is `in-stock`, `out-of-stock`, or **empty**. Empty shows “confirm”.
+- [ ] Photos are your own photographs of the actual bicycle, on HTTPS.
+- [ ] No discounts, ratings, warranty claims or years-in-business unless true.
+- [ ] Update stock the same day it changes. A wrong “in stock” costs a customer.
+
+### Everyday habits that make the site sell
+
+- [ ] Reply to every shortlist message with a real price and an offer to hold the
+      cycle until the next evening.
+- [ ] Ask for a Google review at handover, in person.
+- [ ] Upload two or three fresh photos to the Google Business Profile each week.
+- [ ] Post the weekly stock list to WhatsApp status / Google Posts (the n8n
+      workflow writes it for you).
+- [ ] Keep hours identical on the website, Google Maps and WhatsApp. When you are
+      ready, ask for `hours.confirmed: true`.
+
+### Do not
+
+- [ ] Do not use `/owner` on a shared or borrowed phone — it has no password and
+      keeps drafts in that browser.
+- [ ] Do not paste the Supabase **service_role** key into the website, a chat or a
+      screenshot. The website only needs the public anon key.
+- [ ] Do not turn on search indexing before the final content review.

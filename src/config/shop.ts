@@ -49,6 +49,12 @@ export interface Product {
   /** null means unverified, not in stock. */
   availability: Availability;
   featured: boolean;
+  /**
+   * Optional photograph supplied by the owner for a live (Supabase) product.
+   * Must be an HTTPS URL on an approved host. The static seed catalogue stays
+   * text-only, and no stock photography is ever used.
+   */
+  photoUrl?: string | null;
 }
 export interface Service {
   id: string;

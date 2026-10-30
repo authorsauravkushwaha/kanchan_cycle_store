@@ -1,24 +1,52 @@
 # Testing and quality checks
 
-Initial checks: **2026-10-29**. Pre-push verification: **2026-10-30**. Environment: local development and production-preview builds in the Arena sandbox. This is **not** a public deployment or a field-data Core Web Vitals report.
+Environment: local development and production-preview builds in the Arena sandbox.
+This is **not** a public deployment or a field-data Core Web Vitals report.
 
-## Pre-push verification — 2026-10-30
+## Android/PWA release verification — 2026-10-30
 
-- `npm run check`: passed again, including all 23 unit/component tests, TypeScript, production build, catalog validation and SEO generation.
-- `npm run test:e2e`: passed all 11 browser tests, including bilingual navigation, catalog filtering with isolated fixtures, repair messages, quiz, mobile navigation, responsive overflow and automated accessibility checks.
-- `npm audit --audit-level=moderate`: reported 0 vulnerabilities.
-- Desktop and mobile visual review completed; the live development preview remains available in the workspace.
-- The Lighthouse results below are from the earlier local production-preview run, not a new measurement on a public host.
+| Check | Result |
+|---|---|
+| `npm test` | **40 passed** across 7 files (config honesty, catalogue filtering, quiz/repair messages, inventory mapping, shortlist storage/message, stock-desk CSV/JSON, product cards) |
+| `npm run build` | Passed: TypeScript, production build, catalogue validation, PWA artefact checks, SEO files |
+| `npm run test:e2e` | **12 passed**: bilingual navigation, routes, catalogue, shortlist flow, repair, quiz, drawer, install sheet, responsive overflow, axe, image policy |
+| `npm run test:pwa` | **2 passed** against `vite preview`: manifest, service-worker control, every route opened offline, offline fallback page |
+| `npm run security:check` | Passed after build: CSP (including `manifest-src`/`worker-src`), no inline scripts, PWA files, secret patterns |
+| Offline route sweep | `/`, `/cycles`, `/list`, `/services`, `/recommendation` and the 404 all render from cache with the offline banner; call and WhatsApp links still work |
+| Axe WCAG 2 A/AA + 2.1 AA | 0 violations on Home, Cycles, My list, Services, Recommendation and Contact at 1440 px and 390 px; an ad-hoc run on `/owner` and the open install sheet also returned 0 |
+| Responsive overflow sweep | No horizontal overflow at 320, 360, 390, 768, 1024 and 1440 px across `/`, `/cycles`, `/list`, `/services`, `/recommendation`, `/contact`, `/about` |
+| Bundle size (gzip) | Initial JS **125.8 kB**, CSS **19.5 kB**; `/owner` is a separate 6.9 kB chunk |
+| Service worker precache | 18 hashed JS/CSS files + shell, icons and shop photographs |
+
+### What the PWA work fixed
+
+- The service worker now precaches every hashed build file, so pages a visitor has
+  not opened yet still work offline. Before this change, an offline tap on
+  “Repair” showed a blank page.
+- Cached responses are matched with `ignoreVary` because some hosts add
+  `Vary: Origin` to static assets, which otherwise prevented module imports from
+  matching the cache.
+- A route-level error boundary turns a failed chunk download on a weak connection
+  into a readable retry screen instead of a blank page.
+- The controller-change listener no longer reloads a first-time visitor's page
+  when the worker claims it.
+
+## Previous release verification — 2026-10-29/30
+
+- `npm run check` passed with the then-current 23 unit/component tests and 11 browser tests.
+- `npm audit --audit-level=moderate` reported 0 vulnerabilities.
+- Desktop and mobile visual review completed.
 
 ## Automated checks executed
 
 | Check | Result |
 |---|---|
-| `npm run check` | Passed: TypeScript, 23 unit/component tests, production build, catalog validation and SEO generation |
-| `npm run test:e2e` | Passed: 11 Playwright browser tests |
+| `npm run check` | Passed: TypeScript, 40 unit/component tests, production build, catalog validation, PWA and SEO generation |
+| `npm run test:e2e` | Passed: 12 Playwright browser tests |
+| `npm run test:pwa` | Passed: 2 production service-worker/offline tests |
 | `npm audit --audit-level=moderate` | 0 vulnerabilities |
-| Axe WCAG 2 A/AA + 2.1 AA, primary pages at 1440px and 390px | 0 violations on Home, Cycles, Services, Recommendation and Contact |
-| Responsive overflow sweep | No horizontal overflow at 320, 360, 390, 768, 1024 and 1440px across the main routes |
+| Axe WCAG 2 A/AA + 2.1 AA, primary pages at 1440px and 390px | 0 violations on Home, Cycles, My list, Services, Recommendation and Contact |
+| Responsive overflow sweep | No horizontal overflow at 320, 360, 390, 768, 1024 and 1440px across the main routes, including My list |
 | Production preview smoke test | All public routes return the app, one H1 per page, mobile layout fits, preview remains noindex |
 | GitHub Pages base-path test | Passed with `/kanchan_cycle_store/`: deep link, query preservation, refresh and `#repair-form` restoration |
 
@@ -40,7 +68,10 @@ Fictional catalog records used by browser tests are injected only into the test 
 
 ## Lighthouse — local production preview, mobile emulation
 
-Latest run against `http://127.0.0.1:4173/`:
+These numbers are from the **previous release**, before the Android/PWA work and
+before `/list` existed. They are kept as a baseline, not a current claim. Re-run
+Lighthouse against the deployed site with mobile emulation and slow 4G; the
+performance budget is in [docs/ANDROID.md](docs/ANDROID.md).
 
 | Category | Score |
 |---|---:|
@@ -66,3 +97,8 @@ The home hero photograph and critical Bengali fonts are preloaded, non-home page
 - Automated accessibility checks are not a full screen-reader or assistive-technology audit.
 - Lighthouse lab scores are not Search Console field data. Re-test on the final host and on a real mid-range Android phone over a mobile connection.
 - Public deployment, domain canonicalization, sitemap submission and Google Business Profile updates have **not** been performed.
+- The install prompt itself cannot be triggered by automation (Chromium only fires `beforeinstallprompt` when real install criteria and an HTTPS origin are met). The manifest, the manual install sheet, the service worker and the offline experience are tested; the final “Add to Home screen” tap must be done on a real Android phone.
+- Offline behaviour depends on the visitor keeping the installed app or the site in Chrome. Clearing site data removes the cache by design.
+- Supabase-backed catalogue behaviour is covered by unit tests and a local simulation only; no live project was connected. Row-level security must be verified against the owner's real project (see `docs/SUPABASE.md`).
+- The n8n workflow JSON files are valid imports but were not executed against a live Supabase/Telegram/SMTP setup.
+- No Play Store / Trusted Web Activity build was produced; the Bubblewrap steps in `docs/ANDROID.md` are guidance, not a tested release.

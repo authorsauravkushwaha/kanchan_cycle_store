@@ -1,12 +1,15 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
-import { ArrowRight, ArrowUp, ArrowUpRight, Bike, Clock3, MapPin, Menu, Phone, X } from 'lucide-react';
+import { ArrowRight, ArrowUp, ArrowUpRight, Bike, Clock3, Heart, MapPin, Menu, Phone, X } from 'lucide-react';
 import { addressLines, shop } from '../config/shop';
 import { useLanguage } from '../i18n';
 import type { TranslationKey } from '../i18n';
 import { phoneHref, track } from '../lib/business';
-import { CallButton, DirectionsButton, Logo, WhatsAppButton } from './UI';
+import { useShortlist } from '../shortlist';
+import { CallButton, DirectionsButton, Logo, ShareButton, WhatsAppButton } from './UI';
+import { ArrivalNotice, OfflineBanner, UpdateToast } from './AppStatus';
+import { InstallHelpButton, InstallPrompt } from './Install';
 
 export const navigation: { to: string; key: TranslationKey }[] = [
   { to: '/', key: 'nav.home' }, { to: '/cycles', key: 'nav.cycles' },
@@ -20,9 +23,19 @@ function LanguageSwitcher() {
     <button type="button" lang="en" aria-pressed={language === 'en'} onClick={() => setLanguage('en')}>EN</button>
   </div>;
 }
+function ShortlistLink({ className = '', withLabel = false }: { className?: string; withLabel?: boolean }) {
+  const { t } = useLanguage();
+  const { count } = useShortlist();
+  return <NavLink to="/list" className={`header-list ${className}`} aria-label={count ? `${t('list.nav')} (${count})` : t('list.nav')}>
+    <Heart size={19} aria-hidden="true" />
+    {withLabel && <span>{t('list.nav')}</span>}
+    {count > 0 && <span className="list-badge" aria-hidden="true">{count > 9 ? '9+' : count}</span>}
+  </NavLink>;
+}
 function MobileNavigation({ open, onClose }: { open: boolean; onClose: () => void }) {
   const ref = useRef<HTMLDialogElement>(null);
   const { t, l } = useLanguage();
+  const { count } = useShortlist();
   useEffect(() => {
     const dialog = ref.current;
     if (!dialog) return;
@@ -37,8 +50,8 @@ function MobileNavigation({ open, onClose }: { open: boolean; onClose: () => voi
   return <dialog ref={ref} id="mobile-navigation" className="mobile-drawer" aria-label={t('nav.menu')} onCancel={onClose} onClose={onClose} onClick={event => { if (event.target === ref.current) onClose(); }}>
     <div className="drawer-inner">
       <div className="drawer-top"><span className="drawer-label"><Bike size={23} aria-hidden="true" />{l(shop.name)}</span><button className="icon-button" onClick={onClose} aria-label={t('nav.close')} autoFocus><X size={23} /></button></div>
-      <nav aria-label={t('nav.primary')} className="drawer-links">{navigation.map(item => <NavLink key={item.to} to={item.to} end={item.to === '/'} onClick={onClose}>{t(item.key)}<ArrowUpRight size={18} aria-hidden="true" /></NavLink>)}</nav>
-      <div className="drawer-bottom"><LanguageSwitcher /><WhatsAppButton className="w-full" /><DirectionsButton variant="text" /><a href={phoneHref()} className="drawer-phone" onClick={() => track('phone_click')}><Phone size={16} aria-hidden="true" />{shop.contact.phoneDisplay}</a><p>{shop.hours.confirmed ? l(shop.hours.display) : t('common.hoursPending')}</p></div>
+      <nav aria-label={t('nav.primary')} className="drawer-links">{navigation.map(item => <NavLink key={item.to} to={item.to} end={item.to === '/'} onClick={onClose}>{t(item.key)}<ArrowUpRight size={18} aria-hidden="true" /></NavLink>)}<NavLink to="/list" onClick={onClose}>{t('list.nav')}{count > 0 && <span className="drawer-count">{count}</span>}<ArrowUpRight size={18} aria-hidden="true" /></NavLink><NavLink to="/recommendation" onClick={onClose}>{t('nav.quiz')}<ArrowUpRight size={18} aria-hidden="true" /></NavLink></nav>
+      <div className="drawer-bottom"><LanguageSwitcher /><WhatsAppButton className="w-full" /><DirectionsButton variant="text" /><a href={phoneHref()} className="drawer-phone" onClick={() => track('phone_click')}><Phone size={16} aria-hidden="true" />{shop.contact.phoneDisplay}</a><p>{shop.hours.confirmed ? l(shop.hours.display) : t('common.hoursPending')}</p><InstallHelpButton /><ShareButton className="drawer-share" /></div>
     </div>
   </dialog>;
 }
@@ -53,17 +66,21 @@ function Header() {
     <header className="site-header"><div className="container header-inner">
       <Logo />
       <nav className="desktop-nav" aria-label={t('nav.primary')}>{navigation.map(item => <NavLink key={item.to} to={item.to} end={item.to === '/'}>{t(item.key)}</NavLink>)}</nav>
-      <div className="header-actions"><LanguageSwitcher /><WhatsAppButton variant="small" className="header-whatsapp" placement="header"><span className="header-whatsapp-label">{t('action.whatsappShort')}</span></WhatsAppButton><button className="icon-button mobile-menu-button" aria-label={t('nav.open')} aria-expanded={open} aria-controls="mobile-navigation" onClick={() => setOpen(true)}><Menu size={23} /></button></div>
+      <div className="header-actions"><LanguageSwitcher /><ShortlistLink className="header-list-desktop" /><WhatsAppButton variant="small" className="header-whatsapp" placement="header"><span className="header-whatsapp-label">{t('action.whatsappShort')}</span></WhatsAppButton><button className="icon-button mobile-menu-button" aria-label={t('nav.open')} aria-expanded={open} aria-controls="mobile-navigation" onClick={() => setOpen(true)}><Menu size={23} /></button></div>
     </div></header>
     <MobileNavigation open={open} onClose={() => setOpen(false)} />
   </>;
 }
 function MobileActionBar() {
   const { t } = useLanguage();
+  const { count } = useShortlist();
   return <nav className="mobile-action-bar" aria-label={t('footer.contact')}>
     <WhatsAppButton variant="text" placement="mobile-action-bar"><span>{t('action.whatsappShort')}</span></WhatsAppButton>
     <CallButton variant="text" short />
     <DirectionsButton variant="text" short />
+    <NavLink to="/list" className={({ isActive }) => `mobile-bar-list ${isActive ? 'is-active' : ''}`}>
+      <Heart size={17} aria-hidden="true" /><span>{t('list.nav')}</span>{count > 0 && <span className="list-badge" aria-hidden="true">{count > 9 ? '9+' : count}</span>}
+    </NavLink>
   </nav>;
 }
 function Footer() {
@@ -71,11 +88,11 @@ function Footer() {
   return <footer className="site-footer"><div className="container">
     <div className="footer-grid">
       <div className="footer-brand"><Logo light /><p>{t('footer.description')}</p><span className="footer-tagline"><Bike size={19} aria-hidden="true" />{l(shop.tagline)}</span></div>
-      <div><h2>{t('footer.explore')}</h2><nav aria-label={t('footer.explore')}>{navigation.filter(item => item.to !== '/').map(item => <Link key={item.to} to={item.to}>{t(item.key)}</Link>)}<Link to="/recommendation">{t('nav.quiz')}</Link></nav></div>
+      <div><h2>{t('footer.explore')}</h2><nav aria-label={t('footer.explore')}>{navigation.filter(item => item.to !== '/').map(item => <Link key={item.to} to={item.to}>{t(item.key)}</Link>)}<Link to="/list">{t('list.nav')}</Link><Link to="/recommendation">{t('nav.quiz')}</Link></nav></div>
       <div className="footer-contact"><h2>{t('footer.contact')}</h2><a href={phoneHref()} onClick={() => track('phone_click')}><Phone size={16} aria-hidden="true" />{shop.contact.phoneDisplay}</a><p><MapPin size={17} aria-hidden="true" /><span>{addressLines(language).join(', ')}</span></p><DirectionsButton variant="text" short />{shop.contact.email && <a href={`mailto:${shop.contact.email}`}>{shop.contact.email}</a>}</div>
       <div className="footer-hours"><h2>{t('common.hours')}</h2><p className={shop.hours.confirmed ? 'verified-hours' : 'unconfirmed-hours'}><Clock3 size={17} aria-hidden="true" />{l(shop.hours.display)}</p>{!shop.hours.confirmed && <p className="hours-caveat">{l(shop.hours.caveat)}</p>}<p className="footer-hours-note">{t('common.hoursPending')}</p><WhatsAppButton variant="text" placement="footer">{t('action.whatsappShort')}<ArrowUpRight size={15} aria-hidden="true" /></WhatsAppButton>{shop.socialLinks.length > 0 && <div className="footer-socials">{shop.socialLinks.filter(link => /^https:\/\//.test(link.url)).map(link => <a key={link.url} href={link.url} target="_blank" rel="noopener noreferrer">{link.label}<ArrowUpRight size={14} aria-hidden="true" /></a>)}</div>}</div>
     </div>
-    <div className="footer-bottom"><p>© {new Date().getFullYear()} {l(shop.name)}. {t('footer.rights')}</p><div><Link to="/privacy">{t('footer.privacy')}</Link><Link to="/about#our-shop">{t('footer.photoNote')}</Link><button onClick={() => window.scrollTo({ top: 0, behavior: 'auto' })} className="back-top" aria-label={t('footer.backTop')}><ArrowUp size={17} /></button></div></div>
+    <div className="footer-bottom"><p>© {new Date().getFullYear()} {l(shop.name)}. {t('footer.rights')}</p><div><Link to="/privacy">{t('footer.privacy')}</Link><Link to="/about#our-shop">{t('footer.photoNote')}</Link><InstallHelpButton className="footer-install" /><ShareButton label={t('share.action')} /><button onClick={() => window.scrollTo({ top: 0, behavior: 'auto' })} className="back-top" aria-label={t('footer.backTop')}><ArrowUp size={17} /></button></div></div>
   </div></footer>;
 }
 export function Layout({ children }: { children: ReactNode }) {
@@ -92,5 +109,14 @@ export function Layout({ children }: { children: ReactNode }) {
     });
     return () => cancelAnimationFrame(frame);
   }, [location.pathname, location.hash]);
-  return <><Header /><main id="main-content" tabIndex={-1}>{children}</main><Footer /><MobileActionBar /></>;
+  return <>
+    <OfflineBanner />
+    <Header />
+    <ArrivalNotice />
+    <main id="main-content" tabIndex={-1}>{children}</main>
+    <Footer />
+    <MobileActionBar />
+    <InstallPrompt />
+    <UpdateToast />
+  </>;
 }

@@ -11,7 +11,7 @@ export const productUrl = (slug: string) => {
   return `${base.replace(/\/+$/, '')}/cycles/${encodeURIComponent(slug)}`;
 };
 
-export type AnalyticsEvent = 'whatsapp_click' | 'phone_click' | 'directions_click' | 'product_enquiry_click' | 'repair_enquiry_submit' | 'quiz_complete' | 'source_shared';
+export type AnalyticsEvent = 'whatsapp_click' | 'phone_click' | 'directions_click' | 'product_enquiry_click' | 'repair_enquiry_submit' | 'quiz_complete' | 'source_shared' | 'shortlist_add' | 'shortlist_share' | 'install_prompt';
 /** No analytics requests by default. Consent is explicit; enquiry content is never sent. */
 export function track(event: AnalyticsEvent, context?: { productId?: string; serviceId?: string; placement?: string }) {
   if (!shop.analytics.endpoint) return;

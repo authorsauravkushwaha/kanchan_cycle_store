@@ -1,7 +1,8 @@
-import { ArrowRight, ArrowUpRight, Bike, Check, MapPin, MessageCircle, Phone, SearchX } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Bike, Check, MapPin, MessageCircle, Phone, SearchX, Share2 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { ReactNode } from 'react';
+import { useState } from 'react';
 import { asset, shop, shopPhotos } from '../config/shop';
 import type { ShopPhoto as ShopPhotoData } from '../config/shop';
 import { useLanguage } from '../i18n';
@@ -78,3 +79,36 @@ export function Notice({ children, positive = false }: { children: ReactNode; po
   return <p className={`notice ${positive ? 'notice-positive' : ''}`}><span className="notice-icon" aria-hidden="true">{positive ? <Check size={16} /> : 'i'}</span><span>{children}</span></p>;
 }
 export function RequiredMark() { const { t } = useLanguage(); return <span className="required-mark" aria-label={t('common.required')}>*</span>; }
+
+/**
+ * Word of mouth is the strongest channel for a neighbourhood shop. Uses the
+ * Android share sheet where available and falls back to copying the link.
+ */
+export function ShareButton({ className = '', label }: { className?: string; label?: string }) {
+  const { t, l } = useLanguage();
+  const [status, setStatus] = useState<'idle' | 'copied' | 'failed'>('idle');
+  const share = async () => {
+    const url = shop.websiteUrl || window.location.origin;
+    const text = l({
+      bn: 'কোলাঘাটে কাঞ্চন সাইকেল স্টোর্স — সাইকেল, অ্যাক্সেসরিজ ও মেরামত।',
+      en: 'Kanchan Cycle Stores in Kolaghat — cycles, accessories and repairs.',
+    });
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: l(shop.name), text, url });
+        track('source_shared', { placement: 'share-sheet' });
+        return;
+      }
+      await navigator.clipboard.writeText(`${text} ${url}`);
+      setStatus('copied');
+      track('source_shared', { placement: 'copy-link' });
+    } catch (error) {
+      if ((error as Error)?.name === 'AbortError') return;
+      setStatus('failed');
+    }
+  };
+  return <div className={`share-control ${className}`}>
+    <button type="button" className="text-link share-button" onClick={share}><Share2 size={17} aria-hidden="true" />{label || t('share.action')}</button>
+    <span className="share-status" role="status" aria-live="polite">{status === 'copied' ? t('share.copied') : status === 'failed' ? t('share.failed') : ''}</span>
+  </div>;
+}

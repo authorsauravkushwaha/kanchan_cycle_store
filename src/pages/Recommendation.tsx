@@ -3,6 +3,7 @@ import type { FormEvent, ReactNode } from 'react';
 import { ArrowLeft, ArrowRight, Baby, Bike, BriefcaseBusiness, Check, GraduationCap, Mountain, RotateCcw, School, Sparkles, Sun, UserRound } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { shop } from '../config/shop';
+import { useCatalog } from '../inventory';
 import { useLanguage } from '../i18n';
 import type { TranslationKey } from '../i18n';
 import { answerLabel, emptyAnswers, quizFields, recommendProducts, validateQuizStep } from '../lib/quiz';
@@ -21,7 +22,8 @@ export default function Recommendation() {
   const [answers, setAnswers] = useState<QuizAnswers>({ ...emptyAnswers });
   const [error, setError] = useState<TranslationKey | null>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
-  const matches = step === 6 ? recommendProducts(shop.catalog, answers) : [];
+  const { products } = useCatalog();
+  const matches = step === 6 ? recommendProducts(products, answers) : [];
   const update = (field: keyof QuizAnswers, value: string) => { setAnswers(previous => ({ ...previous, [field]: value })); setError(null); };
   const advance = (skipHeight = false) => {
     const nextAnswers = skipHeight ? { ...answers, height: '' } : answers;

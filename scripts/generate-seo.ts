@@ -1,4 +1,5 @@
 /** Build-time SEO and GitHub Pages refresh support. No guessed production domain. */
+import { createHash } from 'node:crypto';
 import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { shop } from '../src/config/shop.ts';
@@ -23,7 +24,8 @@ if (configuredUrl) {
   websiteUrl = url.href.replace(/\/+$/, '');
 }
 const canIndex = Boolean(websiteUrl && shop.seo.indexingEnabled);
-const routes = ['/', '/cycles', '/accessories', '/services', '/recommendation', '/offers', '/about', '/contact', '/privacy'];
+// /owner is deliberately excluded: it is a device-local tool, not a public page.
+const routes = ['/', '/cycles', '/accessories', '/services', '/recommendation', '/list', '/offers', '/about', '/contact', '/privacy'];
 for (const product of shop.catalog) routes.push(`/cycles/${encodeURIComponent(product.slug)}`);
 const escape = (text: string) => text.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
 if (canIndex && websiteUrl) {
@@ -41,10 +43,33 @@ const redirect = `<!doctype html><html lang="bn"><head><meta charset="utf-8"><me
 await writeFile(resolve(dist, '404.html'), redirect);
 // Also include a root fallback for static hosts that need one before build.
 await writeFile(resolve(dist, '_redirects'), '/* /index.html 200\n');
+// Android installability is part of the product: fail the build if the pieces are missing.
+for (const file of ['manifest.webmanifest', 'sw.js', 'offline.html', 'offline.css']) {
+  await readFile(resolve(dist, file));
+}
+const manifest = JSON.parse(await readFile(resolve(dist, 'manifest.webmanifest'), 'utf8')) as { icons?: { src: string }[]; start_url?: string; short_name?: string };
+if (!manifest.icons?.length) throw new Error('The web app manifest has no icons.');
+for (const icon of manifest.icons) await readFile(resolve(dist, icon.src));
+if (!manifest.short_name || manifest.short_name.length > 14) throw new Error('The manifest short_name must fit under an Android icon.');
+
 let index = await readFile(resolve(dist, 'index.html'), 'utf8');
+if (!index.includes('manifest.webmanifest')) throw new Error('index.html does not link the web app manifest.');
 if (!index.includes('route-restore.js')) throw new Error('Missing GitHub Pages route restoration script in index.html.');
-// Discover the home LCP photograph (the shop’s own photo) and critical Bengali fonts before the JS bundle.
+// Inject every hashed JS/CSS asset into the service worker precache list, so a
+// customer who installs the app can open pages they have not visited yet offline.
 const assets = await readdir(resolve(dist, 'assets'));
+const precacheAssets = assets.filter(name => /\.(?:js|css)$/.test(name)).map(name => `assets/${name}`);
+let worker = await readFile(resolve(dist, 'sw.js'), 'utf8');
+if (!worker.includes('const PRECACHE_ASSETS = [];')) throw new Error('Service worker precache placeholder was not found.');
+worker = worker.replace('const PRECACHE_ASSETS = [];', `const PRECACHE_ASSETS = ${JSON.stringify(precacheAssets)};`);
+// A new build gets a new cache name, so old shells are deleted on activation.
+const buildId = createHash('sha1').update(precacheAssets.join('|')).digest('hex').slice(0, 8);
+if (!worker.includes("const VERSION = 'kanchan-v1';")) throw new Error('Service worker version placeholder was not found.');
+worker = worker.replace("const VERSION = 'kanchan-v1';", `const VERSION = 'kanchan-${buildId}';`);
+await writeFile(resolve(dist, 'sw.js'), worker);
+console.log(`Offline precache: ${precacheAssets.length} JS/CSS files.`);
+
+// Discover the home LCP photograph (the shop’s own photo) and critical Bengali fonts before the JS bundle.
 const preloads: string[] = [];
 for (const pattern of [/hind-siliguri-bengali-400-normal-.*\.woff2$/, /hind-siliguri-bengali-600-normal-.*\.woff2$/]) {
   const file = assets.find(name => pattern.test(name));

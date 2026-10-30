@@ -33,6 +33,10 @@ Opening hours are recorded but not published as confirmed data.
   says “stock to confirm”. Nothing is invented to look complete.
 - **Bengali first, English available.** Both languages are complete, not a partial
   translation, and the choice is remembered.
+- **A tactile, 3D scroll experience.** Neumorphic sage surfaces, a rotatable
+  SVG/CSS bicycle on a sculpted plinth, and scroll-linked motion that reverses
+  when you scroll back up. Native touch/wheel scrolling is preserved, with a
+  pause control and full respect for `prefers-reduced-motion`.
 
 Owner-side additions: a phone-friendly **stock desk** at `/owner` that exports the
 exact CSV for Supabase, an optional live catalogue, and three importable n8n
@@ -50,7 +54,7 @@ npm run dev
 Open the local URL printed by Vite. The dev server binds to `0.0.0.0`.
 
 ```bash
-npm test                 # Unit and component tests (40)
+npm test                 # Unit and component tests (46)
 npm run build            # Type check, static build, data validation, PWA + SEO files
 npm run preview          # Serve the production build locally
 npm run test:e2e         # Browser, keyboard, mobile, offline-relevant and axe checks

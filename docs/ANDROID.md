@@ -152,8 +152,8 @@ tracking. If the customer installs, the prompt disappears for good.
 | Item | Budget | Where |
 | --- | --- | --- |
 | Initial JS (gzip) | ≤ 130 kB | `npm run build` output |
-| Initial CSS (gzip) | ≤ 20 kB | same |
-| Hero image | ≤ 70 kB on phones | `storefront-480.webp` |
+| Shared + experience CSS (gzip) | ≤ 24 kB | same; tactile shadows and responsive 3D scene styles |
+| Shop portrait | Lazy-loaded below the fold | `kanchan-store-hero.jpeg`; not a render-blocking hero |
 | Fonts | Bengali subset only, 2 weights, woff2 | `src/main.tsx` imports |
 | Third-party requests before consent | 0 | no analytics, map only on request |
 | Lighthouse mobile performance | ≥ 90 | measure; do not assume |

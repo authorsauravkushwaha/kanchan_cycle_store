@@ -1,6 +1,6 @@
-import { ArrowRight, Bike, Check, Info, MessagesSquare, Ruler, ScanEye, Wrench } from 'lucide-react';
+import { ArrowRight, Bike, Check, Info, MapPin, MessagesSquare, Ruler, ScanEye, Wrench } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { shop, verifiedOffers } from '../config/shop';
+import { asset, shop, verifiedOffers } from '../config/shop';
 import { useLanguage } from '../i18n';
 import { SEO } from '../components/SEO';
 import { BuyingGuide, FinalCTA, HeroSection, MaintenanceTips, ReviewSection } from '../components/HeroSection';
@@ -30,6 +30,10 @@ export default function Home() {
         <div className="home-about-copy" data-reveal>
           <SectionHeading eyebrow={l({ bn: 'কাঞ্চন সাইকেল স্টোর্স', en: 'KANCHAN CYCLE STORES' })} title={l({ bn: 'আপনার কাছের সাইকেল স্টোর', en: 'Your neighbourhood cycle store' })} description={l({ bn: 'সাইকেল, অ্যাক্সেসরিজ এবং মেরামত পরিষেবার জন্য কোলাঘাটে আপনার স্থানীয় ঠিকানা। কী পাওয়া যাচ্ছে, দাম ও স্টক—দোকানে সরাসরি জেনে নিন।', en: 'Your local destination in Kolaghat for bicycles, accessories and repair services. Ask the shop directly about current options, prices and stock.' })} />
           <TextLink to="/about">{l({ bn: 'আমাদের সম্পর্কে জানুন', en: 'More about the store' })}</TextLink>
+          <figure className="home-shop-portrait" data-reveal>
+            <img src={asset(shop.heroPhoto.src)} alt={l(shop.heroPhoto.alt)} width={shop.heroPhoto.width} height={shop.heroPhoto.height} loading="lazy" decoding="async" />
+            <figcaption><span className="portrait-location"><MapPin size={13} aria-hidden="true" />{t('common.location')}</span><strong>{l(shop.heroPhoto.caption)}</strong><span>{l({ bn: 'সামনে দেখুন। কথা বলুন। বেছে নিন।', en: 'See it. Talk it through. Make it yours.' })}</span></figcaption>
+          </figure>
         </div>
         <div className="home-offering-panel glass-panel" aria-label={l({ bn: 'দোকানের পরিষেবা', en: 'What the shop offers' })} data-reveal>
           {offeringCopy.map((item, index) => {

@@ -6,6 +6,7 @@ import { PwaProvider } from './pwa';
 import { ShortlistProvider } from './shortlist';
 import { Layout } from './components/Layout';
 import { RouteBoundary } from './components/RouteBoundary';
+import { MotionProvider } from './components/MotionExperience';
 import Home from './pages/Home';
 
 const Cycles = lazy(() => import('./pages/Cycles'));
@@ -29,25 +30,27 @@ export default function App() {
   return <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, '') || '/'}>
     <PwaProvider>
       <LanguageProvider>
-        <CatalogProvider>
-          <ShortlistProvider>
-            <Layout><RouteBoundary><Suspense fallback={<LoadingPage />}><Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/cycles" element={<Cycles />} />
-              <Route path="/cycles/:slug" element={<ProductDetail />} />
-              <Route path="/accessories" element={<Accessories />} />
-              <Route path="/services" element={<Services />} />
-              <Route path="/recommendation" element={<Recommendation />} />
-              <Route path="/list" element={<Shortlist />} />
-              <Route path="/offers" element={<Offers />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/privacy" element={<Privacy />} />
-              <Route path="/owner" element={<OwnerDesk />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes></Suspense></RouteBoundary></Layout>
-          </ShortlistProvider>
-        </CatalogProvider>
+        <MotionProvider>
+          <CatalogProvider>
+            <ShortlistProvider>
+              <Layout><RouteBoundary><Suspense fallback={<LoadingPage />}><Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/cycles" element={<Cycles />} />
+                <Route path="/cycles/:slug" element={<ProductDetail />} />
+                <Route path="/accessories" element={<Accessories />} />
+                <Route path="/services" element={<Services />} />
+                <Route path="/recommendation" element={<Recommendation />} />
+                <Route path="/list" element={<Shortlist />} />
+                <Route path="/offers" element={<Offers />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/privacy" element={<Privacy />} />
+                <Route path="/owner" element={<OwnerDesk />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes></Suspense></RouteBoundary></Layout>
+            </ShortlistProvider>
+          </CatalogProvider>
+        </MotionProvider>
       </LanguageProvider>
     </PwaProvider>
   </BrowserRouter>;

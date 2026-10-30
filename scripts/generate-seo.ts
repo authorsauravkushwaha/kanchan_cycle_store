@@ -69,14 +69,14 @@ worker = worker.replace("const VERSION = 'kanchan-v1';", `const VERSION = 'kanch
 await writeFile(resolve(dist, 'sw.js'), worker);
 console.log(`Offline precache: ${precacheAssets.length} JS/CSS files.`);
 
-// Discover the home LCP photograph (the shop’s own photo) and critical Bengali fonts before the JS bundle.
+// Preload the owner-uploaded homepage hero photograph and critical Bengali fonts before the JS bundle.
 const preloads: string[] = [];
 for (const pattern of [/hind-siliguri-bengali-400-normal-.*\.woff2$/, /hind-siliguri-bengali-600-normal-.*\.woff2$/]) {
   const file = assets.find(name => pattern.test(name));
   if (file) preloads.push(`<link rel="preload" href="${basePath}assets/${file}" as="font" type="font/woff2" crossorigin>`);
 }
 // Static preload requires no inline script; browsers may ignore it on non-home routes.
-const homeImagePreload = `<link rel="preload" href="${basePath}images/shop/storefront-480.webp" as="image" imagesrcset="${basePath}images/shop/storefront-480.webp 480w, ${basePath}images/shop/storefront.webp 960w" imagesizes="(max-width: 760px) 92vw, 42vw">`;
+const homeImagePreload = `<link rel="preload" href="${basePath}images/kanchan-store-hero.jpeg" as="image" fetchpriority="high">`;
 index = index.replace('</head>', `${preloads.join('\n')}\n${homeImagePreload}\n</head>`);
 await writeFile(resolve(dist, 'index.html'), index);
 console.log(`Routes: ${routes.length}; base path: ${basePath}; GitHub Pages refresh fallback and critical preloads generated.`);

@@ -60,11 +60,19 @@ function Header() {
   const { t, l } = useLanguage();
   const location = useLocation();
   useEffect(() => { setOpen(false); }, [location.pathname, location.hash]);
+  useEffect(() => {
+    const header = document.querySelector('.site-header');
+    if (!header) return;
+    const update = () => header.classList.toggle('is-scrolled', window.scrollY > 24);
+    update();
+    window.addEventListener('scroll', update, { passive: true });
+    return () => window.removeEventListener('scroll', update);
+  }, []);
   return <>
     <a className="skip-link" href="#main-content">{t('nav.skip')}</a>
     {shop.announcement.enabled && <div className="announcement"><Link to="/cycles" className="container"><Bike size={14} aria-hidden="true" /><span>{l(shop.announcement.text)}</span><ArrowRight size={13} aria-hidden="true" /></Link></div>}
     <header className="site-header"><div className="container header-inner">
-      <Logo />
+      <Logo light />
       <nav className="desktop-nav" aria-label={t('nav.primary')}>{navigation.map(item => <NavLink key={item.to} to={item.to} end={item.to === '/'}>{t(item.key)}</NavLink>)}</nav>
       <div className="header-actions"><LanguageSwitcher /><ShortlistLink className="header-list-desktop" /><WhatsAppButton variant="small" className="header-whatsapp" placement="header"><span className="header-whatsapp-label">{t('action.whatsappShort')}</span></WhatsAppButton><button className="icon-button mobile-menu-button" aria-label={t('nav.open')} aria-expanded={open} aria-controls="mobile-navigation" onClick={() => setOpen(true)}><Menu size={23} /></button></div>
     </div></header>
@@ -92,7 +100,7 @@ function Footer() {
       <div className="footer-contact"><h2>{t('footer.contact')}</h2><a href={phoneHref()} onClick={() => track('phone_click')}><Phone size={16} aria-hidden="true" />{shop.contact.phoneDisplay}</a><p><MapPin size={17} aria-hidden="true" /><span>{addressLines(language).join(', ')}</span></p><DirectionsButton variant="text" short />{shop.contact.email && <a href={`mailto:${shop.contact.email}`}>{shop.contact.email}</a>}</div>
       <div className="footer-hours"><h2>{t('common.hours')}</h2><p className={shop.hours.confirmed ? 'verified-hours' : 'unconfirmed-hours'}><Clock3 size={17} aria-hidden="true" />{l(shop.hours.display)}</p>{!shop.hours.confirmed && <p className="hours-caveat">{l(shop.hours.caveat)}</p>}<p className="footer-hours-note">{t('common.hoursPending')}</p><WhatsAppButton variant="text" placement="footer">{t('action.whatsappShort')}<ArrowUpRight size={15} aria-hidden="true" /></WhatsAppButton>{shop.socialLinks.length > 0 && <div className="footer-socials">{shop.socialLinks.filter(link => /^https:\/\//.test(link.url)).map(link => <a key={link.url} href={link.url} target="_blank" rel="noopener noreferrer">{link.label}<ArrowUpRight size={14} aria-hidden="true" /></a>)}</div>}</div>
     </div>
-    <div className="footer-bottom"><p>© {new Date().getFullYear()} {l(shop.name)}. {t('footer.rights')}</p><div><Link to="/privacy">{t('footer.privacy')}</Link><Link to="/about#our-shop">{t('footer.photoNote')}</Link><InstallHelpButton className="footer-install" /><ShareButton label={t('share.action')} /><button onClick={() => window.scrollTo({ top: 0, behavior: 'auto' })} className="back-top" aria-label={t('footer.backTop')}><ArrowUp size={17} /></button></div></div>
+    <div className="footer-bottom"><p>© {new Date().getFullYear()} {l(shop.name)}. {t('footer.rights')}</p><div><Link to="/privacy">{t('footer.privacy')}</Link><Link to="/about#our-shop">{t('footer.shopInfo')}</Link><LanguageSwitcher /><InstallHelpButton className="footer-install" /><ShareButton label={t('share.action')} /><button onClick={() => window.scrollTo({ top: 0, behavior: 'auto' })} className="back-top" aria-label={t('footer.backTop')}><ArrowUp size={17} /></button></div></div>
   </div></footer>;
 }
 export function Layout({ children }: { children: ReactNode }) {
@@ -109,6 +117,28 @@ export function Layout({ children }: { children: ReactNode }) {
     });
     return () => cancelAnimationFrame(frame);
   }, [location.pathname, location.hash]);
+  useEffect(() => {
+    const candidates = document.querySelectorAll<HTMLElement>(
+      '#main-content [data-reveal], #main-content .section-heading, #main-content .category-card, #main-content .product-card, #main-content .service-card, #main-content .maintenance-card, #main-content .visit-item, #main-content .map-content, #main-content .map-frame',
+    );
+    if (!('IntersectionObserver' in window)) {
+      candidates.forEach(element => element.classList.add('reveal-item', 'is-visible'));
+      return;
+    }
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -36px 0px' });
+    candidates.forEach((element, index) => {
+      element.classList.add('reveal-item', `reveal-delay-${index % 4}`);
+      observer.observe(element);
+    });
+    return () => observer.disconnect();
+  }, [location.pathname]);
   return <>
     <OfflineBanner />
     <Header />

@@ -1,17 +1,45 @@
-import { ExternalLink, HeartHandshake, MapPin, ShieldCheck } from 'lucide-react';
-import { photos, shop } from '../config/shop';
+import { Bike, HeartHandshake, MapPin, ShieldCheck } from 'lucide-react';
+import { addressLines, shop } from '../config/shop';
 import { useLanguage } from '../i18n';
 import { SEO } from '../components/SEO';
-import { PageHero, Photo, SectionHeading } from '../components/UI';
+import { Notice, PageHero, SectionHeading, ShopGallery, TextLink } from '../components/UI';
 import { FinalCTA } from '../components/HeroSection';
 import { MapSection } from '../components/MapSection';
+
 export default function About() {
-  const { t, l } = useLanguage();
-  return <><SEO title={t('nav.about')} description="seo.aboutDescription" /><PageHero eyebrow={t('about.eyebrow')} title={t('about.title')} description={t('about.description')} /><section className="section about-story"><div className="container about-story-grid"><Photo image={photos.hero} className="about-photo" sizes="(max-width: 760px) 90vw, 40vw" /><div><SectionHeading eyebrow={l(shop.name)} title={t('about.storyTitle')} />{['about.story1', 'about.story2', 'about.story3'].map(key => <p key={key}>{t(key as 'about.story1')}</p>)}<div className="about-values"><span><HeartHandshake size={21} strokeWidth={1.5} aria-hidden="true" />{t('benefit.2.title')}</span><span><ShieldCheck size={21} strokeWidth={1.5} aria-hidden="true" />{t('catalog.verifiedOnly')}</span><span><MapPin size={21} strokeWidth={1.5} aria-hidden="true" />{t('common.location')}</span></div></div></div></section><section className="section photo-transparency" id="photo-transparency"><div className="container"><SectionHeading title={t('about.photosTitle')} description={t('about.photosText')} /><details className="photo-source-details"><summary>{t('about.photoCredits')}<ExternalLink size={16} aria-hidden="true" /></summary><div><p>{l({ bn: 'নিচের ছবিগুলো Pexels ও Unsplash থেকে নেওয়া প্রতীকী ছবি। সংশ্লিষ্ট লাইসেন্সের শর্ত মেনে ব্যবহার করতে হবে। মূল মডেল বা দোকানের পণ্য হিসেবে দেখানো হয়নি।', en: 'These illustrative photographs are sourced from Pexels and Unsplash and are subject to their respective licences. They are not presented as the shop’s actual models or inventory.' })}</p><ul className="photo-credits-list">{Object.entries(photos).map(([key, image]) => <li key={key}><span>{l(image.alt)}</span><a href={imageCredits[key]} target="_blank" rel="noopener noreferrer">{l({ bn: 'ছবির উৎস', en: 'Photo source' })}<ExternalLink size={13} aria-hidden="true" /></a></li>)}</ul><div className="license-links"><a href="https://www.pexels.com/license/" target="_blank" rel="noopener noreferrer">Pexels License<ExternalLink size={13} aria-hidden="true" /></a><a href="https://unsplash.com/license" target="_blank" rel="noopener noreferrer">Unsplash License<ExternalLink size={13} aria-hidden="true" /></a></div></div></details></div></section><MapSection /><FinalCTA /></>;
+  const { t, l, language } = useLanguage();
+  return <>
+    <SEO title={t('nav.about')} description="seo.aboutDescription" />
+    <PageHero eyebrow={t('about.eyebrow')} title={t('about.title')} description={t('about.description')} />
+    <section className="section about-story"><div className="container about-story-grid">
+      <div className="about-story-copy">
+        <SectionHeading eyebrow={l(shop.name)} title={t('about.storyTitle')} />
+        {['about.story1', 'about.story2', 'about.story3'].map(key => <p key={key}>{t(key as 'about.story1')}</p>)}
+        <div className="about-values"><span><HeartHandshake size={21} strokeWidth={1.5} aria-hidden="true" />{t('benefit.2.title')}</span><span><ShieldCheck size={21} strokeWidth={1.5} aria-hidden="true" />{t('catalog.verifiedOnly')}</span><span><MapPin size={21} strokeWidth={1.5} aria-hidden="true" />{t('common.location')}</span></div>
+      </div>
+      <aside className="about-facts" aria-label={l({ bn: 'দোকানের তথ্য', en: 'Shop details' })}>
+        <p className="eyebrow"><span />{l({ bn: 'এক নজরে', en: 'AT A GLANCE' })}</p>
+        <dl>
+          <div><dt>{l({ bn: 'কী পাওয়া যায়', en: 'What we offer' })}</dt><dd>{l({ bn: 'সাইকেল বিক্রি, অ্যাক্সেসরিজ, মেরামত ও সার্ভিসিং', en: 'Cycle sales, accessories, repair & servicing' })}</dd></div>
+          <div><dt>{t('common.address')}</dt><dd>{addressLines(language).join(', ')}</dd></div>
+          <div><dt>{t('common.hours')}</dt><dd>{l(shop.hours.display)}<small className="hours-caveat">{l(shop.hours.caveat)}</small></dd></div>
+        </dl>
+        <TextLink to="/contact">{t('action.contact')}</TextLink>
+      </aside>
+    </div></section>
+    <section className="section gallery-section" id="our-shop">
+      <div className="container">
+        <SectionHeading eyebrow={t('home.gallery.eyebrow')} title={t('about.photosTitle')} description={t('about.photosText')} />
+        <p className="gallery-subheading">{t('about.galleryHeading')}</p>
+        <ShopGallery />
+        <Notice>{t('about.galleryNote')}</Notice>
+      </div>
+    </section>
+    <section className="section about-promise"><div className="container about-promise-grid">
+      <span className="about-promise-icon" aria-hidden="true"><Bike size={34} strokeWidth={1.3} /></span>
+      <div><h2>{t('about.valuesTitle')}</h2><p>{l({ bn: 'আপনার প্রয়োজন বুঝে, বাজেট মিলিয়ে, সামনে দেখে সাইকেল বেছে নিন। দাম, মডেল বা পরিষেবা নিশ্চিত না হলে আমরা অনুমান করে কিছু লিখি না — সরাসরি দোকানে জিজ্ঞাসা করাই সবচেয়ে ভালো।', en: 'Choose a cycle after we understand what you need, match it to your budget and let you see it in person. If a price, model or service is not confirmed, we do not guess — asking the shop directly is always best.' })}</p></div>
+    </div></section>
+    <MapSection />
+    <FinalCTA />
+  </>;
 }
-const imageCredits: Record<string, string> = {
-  hero: 'https://www.pexels.com/photo/36891176/', kids: 'https://www.pexels.com/photo/3619972/',
-  student: 'https://www.pexels.com/photo/101980/', city: 'https://unsplash.com/photos/green-city-bicycle-beside-green-steel-fence-during-daytime-PeSVtlpudx8',
-  geared: 'https://unsplash.com/photos/person-cycling-on-bike-surrounds-with-trees-at-daytime-6DWMeV1kNCc',
-  electric: 'https://www.pexels.com/photo/8811577/', accessories: 'https://www.pexels.com/photo/30827167/', repair: 'https://www.pexels.com/photo/10263877/',
-};

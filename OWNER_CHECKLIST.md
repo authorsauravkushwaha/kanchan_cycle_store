@@ -18,10 +18,10 @@ All routine settings live in **`src/config/shop.ts`**. Do not publish a detail m
 |---|---|---|
 | Opening hours | Supplied 9 AM–9 PM daily is recorded, **not shown publicly** | Confirm the interpretation, then set `hours.confirmed: true`. Update days/times/display text if different. |
 | WhatsApp ownership | Links use the supplied number | Send a real test enquiry and confirm the shop receives it. No message was sent during development. |
-| Bicycle catalog | Empty; useful enquiry state instead of fake products | Add verified names, brands, specifications, prices, stock and product photos. |
+| Bicycle catalog | Empty; useful enquiry state instead of fake products | Add verified names, brands, specifications, prices and stock. Product cards stay text-only — the site has no product images. |
 | Accessories | Enquiry topics only; no claimed inventory | Add real accessory records or confirm the enquiry topics are useful. |
 | Repair services | Six possible topics, all marked as requiring availability confirmation | Set `confirmed: true` only for services actually offered. Add a price only when verified. |
-| Shop photographs | None supplied; stock bicycle images clearly labelled illustrative | Supply real storefront/interior photos for `shopPhotos`; replace category/hero images as appropriate. |
+| Shop photographs | Six of the owner's own photographs are used (hero + About gallery), each labelled দোকানের ছবি | Confirm you are happy with the selection, captions and crops. |
 | Offers | No discounts published; useful buying tips shown | Add only genuine, owner-approved offers with `verified: true`. |
 | Reviews | No names, ratings or testimonials fabricated | Supply authentic reviews with permission and a genuine source URL, or a real review link. |
 | Production domain | `websiteUrl: null`; preview noindex | Set the actual HTTPS URL after deployment. |
@@ -45,14 +45,6 @@ All routine settings live in **`src/config/shop.ts`**. Do not publish a detail m
   category: 'city', // kids | student | city | geared | electric | accessories
   brand: null, // A verified brand string, or null.
   price: null, // A verified INR number, e.g. 5499; never a string or a guess.
-  image: '/images/REPLACE-WITH-REAL-PHOTO.webp',
-  imageAlt: {
-    bn: 'পণ্যের সঠিক বর্ণনা লিখুন',
-    en: 'Replace with an accurate product description',
-  },
-  imageIsIllustrative: true, // false ONLY for a real photo of this exact product.
-  imageWidth: 1000,
-  imageHeight: 750,
   descriptionBn: 'দোকান থেকে যাচাই করা বিবরণ লিখুন।',
   descriptionEn: 'Replace with a shop-verified description.',
   specifications: {
@@ -68,12 +60,12 @@ All routine settings live in **`src/config/shop.ts`**. Do not publish a detail m
 }
 ```
 
-For an accessory, use `kind: 'accessory'` and `category: 'accessories'`. Its detail page and WhatsApp enquiry work through the same catalog. Keep image dimensions equal to the actual file’s dimensions. Recommended product crop: 4:3, around 1000 × 750, optimized WebP.
+For an accessory, use `kind: 'accessory'` and `category: 'accessories'`. Its detail page and WhatsApp enquiry work through the same catalog. Product records have **no image fields** — product cards are text-only by design, so a missing photograph never leaves an empty placeholder.
 
 ## Before announcing the website
 
 1. Confirm hours, service availability and all product information with the shop.
-2. Replace illustrative photos with genuine photos where possible; keep honest captions on any remaining placeholders.
+2. Review the shop photographs in `public/images/shop/`: the hero uses `storefront`, and the About gallery uses six of your own pictures. Replace any picture you would rather not show, and check each caption is accurate.
 3. Check the Bengali and English versions on a small Android phone.
 4. Test WhatsApp, phone and Google Maps using the shop’s actual devices. **Do not send test messages to customers.**
 5. Confirm that no fictional products, offers, reviews, social links or business claims appear.

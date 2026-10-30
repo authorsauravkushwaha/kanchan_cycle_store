@@ -2,8 +2,8 @@ import { ArrowRight, ArrowUpRight, Bike, Check, MapPin, MessageCircle, Phone, Se
 import type { LucideIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { ReactNode } from 'react';
-import { asset, shop } from '../config/shop';
-import type { ImageAsset } from '../config/shop';
+import { asset, shop, shopPhotos } from '../config/shop';
+import type { ShopPhoto as ShopPhotoData } from '../config/shop';
 import { useLanguage } from '../i18n';
 import { phoneHref, track, whatsappHref } from '../lib/business';
 import type { AnalyticsEvent } from '../lib/business';
@@ -33,14 +33,27 @@ export function TextLink({ to, children, className = '' }: { to: string; childre
 export function SectionHeading({ eyebrow, title, description, children, className = '' }: { eyebrow?: string; title: string; description?: string; children?: ReactNode; className?: string }) {
   return <div className={`section-heading ${className}`}><div>{eyebrow && <p className="eyebrow"><span />{eyebrow}</p>}<h2>{title}</h2>{description && <p className="section-description">{description}</p>}</div>{children}</div>;
 }
-export function Photo({ image, className = '', priority = false, sizes = '(max-width: 640px) 90vw, 50vw', srcSet, children }: { image: ImageAsset; className?: string; priority?: boolean; sizes?: string; srcSet?: string; children?: ReactNode }) {
+/**
+ * The only photographic component on the website. It renders the owner's own
+ * photographs of the Kolaghat shop — never stock photography or illustrations.
+ * Captions describe what is actually visible in the frame.
+ */
+export function ShopPhoto({ photo, className = '', priority = false, sizes = '(max-width: 760px) 92vw, 44vw', showCaption = true }: {
+  photo: ShopPhotoData; className?: string; priority?: boolean; sizes?: string; showCaption?: boolean;
+}) {
   const { t, l } = useLanguage();
-  const responsiveSrcSet = srcSet ?? (image.smallSrc && image.smallWidth ? `${asset(image.smallSrc)} ${image.smallWidth}w, ${asset(image.src)} ${image.width}w` : undefined);
-  return <div className={`photo ${className}`}>
-    <img src={asset(image.src)} srcSet={responsiveSrcSet} alt={l(image.alt)} width={image.width} height={image.height} loading={priority ? 'eager' : 'lazy'} fetchPriority={priority ? 'high' : 'auto'} decoding="async" sizes={sizes} />
-    {children}
-    {image.illustrative && <span className="photo-credit">{t('common.illustrative')}</span>}
-  </div>;
+  return <figure className={`shop-photo ${className}`}>
+    <img src={asset(photo.src)} srcSet={`${asset(photo.smallSrc)} ${photo.smallWidth}w, ${asset(photo.src)} ${photo.width}w`} sizes={sizes} alt={l(photo.alt)} width={photo.width} height={photo.height} loading={priority ? 'eager' : 'lazy'} fetchPriority={priority ? 'high' : 'auto'} decoding="async" />
+    {showCaption && <figcaption><span className="shop-photo-badge">{t('common.shopPhoto')}</span>{l(photo.caption)}</figcaption>}
+  </figure>;
+}
+export function ShopGallery({ className = '' }: { className?: string }) {
+  return <div className={`shop-gallery ${className}`}>{shop.gallery.map(photo => <ShopPhoto key={photo.src} photo={photo} sizes="(max-width: 620px) 92vw, (max-width: 1000px) 44vw, 360px" />)}</div>;
+}
+/** A small, single real photograph used to introduce the shop on the homepage. */
+export function ShopStrip() {
+  const { t } = useLanguage();
+  return <div className="shop-strip"><div className="shop-strip-photos"><ShopPhoto photo={shopPhotos.showroom} sizes="(max-width: 760px) 46vw, 300px" /><ShopPhoto photo={shopPhotos.workshop} sizes="(max-width: 760px) 46vw, 300px" /></div><div className="shop-strip-copy"><h3>{t('home.gallery.stripTitle')}</h3><p>{t('home.gallery.stripText')}</p><ul className="shop-strip-facts"><li>{t('benefit.1.title')}</li><li>{t('benefit.3.title')}</li><li>{t('benefit.4.title')}</li></ul><TextLink to="/about#our-shop">{t('home.gallery.link')}</TextLink></div></div>;
 }
 export function Logo({ light = false, onClick }: { light?: boolean; onClick?: () => void }) {
   const { l } = useLanguage();
@@ -51,7 +64,7 @@ export function Logo({ light = false, onClick }: { light?: boolean; onClick?: ()
   </Link>;
 }
 export function PageHero({ eyebrow, title, description, children }: { eyebrow: string; title: string; description: string; children?: ReactNode }) {
-  return <section className="page-hero"><div className="container"><p className="eyebrow"><span />{eyebrow}</p><h1>{title}</h1><p className="page-hero-description">{description}</p>{children}</div><div className="page-hero-wheel" aria-hidden="true"><Bike strokeWidth={0.6} /></div></section>;
+  return <section className="page-hero"><div className="container"><p className="eyebrow"><span />{eyebrow}</p><h1>{title}</h1><p className="page-hero-description">{description}</p>{children}</div><div className="page-hero-wheel" aria-hidden="true"><span /><span /><span /></div></section>;
 }
 export function Breadcrumbs({ items }: { items: { label: string; to?: string }[] }) {
   const { t } = useLanguage();

@@ -45,14 +45,14 @@ await writeFile(resolve(dist, '404.html'), redirect);
 await writeFile(resolve(dist, '_redirects'), '/* /index.html 200\n');
 let index = await readFile(resolve(dist, 'index.html'), 'utf8');
 if (!index.includes('kanchan-route')) throw new Error('Missing GitHub Pages route restoration script in index.html.');
-// Discover the home LCP image and critical Bengali fonts before the JS bundle.
+// Discover the home LCP photograph (the shop’s own photo) and critical Bengali fonts before the JS bundle.
 const assets = await readdir(resolve(dist, 'assets'));
 const preloads: string[] = [];
 for (const pattern of [/hind-siliguri-bengali-400-normal-.*\.woff2$/, /hind-siliguri-bengali-600-normal-.*\.woff2$/]) {
   const file = assets.find(name => pattern.test(name));
   if (file) preloads.push(`<link rel="preload" href="${basePath}assets/${file}" as="font" type="font/woff2" crossorigin>`);
 }
-const homeImagePreload = `<script>(function(){var b=${JSON.stringify(basePath)};var p=location.pathname;if(p===b||p===b+'index.html'){var l=document.createElement('link');l.rel='preload';l.as='image';l.href=b+'images/hero-cycle.webp';l.imageSrcset=b+'images/hero-cycle-400.webp 400w, '+b+'images/hero-cycle.webp 500w';l.imageSizes='(max-width: 760px) 92vw, 48vw';l.fetchPriority='high';document.head.appendChild(l);}})();</script>`;
+const homeImagePreload = `<script>(function(){var b=${JSON.stringify(basePath)};var p=location.pathname;if(p===b||p===b+'index.html'){var l=document.createElement('link');l.rel='preload';l.as='image';l.href=b+'images/shop/storefront-480.webp';l.imageSrcset=b+'images/shop/storefront-480.webp 480w, '+b+'images/shop/storefront.webp 960w';l.imageSizes='(max-width: 760px) 92vw, 42vw';l.fetchPriority='high';document.head.appendChild(l);}})();</script>`;
 index = index.replace('</head>', `${preloads.join('\n')}\n${homeImagePreload}\n</head>`);
 await writeFile(resolve(dist, 'index.html'), index);
 console.log(`Routes: ${routes.length}; base path: ${basePath}; GitHub Pages refresh fallback and critical preloads generated.`);

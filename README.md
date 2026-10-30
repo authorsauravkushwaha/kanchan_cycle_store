@@ -37,7 +37,7 @@ The browser tests use the development-only `@sparticuz/chromium` package, so the
 - Click-to-load Google map based on the supplied coordinates, with a directions fallback; no invented landmark or Google Business Profile.
 - Page-specific titles/descriptions, Open Graph, conditional canonical URLs, verified-only LocalBusiness data, robots.txt and build-generated sitemap.
 - Optional, consent-gated analytics hook; **no analytics requests are enabled by default**.
-- Optimized local WebP photographs, explicit image dimensions, lazy loading, reduced-motion support and visible keyboard focus.
+- A deliberately image-light design: the only photographs are the owner's own pictures of the shop. Text-based category, product and service cards, CSS-only decoration, lazy loading and visible keyboard focus.
 
 ## One place for business updates
 
@@ -46,8 +46,8 @@ Edit **`src/config/shop.ts`**. It contains:
 - Bengali/English business names, announcement and tagline.
 - Phone, WhatsApp, structured postal address and map coordinates.
 - Opening hours and their confirmation flag.
-- Product catalog, categories, image metadata, service availability/prices, offers and permitted reviews.
-- Website URL, indexing flag, email, social links, shop photos, review URL, budget ranges and analytics endpoint.
+- Product catalog, categories, service availability/prices, offers and permitted reviews.
+- Website URL, indexing flag, email, social links, shop photographs (`heroPhoto`, `gallery`), review URL, budget ranges and analytics endpoint.
 
 Read **[OWNER_CHECKLIST.md](OWNER_CHECKLIST.md)** before launch. It distinguishes supplied details from pending owner confirmation and includes a product-record template.
 
@@ -56,26 +56,37 @@ Read **[OWNER_CHECKLIST.md](OWNER_CHECKLIST.md)** before launch. It distinguishe
 - Phone / WhatsApp: **+91 7076884950** / **917076884950**.
 - Address: **Kolaghat - Jashar Rd, Kolaghat, West Bengal 721134**.
 - Coordinates: **22.4452382, 87.8751764**.
-- Hours supplied for confirmation: **every day, 9 AM–9 PM**. `hours.confirmed` remains `false`.
+- Hours supplied for confirmation: **every day, 9 AM–9 PM**. They are displayed with a visible
+  "subject to the owner's final confirmation" caveat, and `hours.confirmed` remains `false`, so no
+  opening-hours structured data is published.
 
 WhatsApp links use `https://wa.me/917076884950?text=...` with URL-encoded Bengali or English messages. Product messages include the product name and a real page URL. Repair messages include the selected service and the customer’s preferred date/time, with an explicit manual-confirmation notice.
 
 ### Add a real product
 
-1. Put an optimized product photograph in `public/images/`.
-2. Add one record to `shop.catalog`, using the template in the owner checklist.
-3. Supply both Bengali and English names/descriptions and descriptive alt text.
+1. Add one record to `shop.catalog`, using the template in the owner checklist.
+2. Supply both Bengali and English names and descriptions.
 4. Use a number for `price` **only after verification**; otherwise use `null`.
-5. Use `availability: null` until stock is checked. Known values are `in-stock` and `out-of-stock`.
-6. Include only confirmed specifications. Unknown gearing is `null`, not `false`.
-7. Set `featured: true` to show a cycle in the homepage selection.
-8. Run `npm run check`. Duplicate IDs/slugs, negative prices and inconsistent categories fail the build.
+4. Use `availability: null` until stock is checked. Known values are `in-stock` and `out-of-stock`.
+5. Include only confirmed specifications. Unknown gearing is `null`, not `false`.
+6. Set `featured: true` to show a cycle in the homepage selection.
+7. Run `npm run check`. Duplicate IDs/slugs, negative prices and inconsistent categories fail the build.
 
 Catalog records drive the homepage, filters, detail pages, recommendations, WhatsApp messages and sitemap. Fictional fixtures exist **only under `tests/`** and are never imported into the application.
 
-### Photos and honesty
+### Photographs and honesty
 
-No owner photographs were supplied. The current bicycle, accessory and repair photographs are explicitly labelled **প্রতীকী ছবি / Illustrative photo**. They are not represented as shop inventory, staff or premises. Sources are listed in [PHOTO_CREDITS.md](PHOTO_CREDITS.md) and on the About page. Replace them with real shop/product photos when available; update `illustrative` or `imageIsIllustrative` only when the photograph really depicts the corresponding subject.
+The website is text-first. There are **no stock photographs, illustrations or product images**.
+The only pictures are the shop's own photographs, supplied by the owner in October 2026 and stored
+in `public/images/shop/`:
+
+- one portrait photograph of the shopfront in the homepage hero (`shop.heroPhoto`);
+- two of them in the homepage "our shop" strip and six in the About gallery (`shop.gallery`).
+
+Every one is labelled **দোকানের ছবি / Shop photo**, and the captions describe only what is visible.
+Photographs are never shown as catalogue products, and product cards are text-only. See
+[PHOTO_CREDITS.md](PHOTO_CREDITS.md) for the file list and how to replace a photograph. An automated
+test fails if any image outside `/images/shop/` is requested.
 
 There are no invented products, prices, discounts, ratings, review counts, warranties, certifications or years in business. Unconfirmed repair topics are presented as questions to ask, not promises of service.
 
@@ -136,7 +147,7 @@ src/components/             Header, footer, cards, filters, forms, map, SEO
 src/pages/                  Route pages
 src/lib/                    URL helpers, filtering, quiz matching, validation
 src/styles.css              Tailwind theme and responsive design system
-public/images/              Optimized, replaceable local photographs
+public/images/shop/         The owner's own photographs of the shop (the only images)
 scripts/generate-seo.ts     Data checks, sitemap, robots and Pages fallback
 tests/                      Isolated fixtures, unit/component/browser tests
 ```

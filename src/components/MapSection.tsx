@@ -10,9 +10,9 @@ export function MapSection({ standalone = false }: { standalone?: boolean }) {
   const [mapRequested, setMapRequested] = useState(false);
   const { latitude, longitude } = shop.coordinates;
   return <section className={`section map-section ${standalone ? 'map-standalone' : ''}`} id="location"><div className="container map-layout">
-    <div className="map-content"><SectionHeading eyebrow={t('home.visit.eyebrow')} title={t('contact.visitTitle')} /><h3 className="map-shop-name">{l(shop.name)}</h3>
+    <div className="map-content"><SectionHeading eyebrow={t('map.eyebrow')} title={t('contact.visitTitle')} /><h3 className="map-shop-name">{l(shop.name)}</h3>
       <div className="map-detail"><MapPin size={21} aria-hidden="true" /><div><h4>{t('common.address')}</h4><address>{addressLines(language).map(line => <span key={line}>{line}</span>)}</address></div></div>
-      <div className="map-detail"><Clock3 size={20} aria-hidden="true" /><div><h4>{t('common.hours')}</h4><p>{shop.hours.confirmed ? l(shop.hours.display) : t('common.hoursPending')}</p></div></div>
+      <div className="map-detail"><Clock3 size={20} aria-hidden="true" /><div><h4>{t('common.hours')}</h4><p>{l(shop.hours.display)}{!shop.hours.confirmed && <small className="hours-caveat">{l(shop.hours.caveat)}</small>}</p></div></div>
       <a className="map-phone" href={phoneHref()} onClick={() => track('phone_click')}><Phone size={17} aria-hidden="true" />{shop.contact.phoneDisplay}</a>
       <div className="map-actions"><DirectionsButton variant="primary" /></div>
     </div>

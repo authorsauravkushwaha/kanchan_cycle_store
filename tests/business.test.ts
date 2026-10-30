@@ -20,7 +20,9 @@ describe('contact configuration', () => {
     expect(shop.catalog).toEqual([]);
     expect(shop.offers).toEqual([]);
     expect(shop.reviews).toEqual([]);
-    expect(shop.services.every(service => !service.confirmed && service.price === null)).toBe(true);
+    expect(shop.services.every(service => service.price === null)).toBe(true);
+    // Only the owner-confirmed "bicycle repair & servicing" service is published as confirmed.
+    expect(shop.services.filter(service => service.confirmed).map(service => service.id)).toEqual(['general']);
   });
   it('uses the exact supplied coordinates and postal address', () => {
     expect(shop.coordinates).toEqual({ latitude: 22.4452382, longitude: 87.8751764 });

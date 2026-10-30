@@ -67,8 +67,9 @@ test('category links, empty catalog, phone, directions and embedded map are corr
   const map = page.locator('.map-frame iframe');
   await expect(map).toHaveAttribute('src', /22\.4452382,87\.8751764/);
   await expect(map).toHaveAttribute('title', /Google মানচিত্র/);
-  await expect(page.locator('.contact-hours')).toContainText('আসার আগে');
-  await expect(page.locator('.contact-hours')).not.toContainText('সকাল ৯টা');
+  // The supplied 9 AM–9 PM hours are shown, but explicitly marked unconfirmed.
+  await expect(page.locator('.contact-hours')).toContainText('সকাল ৯টা');
+  await expect(page.locator('.contact-hours')).toContainText('চূড়ান্ত নিশ্চিতকরণ সাপেক্ষে');
   const structured = JSON.parse((await page.locator('#business-structured-data').textContent())!);
   expect(structured[0]['@type']).toBe('Store');
   expect(structured[0].telephone).toBe('+917076884950');
@@ -238,7 +239,7 @@ test('primary pages pass automated WCAG A/AA checks on desktop and mobile', asyn
   }
 });
 
-test('local images load and pages do not produce application errors', async ({ page }) => {
+test('only the shop’s own photographs load and pages do not produce application errors', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', error => errors.push(error.message));
   for (const path of ['/', '/cycles', '/accessories', '/services', '/recommendation', '/offers', '/about', '/contact', '/privacy']) {
@@ -250,6 +251,11 @@ test('local images load and pages do not produce application errors', async ({ p
     });
     const broken = await page.evaluate(() => Array.from(document.images).filter(img => img.complete && img.naturalWidth === 0).map(img => img.src));
     expect(broken, path).toEqual([]);
+    // No stock photography: every image on every page comes from /images/shop/.
+    const foreign = await page.evaluate(() => Array.from(document.images)
+      .map(img => new URL(img.currentSrc || img.src, location.origin).pathname)
+      .filter(src => !src.includes('/images/shop/')));
+    expect(foreign, path).toEqual([]);
   }
   expect(errors).toEqual([]);
 });

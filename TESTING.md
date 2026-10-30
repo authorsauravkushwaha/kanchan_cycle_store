@@ -33,7 +33,7 @@ Initial checks: **2026-10-29**. Pre-push verification: **2026-10-30**. Environme
 - Repair validation, Bengali phone digits, formatted WhatsApp enquiry, preferred date/time, acquisition source and explicit “not a confirmed booking” wording.
 - Six-step quiz, back navigation, optional height, safe empty recommendation state and shareable answers.
 - Mobile drawer open/close, Escape key, focus return and persistent WhatsApp/Call/Directions bar.
-- Local images decode successfully; no application JavaScript errors on the public routes.
+- Only the shop's own photographs load (any image outside `/images/shop/` fails the test), they decode successfully and no application JavaScript errors occur on the public routes.
 - Click-to-load map uses the supplied coordinates; no map iframe is created before the visitor chooses it.
 
 Fictional catalog records used by browser tests are injected only into the test browser. They are not part of `src/config/shop.ts` or the public build.
@@ -56,7 +56,7 @@ Selected lab metrics:
 - Total Blocking Time: **120 ms**
 - Cumulative Layout Shift: **0**
 
-The home hero image and critical Bengali fonts are preloaded, non-home pages are code-split, local images have responsive variants, and the map is click-to-load. The SEO score is expected to improve after the real domain is configured, owner review is complete and indexing is deliberately enabled; do not enable it merely to raise a preview score.
+The home hero photograph and critical Bengali fonts are preloaded, non-home pages are code-split, the shop photographs have responsive variants, and the map is click-to-load. The SEO score is expected to improve after the real domain is configured, owner review is complete and indexing is deliberately enabled; do not enable it merely to raise a preview score.
 
 ## Limits and remaining real-world checks
 

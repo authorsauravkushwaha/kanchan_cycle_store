@@ -3,21 +3,27 @@
  * Read OWNER_CHECKLIST.md before changing verification flags.
  * Never turn an unknown price, stock level, service or offer into a claim.
  * Only the values in this file need editing for routine business updates.
+ *
+ * Design note: this website is deliberately image-light. The only photographs
+ * on the site are the owner's own pictures of the Kolaghat shop (see shopPhotos).
+ * There are no stock photographs, no illustrations and no product images.
  */
 export type Language = 'bn' | 'en';
 export type Localized = { bn: string; en: string };
 export type CategoryId = 'kids' | 'student' | 'city' | 'geared' | 'electric' | 'accessories';
 export type Availability = 'in-stock' | 'out-of-stock' | null;
 export type UseCase = 'school' | 'commuting' | 'recreation' | 'mixed';
-export interface ImageAsset {
+
+/** A real photograph taken inside or outside the shop. Never a stock photo. */
+export interface ShopPhoto {
   src: string;
-  alt: Localized;
+  /** Smaller variant for responsive loading. */
+  smallSrc: string;
+  smallWidth: number;
   width: number;
   height: number;
-  illustrative: boolean;
-  /** Optional smaller variant for responsive loading; omit if not available. */
-  smallSrc?: string;
-  smallWidth?: number;
+  alt: Localized;
+  caption: Localized;
 }
 export interface Product {
   id: string;
@@ -29,11 +35,6 @@ export interface Product {
   brand: string | null;
   /** A finite, owner-verified INR amount; null means contact for price. */
   price: number | null;
-  image: string;
-  imageAlt: Localized;
-  imageIsIllustrative: boolean;
-  imageWidth: number;
-  imageHeight: number;
   descriptionBn: string;
   descriptionEn: string;
   /** Include only confirmed specifications. null is unknown, never false. */
@@ -71,40 +72,54 @@ export interface Review {
   permissionConfirmed: boolean;
   rating: number | null;
 }
-export const photos = {
-  hero: {
-    src: '/images/hero-cycle.webp', smallSrc: '/images/hero-cycle-400.webp', smallWidth: 400, width: 500, height: 647, illustrative: true,
-    alt: { bn: 'গাছের ছায়ায় একটি পথে দাঁড়িয়ে থাকা সাইকেল — প্রতীকী ছবি', en: 'A bicycle on a tree-lined path — illustrative photograph' },
+export interface Category {
+  id: CategoryId;
+  name: Localized;
+  subtitle: Localized;
+  availabilityConfirmed: boolean;
+}
+
+/**
+ * The owner's own photographs of the shop in Kolaghat, supplied October 2026.
+ * Every caption describes only what is visible in the picture.
+ */
+export const shopPhotos = {
+  storefront: {
+    src: '/images/shop/storefront.webp', smallSrc: '/images/shop/storefront-480.webp', smallWidth: 480, width: 960, height: 1200,
+    alt: { bn: 'কাঞ্চন সাইকেল স্টোর্সের সিঁড়ি ও সাইনবোর্ড, সামনে বাচ্চাদের সাইকেল', en: 'The steps and signboard of Kanchan Cycle Stores, with children’s cycles in front' },
+    caption: { bn: 'কোলাঘাট–যাশর রোডে আমাদের দোকান', en: 'Our shop on Kolaghat - Jashar Road' },
   },
-  kids: {
-    src: '/images/kids-cycle.webp', smallSrc: '/images/kids-cycle-320.webp', smallWidth: 320, width: 480, height: 400, illustrative: true,
-    alt: { bn: 'সাইকেল চালাচ্ছে একটি শিশু — বিভাগের প্রতীকী ছবি', en: 'A child enjoying a bicycle ride — illustrative category photograph' },
+  display: {
+    src: '/images/shop/bicycle-display.webp', smallSrc: '/images/shop/bicycle-display-400.webp', smallWidth: 400, width: 800, height: 600,
+    alt: { bn: 'দোকানের প্রবেশপথে সাজিয়ে রাখা নতুন সাইকেল', en: 'New bicycles lined up at the shop entrance' },
+    caption: { bn: 'প্রবেশপথে সাজানো নতুন সাইকেল', en: 'New cycles on display at the entrance' },
   },
-  student: {
-    src: '/images/student-cycle.webp', smallSrc: '/images/student-cycle-320.webp', smallWidth: 320, width: 480, height: 400, illustrative: true,
-    alt: { bn: 'রাস্তার ধারে দুটি ক্লাসিক সাইকেল — প্রতীকী ছবি', en: 'Two classic bicycles beside a street — illustrative photograph' },
+  showroom: {
+    src: '/images/shop/showroom-row.webp', smallSrc: '/images/shop/showroom-row-400.webp', smallWidth: 400, width: 800, height: 600,
+    alt: { bn: 'দোকানের ভিতরে সারি সারি সাইকেল ও সবুজ দেয়াল', en: 'Rows of bicycles inside the shop against a green wall' },
+    caption: { bn: 'ভিতরে সারি সারি সাইকেল', en: 'Rows of cycles inside the showroom' },
   },
-  city: {
-    src: '/images/city-cycle.webp', smallSrc: '/images/city-cycle-320.webp', smallWidth: 320, width: 480, height: 400, illustrative: true,
-    alt: { bn: 'সবুজ রেলিংয়ের পাশে একটি সিটি সাইকেল — প্রতীকী ছবি', en: 'A green city bicycle beside railings — illustrative photograph' },
+  kidsCity: {
+    src: '/images/shop/kids-and-city.webp', smallSrc: '/images/shop/kids-and-city-400.webp', smallWidth: 400, width: 800, height: 600,
+    alt: { bn: 'দোকানের দেয়ালের পাশে বাচ্চাদের ও সিটির সাইকেল', en: 'Children’s and city cycles along the shop wall' },
+    caption: { bn: 'বাচ্চাদের ও দৈনন্দিন ব্যবহারের সাইকেল', en: 'Kids’ and everyday city cycles' },
   },
-  geared: {
-    src: '/images/geared-cycle.webp', smallSrc: '/images/geared-cycle-320.webp', smallWidth: 320, width: 480, height: 400, illustrative: true,
-    alt: { bn: 'বনের পথে সাইকেল চালাচ্ছেন একজন আরোহী — প্রতীকী ছবি', en: 'A cyclist riding along a forest trail — illustrative photograph' },
+  stryder: {
+    src: '/images/shop/stryder-corner.webp', smallSrc: '/images/shop/stryder-corner-400.webp', smallWidth: 400, width: 800, height: 600,
+    alt: { bn: 'দোকানে রাখা স্ট্রাইডার ব্র্যান্ডের বাচ্চাদের সাইকেল', en: 'A Stryder children’s cycle displayed in the shop' },
+    caption: { bn: 'বাচ্চাদের ব্র্যান্ডেড সাইকেল, দোকানে দেখে নিন', en: 'Branded kids’ cycles, ready to see in person' },
   },
-  electric: {
-    src: '/images/electric-cycle.webp', smallSrc: '/images/electric-cycle-320.webp', smallWidth: 320, width: 480, height: 400, illustrative: true,
-    alt: { bn: 'পথের ধারে রাখা একটি ইলেকট্রিক সাইকেল — প্রতীকী ছবি', en: 'An electric bicycle parked beside a path — illustrative photograph' },
+  workshop: {
+    src: '/images/shop/workshop.webp', smallSrc: '/images/shop/workshop-400.webp', smallWidth: 400, width: 800, height: 600,
+    alt: { bn: 'সাইকেল মেরামতের ওয়ার্কশপ: যন্ত্রপাতি, কম্প্রেসর ও যন্ত্রাংশের তাক', en: 'The repair workshop with tools, a compressor and shelves of spare parts' },
+    caption: { bn: 'মেরামতের ওয়ার্কশপ', en: 'The repair workshop' },
   },
-  accessories: {
-    src: '/images/accessories.webp', smallSrc: '/images/accessories-320.webp', smallWidth: 320, width: 480, height: 400, illustrative: true,
-    alt: { bn: 'হ্যান্ডেলবারে লাগানো লাল রঙের সাইকেল বেল — প্রতীকী ছবি', en: 'A red bicycle bell on a handlebar — illustrative photograph' },
+  sign: {
+    src: '/images/shop/hero-sprint-board.webp', smallSrc: '/images/shop/hero-sprint-board-400.webp', smallWidth: 400, width: 800, height: 600,
+    alt: { bn: 'কাঞ্চন সাইকেল স্টোর্সের বাইরের সাইনবোর্ড', en: 'The shop’s signboard facing the road' },
+    caption: { bn: 'রাস্তার ধারে আমাদের সাইনবোর্ড', en: 'Our signboard by the road' },
   },
-  repair: {
-    src: '/images/repair.webp', smallSrc: '/images/repair-480.webp', smallWidth: 480, width: 500, height: 750, illustrative: true,
-    alt: { bn: 'সাইকেলের গিয়ার মেরামত করছেন একজন মেকানিক — প্রতীকী ছবি', en: 'A mechanic working on bicycle gears — illustrative photograph' },
-  },
-} satisfies Record<string, ImageAsset>;
+} satisfies Record<string, ShopPhoto>;
 
 export const shop = {
   name: { bn: 'কাঞ্চন সাইকেল স্টোর্স', en: 'Kanchan Cycle Stores' },
@@ -112,10 +127,14 @@ export const shop = {
   announcement: {
     enabled: true,
     text: {
-      bn: 'আপনার পছন্দের সাইকেল খুঁজুন — আজই যোগাযোগ করুন!',
-      en: 'Find your next bicycle — talk to your local cycle shop today!',
+      bn: 'নতুন সাইকেল, অ্যাক্সেসরিজ ও মেরামত — কোলাঘাটেই যোগাযোগ করুন।',
+      en: 'New cycles, accessories and repairs — talk to the shop in Kolaghat.',
     },
   },
+  /** The single real photograph used in the hero. */
+  heroPhoto: shopPhotos.storefront,
+  /** Ordered gallery shown on the About page. All photographs are the shop’s own. */
+  gallery: [shopPhotos.display, shopPhotos.showroom, shopPhotos.kidsCity, shopPhotos.workshop, shopPhotos.stryder, shopPhotos.sign],
   contact: {
     // Supplied by the business owner in the project brief.
     phone: '+917076884950',
@@ -134,13 +153,15 @@ export const shop = {
   coordinates: { latitude: 22.4452382, longitude: 87.8751764 },
   directionsUrl: 'https://www.google.com/maps/dir/?api=1&destination=22.4452382%2C87.8751764',
   hours: {
-    // Owner supplied 9 AM–9 PM daily, but explicitly requested confirmation.
-    // Keep false until confirmed. The public site will NOT publish these hours.
+    // Owner supplied 9 AM–9 PM daily, but explicitly requested final confirmation.
+    // The times are shown with a visible caveat; structured data stays unpublished
+    // until this flag is true.
     confirmed: false,
     days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
     opens: '09:00',
     closes: '21:00',
     display: { bn: 'প্রতিদিন সকাল ৯টা–রাত ৯টা', en: 'Every day, 9:00 AM–9:00 PM' },
+    caveat: { bn: 'সময় মালিকের চূড়ান্ত নিশ্চিতকরণ সাপেক্ষে', en: 'Subject to the owner’s final confirmation' },
   },
   // Set the real HTTPS website URL at deployment. No domain has been invented.
   websiteUrl: null as string | null,
@@ -152,31 +173,37 @@ export const shop = {
   // null disables all analytics network requests. See README for consent rules.
   analytics: { endpoint: null as string | null },
   categories: [
-    { id: 'kids', name: { bn: 'বাচ্চাদের সাইকেল', en: 'Kids’ cycles' }, subtitle: { bn: 'ছোট্ট পথচলার শুরু', en: 'Little rides, big smiles' }, image: photos.kids, availabilityConfirmed: false },
-    { id: 'student', name: { bn: 'স্টুডেন্ট সাইকেল', en: 'Student cycles' }, subtitle: { bn: 'স্কুল থেকে কলেজের পথে', en: 'For the everyday journey' }, image: photos.student, availabilityConfirmed: false },
-    { id: 'city', name: { bn: 'দৈনন্দিন সাইকেল', en: 'City & commuter' }, subtitle: { bn: 'চেনা পথে প্রতিদিন', en: 'Make the daily ride yours' }, image: photos.city, availabilityConfirmed: false },
-    { id: 'geared', name: { bn: 'গিয়ার সাইকেল', en: 'Geared cycles' }, subtitle: { bn: 'পথ বদলাক, উৎসাহ নয়', en: 'A little more adventure' }, image: photos.geared, availabilityConfirmed: false },
-    { id: 'electric', name: { bn: 'ইলেকট্রিক সাইকেল', en: 'Electric cycles' }, subtitle: { bn: 'নতুন ধরনের পথচলা', en: 'Explore a different ride' }, image: photos.electric, availabilityConfirmed: false },
-    { id: 'accessories', name: { bn: 'সাইকেলের অ্যাক্সেসরিজ', en: 'Accessories' }, subtitle: { bn: 'যাত্রার ছোট্ট সঙ্গী', en: 'The little essentials' }, image: photos.accessories, availabilityConfirmed: false },
-  ] as { id: CategoryId; name: Localized; subtitle: Localized; image: ImageAsset; availabilityConfirmed: boolean }[],
+    { id: 'kids', name: { bn: 'বাচ্চাদের সাইকেল', en: 'Kids’ cycles' }, subtitle: { bn: 'ছোট্ট পথচলার শুরু', en: 'Little rides, big smiles' }, availabilityConfirmed: false },
+    { id: 'student', name: { bn: 'স্টুডেন্ট সাইকেল', en: 'Student cycles' }, subtitle: { bn: 'স্কুল থেকে কলেজের পথে', en: 'For the everyday journey' }, availabilityConfirmed: false },
+    { id: 'city', name: { bn: 'দৈনন্দিন ব্যবহারের সাইকেল', en: 'Everyday city cycles' }, subtitle: { bn: 'চেনা পথে প্রতিদিন', en: 'Make the daily ride yours' }, availabilityConfirmed: false },
+    { id: 'geared', name: { bn: 'গিয়ার সাইকেল', en: 'Geared cycles' }, subtitle: { bn: 'পথ বদলাক, উৎসাহ নয়', en: 'A little more adventure' }, availabilityConfirmed: false },
+    { id: 'electric', name: { bn: 'ইলেকট্রিক সাইকেল', en: 'Electric cycles' }, subtitle: { bn: 'নতুন ধরনের পথচলা', en: 'Explore a different ride' }, availabilityConfirmed: false },
+    { id: 'accessories', name: { bn: 'সাইকেলের অ্যাক্সেসরিজ', en: 'Cycle accessories' }, subtitle: { bn: 'যাত্রার ছোট্ট সঙ্গী', en: 'The little essentials' }, availabilityConfirmed: false },
+  ] as Category[],
   /**
    * No product records were provided. Do not add fictional products to fill space.
    * A complete, commented example is in OWNER_CHECKLIST.md (not in public data).
-   * Price, specifications, photos and availability must be checked by the owner.
+   * Price, specifications and availability must be checked by the owner.
+   * Product images are never used on this website — cards are text-only.
    */
   catalog: [] as Product[],
   services: [
+    {
+      id: 'general',
+      name: { bn: 'সাইকেল মেরামত ও সার্ভিসিং', en: 'Bicycle repair & servicing' },
+      description: { bn: 'কাঞ্চন সাইকেল স্টোর্সে সাইকেল মেরামত ও সার্ভিসিংয়ের কাজ হয়। সমস্যার কথা জানালে সারানোর বিষয়ে পরামর্শ পাবেন।', en: 'Kanchan Cycle Stores repairs and services bicycles. Describe the problem and the shop will advise on getting it fixed.' },
+      confirmed: true,
+      price: null,
+    },
     { id: 'puncture', name: { bn: 'পাংচার মেরামত', en: 'Puncture repair' }, description: { bn: 'টিউবের সমস্যা ও মেরামতের খরচ সম্পর্কে জিজ্ঞাসা করুন।', en: 'Ask about tube problems and the cost of a repair.' }, confirmed: false, price: null },
     { id: 'brakes', name: { bn: 'ব্রেক অ্যাডজাস্টমেন্ট', en: 'Brake adjustment' }, description: { bn: 'ব্রেকের সমস্যার কথা জানিয়ে পরামর্শ নিন।', en: 'Describe the issue with your brakes and ask for advice.' }, confirmed: false, price: null },
     { id: 'chain', name: { bn: 'চেইন ও লুব্রিকেশন', en: 'Chain & lubrication' }, description: { bn: 'চেইনের সমস্যা ও যত্নের বিষয়ে কথা বলুন।', en: 'Talk to the shop about chain issues and care.' }, confirmed: false, price: null },
-    { id: 'general', name: { bn: 'সাধারণ সার্ভিসিং', en: 'General servicing' }, description: { bn: 'সাইকেলের অবস্থা জানিয়ে সার্ভিসিং সম্পর্কে জিজ্ঞাসা করুন।', en: 'Tell us about your bicycle and ask about servicing.' }, confirmed: false, price: null },
     { id: 'gears', name: { bn: 'গিয়ার অ্যাডজাস্টমেন্ট', en: 'Gear adjustment' }, description: { bn: 'গিয়ার বদলাতে সমস্যা হচ্ছে? দোকানে জানান।', en: 'Having trouble shifting gears? Let the shop know.' }, confirmed: false, price: null },
     { id: 'tyres', name: { bn: 'টায়ার ও টিউব বদল', en: 'Tyre & tube replacement' }, description: { bn: 'সাইকেলের মাপ জানিয়ে টায়ার ও টিউবের খোঁজ নিন।', en: 'Share your bicycle’s size to ask about tyres and tubes.' }, confirmed: false, price: null },
   ] as Service[],
   offers: [] as Offer[],
   reviews: [] as Review[],
   reviewUrl: null as string | null,
-  shopPhotos: [] as ImageAsset[],
   budgets: [
     { id: 'under-5000', min: 0, max: 4999, label: { bn: '₹৫,০০০-এর কম', en: 'Under ₹5,000' } },
     { id: '5000-10000', min: 5000, max: 10000, label: { bn: '₹৫,০০০–₹১০,০০০', en: '₹5,000–₹10,000' } },
@@ -197,3 +224,5 @@ export const verifiedProducts = (kind?: Product['kind']) => shop.catalog.filter(
 export const verifiedOffers = () => shop.offers.filter(o => o.verified);
 export const verifiedReviews = () => shop.reviews.filter(r => r.permissionConfirmed && /^https:\/\//.test(r.sourceUrl));
 export const confirmedServices = () => shop.services.filter(s => s.confirmed);
+export const enquiryServices = () => shop.services.filter(s => !s.confirmed);
+export const hoursDisplay = (language: Language) => shop.hours.display[language];

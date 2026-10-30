@@ -15,7 +15,6 @@ export function validateCatalog(products: Product[], categoryIds: string[]): str
     if ((product.kind === 'accessory') !== (product.category === 'accessories')) errors.push(`${label}: kind and category disagree.`);
     if (product.price !== null && (!Number.isFinite(product.price) || product.price < 0)) errors.push(`${label}: price must be null or a nonnegative finite number.`);
     if (![null, 'in-stock', 'out-of-stock'].includes(product.availability)) errors.push(`${label}: invalid availability.`);
-    if (!product.image || !product.imageAlt.bn || !product.imageAlt.en || product.imageWidth <= 0 || product.imageHeight <= 0) errors.push(`${label}: image, bilingual alt text and positive dimensions are required.`);
     if (product.specifications.geared !== null && typeof product.specifications.geared !== 'boolean') errors.push(`${label}: gearing must be true, false or null.`);
     const range = product.specifications.riderHeightCm;
     if (range && (!Number.isFinite(range.min) || !Number.isFinite(range.max) || range.min <= 0 || range.max < range.min)) errors.push(`${label}: invalid rider height range.`);

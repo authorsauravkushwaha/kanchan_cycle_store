@@ -29,8 +29,9 @@ export function SEO({ title, description, product, noindex = false }: { title: s
       if (!canonical) { canonical = document.createElement('link'); canonical.rel = 'canonical'; document.head.append(canonical); }
       canonical.href = canonicalUrl;
       meta('og:url', canonicalUrl, true);
-      meta('og:image', new URL(asset(product?.image || '/images/hero-cycle.webp'), `${origin}/`).href, true);
-      meta('og:image:alt', product ? l(product.imageAlt) : l({ bn: 'সাইকেলের প্রতীকী ছবি', en: 'Illustrative bicycle photograph' }), true);
+      // The only image ever shared is the shop’s own photograph of its premises.
+      meta('og:image', new URL(asset(shop.heroPhoto.src), `${origin}/`).href, true);
+      meta('og:image:alt', l(shop.heroPhoto.alt), true);
     } else { canonical?.remove(); }
     const data: Record<string, unknown> = {
       '@context': 'https://schema.org', '@type': 'Store',

@@ -34,6 +34,15 @@ export interface DraftProduct {
 
 const useCases: UseCase[] = ['school', 'commuting', 'recreation', 'mixed'];
 const categoryIds = shop.categories.map(category => category.id);
+export const MAX_DRAFTS = 500;
+export const MAX_DRAFT_IMPORT_BYTES = 1024 * 1024;
+export const MAX_DRAFT_STORAGE_BYTES = 2 * 1024 * 1024;
+const FIELD_MAX_LENGTH: Partial<Record<keyof DraftProduct, number>> = {
+  id: 80, slug: 80, nameBn: 120, nameEn: 120, brand: 60, price: 10,
+  descriptionBn: 600, descriptionEn: 600, frameSize: 40, wheelSize: 40, brakes: 40,
+  riderHeightMin: 3, riderHeightMax: 3, intendedUse: 80, photoUrl: 500,
+};
+const CONTROL_CHARS = /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/;
 
 export function emptyDraft(): DraftProduct {
   return {
@@ -44,29 +53,57 @@ export function emptyDraft(): DraftProduct {
   };
 }
 
-const text = (value: string, max: number) => value.trim().slice(0, max);
+const text = (value: string, max: number) => value.slice(0, max).trim();
 const slugify = (value: string) => text(value, 80).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+export const normalizeDraftSlug = (value: string) => slugify(value);
 
 /** Returns a friendly, field-level reason instead of silently dropping a record. */
 export function validateDraft(draft: DraftProduct, others: DraftProduct[]): string[] {
+  if (!draft || typeof draft !== 'object' || Array.isArray(draft)) return ['Draft is invalid.'];
   const errors: string[] = [];
+  const textFields = Object.entries(FIELD_MAX_LENGTH) as [keyof DraftProduct, number][];
+  const invalidTypes = textFields.some(([field]) => typeof draft[field] !== 'string');
+  if (invalidTypes) return ['Draft contains invalid field types.'];
+  for (const [field, max] of textFields) {
+    const value = draft[field] as string;
+    if (value.length > max) errors.push(`${field} is too long (maximum ${max} characters).`);
+    else if (CONTROL_CHARS.test(value)) errors.push(`${field} contains unsupported control characters.`);
+  }
+  // Do not call trim(), URL(), split() or a regex on any overlong value.
+  if (errors.length) return errors;
+  if (typeof draft.key !== 'string' || draft.key.length > 80 || typeof draft.featured !== 'boolean') return ['Draft contains invalid field types.'];
+  if (draft.kind !== 'cycle') errors.push('Only cycle drafts are supported.');
   if (!draft.nameBn.trim()) errors.push('বাংলা নাম / Bengali name is required.');
   if (!draft.nameEn.trim()) errors.push('English name is required.');
-  if (!slugify(draft.slug)) errors.push('Slug must use a–z, 0–9 and dashes.');
-  if (others.some(other => other.key !== draft.key && slugify(other.slug) === slugify(draft.slug))) errors.push('Slug is already used by another draft.');
+
+  // Normalize once, then run only bounded, linear-time checks on user input.
+  const normalizedSlug = slugify(draft.slug);
+  const normalizedId = slugify(draft.id) || normalizedSlug;
+  if (normalizedSlug.length < 3 || normalizedSlug.length > 80 || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(normalizedSlug)) errors.push('Slug must use a–z, 0–9 and dashes.');
+  if (others.some(other => other.key !== draft.key && slugify(other.slug) === normalizedSlug)) errors.push('Slug is already used by another draft.');
+  if (others.some(other => other.key !== draft.key && (slugify(other.id) || slugify(other.slug)) === normalizedId)) errors.push('ID is already used by another draft.');
   if (!categoryIds.includes(draft.category)) errors.push('Choose a valid category.');
+  if (!['', 'true', 'false'].includes(draft.geared)) errors.push('Choose a valid gear option.');
+  if (!['', 'in-stock', 'out-of-stock'].includes(draft.availability)) errors.push('Choose a valid stock option.');
   if (draft.price.trim()) {
     const price = Number(draft.price);
-    if (!Number.isFinite(price) || price < 0) errors.push('Price must be zero or more, or left empty.');
+    if (!/^\d+$/.test(draft.price) || !Number.isSafeInteger(price) || price > 2_147_483_647) errors.push('Price must be a whole number from 0 to 2,147,483,647, or left empty.');
   }
-  const min = draft.riderHeightMin.trim() ? Number(draft.riderHeightMin) : null;
-  const max = draft.riderHeightMax.trim() ? Number(draft.riderHeightMax) : null;
-  if ((min !== null && !Number.isFinite(min)) || (max !== null && !Number.isFinite(max))) errors.push('Rider height must be a number.');
-  if (min !== null && max !== null && min > max) errors.push('Rider height minimum must not exceed the maximum.');
+  const readHeight = (value: string) => {
+    if (!value.trim()) return null;
+    if (!/^\d{1,3}$/.test(value)) return Number.NaN;
+    const number = Number(value);
+    return number >= 1 && number < 250 ? number : Number.NaN;
+  };
+  const min = readHeight(draft.riderHeightMin);
+  const max = readHeight(draft.riderHeightMax);
+  if ((min !== null && !Number.isFinite(min)) || (max !== null && !Number.isFinite(max))) errors.push('Rider height must be a whole number from 1 to 249 cm.');
+  if (min !== null && max !== null && Number.isFinite(min) && Number.isFinite(max) && min > max) errors.push('Rider height minimum must not exceed the maximum.');
+  if (draft.intendedUse.split(',').some(value => value.trim() && !useCases.includes(value.trim() as UseCase))) errors.push('Choose only listed intended uses.');
   if (draft.photoUrl.trim()) {
     try {
       const url = new URL(draft.photoUrl.trim());
-      if (url.protocol !== 'https:') errors.push('Photo link must start with https://');
+      if (url.protocol !== 'https:' || url.username || url.password) errors.push('Photo link must be an HTTPS URL without embedded credentials.');
     } catch { errors.push('Photo link is not a valid URL.'); }
   }
   return errors;
@@ -140,39 +177,67 @@ export function draftsToCatalogJson(drafts: DraftProduct[]): string {
   return JSON.stringify(drafts.map(draftToProduct), null, 2);
 }
 
-export function parseDrafts(raw: string | null): DraftProduct[] {
-  if (!raw) return [];
+/**
+ * Parse only bounded, well-shaped device-local draft data. The browser file
+ * picker is not a trust boundary: callers can also pass localStorage contents.
+ */
+export function parseDrafts(raw: string | null, maxLength = MAX_DRAFT_IMPORT_BYTES): DraftProduct[] {
+  if (!raw || raw.length > maxLength) return [];
   try {
     const parsed: unknown = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return [];
-    return parsed.flatMap(item => {
-      if (!item || typeof item !== 'object') return [];
-      const value = item as Partial<DraftProduct>;
-      if (typeof value.nameBn !== 'string' || typeof value.slug !== 'string') return [];
+    if (!Array.isArray(parsed) || parsed.length > MAX_DRAFTS) return [];
+    const accepted: DraftProduct[] = [];
+    for (const item of parsed) {
+      if (!item || typeof item !== 'object' || Array.isArray(item)) continue;
+      const value = item as Record<string, unknown>;
+      if (typeof value.nameBn !== 'string' || typeof value.slug !== 'string') continue;
+      if (value.nameBn.length > 120 || value.slug.length > 80 || CONTROL_CHARS.test(value.nameBn) || CONTROL_CHARS.test(value.slug)) continue;
       const base = emptyDraft();
-      return [{
+      const specsValue = value.specifications && typeof value.specifications === 'object' && !Array.isArray(value.specifications)
+        ? value.specifications as Record<string, unknown> : {};
+      const heightValue = specsValue.riderHeightCm && typeof specsValue.riderHeightCm === 'object' && !Array.isArray(specsValue.riderHeightCm)
+        ? specsValue.riderHeightCm as Record<string, unknown> : {};
+      const readTextValue = (candidate: unknown, max: number, fallback = ''): string | null => {
+        if (candidate === undefined || candidate === null) return fallback;
+        if (typeof candidate !== 'string' || candidate.length > max || CONTROL_CHARS.test(candidate)) return null;
+        return candidate;
+      };
+      const readText = (field: keyof DraftProduct, max: number, fallback = '') => readTextValue(value[field], max, fallback);
+      const priceValue = value.price === undefined ? '' : value.price === null ? ''
+        : typeof value.price === 'number' && Number.isSafeInteger(value.price) ? String(value.price) : value.price;
+      const rawUse = value.intendedUse ?? specsValue.intendedUse;
+      const useValue = Array.isArray(rawUse) && rawUse.length <= 4 && rawUse.every(use => typeof use === 'string')
+        ? rawUse.join(', ') : rawUse;
+      const rawMin = value.riderHeightMin ?? heightValue.min;
+      const rawMax = value.riderHeightMax ?? heightValue.max;
+      const minValue = typeof rawMin === 'number' && Number.isFinite(rawMin) ? String(rawMin) : rawMin;
+      const maxValue = typeof rawMax === 'number' && Number.isFinite(rawMax) ? String(rawMax) : rawMax;
+      const rawGeared = value.geared ?? specsValue.geared;
+      const fields = {
+        id: readText('id', 80), brand: readText('brand', 60), price: readTextValue(priceValue, 10),
+        descriptionBn: readText('descriptionBn', 600), descriptionEn: readText('descriptionEn', 600),
+        frameSize: readText('frameSize', 40), wheelSize: readText('wheelSize', 40), brakes: readText('brakes', 40),
+        riderHeightMin: readTextValue(minValue, 3), riderHeightMax: readTextValue(maxValue, 3),
+        intendedUse: readTextValue(useValue, 80), photoUrl: readText('photoUrl', 500),
+        nameEn: readText('nameEn', 120, value.nameBn),
+      };
+      if (Object.values(fields).some(field => field === null)) continue;
+      const candidate: DraftProduct = {
         ...base,
-        key: typeof value.key === 'string' ? value.key : base.key,
-        id: typeof value.id === 'string' ? value.id : '',
-        slug: value.slug,
-        kind: 'cycle' as const,
-        nameBn: value.nameBn, nameEn: typeof value.nameEn === 'string' ? value.nameEn : value.nameBn,
+        key: typeof value.key === 'string' && value.key.length <= 40 && /^draft-\d{1,16}-[a-z0-9]{1,12}$/.test(value.key) ? value.key : base.key,
+        id: fields.id!, slug: value.slug, kind: 'cycle', nameBn: value.nameBn, nameEn: fields.nameEn!,
         category: categoryIds.includes(value.category as CategoryId) ? value.category as CategoryId : 'student',
-        brand: typeof value.brand === 'string' ? value.brand : '',
-        price: typeof value.price === 'string' ? value.price : '',
-        descriptionBn: typeof value.descriptionBn === 'string' ? value.descriptionBn : '',
-        descriptionEn: typeof value.descriptionEn === 'string' ? value.descriptionEn : '',
-        geared: value.geared === 'true' || value.geared === 'false' ? value.geared : '',
-        frameSize: typeof value.frameSize === 'string' ? value.frameSize : '',
-        wheelSize: typeof value.wheelSize === 'string' ? value.wheelSize : '',
-        brakes: typeof value.brakes === 'string' ? value.brakes : '',
-        riderHeightMin: typeof value.riderHeightMin === 'string' ? value.riderHeightMin : '',
-        riderHeightMax: typeof value.riderHeightMax === 'string' ? value.riderHeightMax : '',
-        intendedUse: typeof value.intendedUse === 'string' ? value.intendedUse : '',
+        brand: fields.brand!, price: fields.price!,
+        descriptionBn: fields.descriptionBn!, descriptionEn: fields.descriptionEn!,
+        geared: rawGeared === true ? 'true' : rawGeared === false ? 'false' : rawGeared === 'true' || rawGeared === 'false' ? rawGeared : '',
+        frameSize: fields.frameSize!, wheelSize: fields.wheelSize!, brakes: fields.brakes!,
+        riderHeightMin: fields.riderHeightMin!, riderHeightMax: fields.riderHeightMax!,
+        intendedUse: fields.intendedUse!,
         availability: value.availability === 'in-stock' || value.availability === 'out-of-stock' ? value.availability : '',
-        featured: value.featured === true,
-        photoUrl: typeof value.photoUrl === 'string' ? value.photoUrl : '',
-      }];
-    });
+        featured: value.featured === true, photoUrl: fields.photoUrl!,
+      };
+      if (validateDraft(candidate, accepted).length === 0) accepted.push(candidate);
+    }
+    return accepted;
   } catch { return []; }
 }

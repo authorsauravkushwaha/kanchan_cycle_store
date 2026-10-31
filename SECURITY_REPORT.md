@@ -1,8 +1,8 @@
 # Kanchan Cycle Stores — security audit and deployment runbook
 
-Audit date: 2026-10-30. Scope: this repository and local build; **no production penetration test or domain/TLS check** was performed. This is a static Vite/React/TypeScript site. It has no backend, database, login, admin interface, payment flow, file upload, or server-side form endpoint. The only enquiry submission is a user-initiated WhatsApp link to **917076884950**; no enquiry is stored by this site. Google Maps is loaded only after a click. Fonts are bundled locally. Optional analytics is disabled (`endpoint: null`). GitHub Pages deployment is present; a Vercel configuration also exists. No website is unhackable.
+Audit date: 2026-10-31. Scope: this repository and local build; **no production penetration test or domain/TLS check** was performed. The storefront is a static Vite/React/TypeScript site with no application server, customer login, payment flow, booking endpoint or server-side enquiry form. Enquiries open a user-initiated WhatsApp link to **917076884950**; no enquiry is stored by the website. An optional external Supabase project can serve a public read-only catalogue and product photos; its schema contains owner RLS policies, but the website itself issues no writes. `/owner` has a local JSON draft import (not a server upload) and is explicitly not an authenticated admin panel. Google Maps is loaded only after a click. Fonts are bundled locally. Optional analytics is disabled (`endpoint: null`). GitHub Pages deployment is present; a Vercel configuration also exists. No website is unhackable.
 
-**Status key:** PASS = code/config implemented and locally tested; PARTIAL = configured but requires deployment/owner verification; FAIL = risk remains without an available mitigation; N/A = no relevant attack surface. PASS for a Vercel header means the configuration passed local checks, **not** that production headers were observed. Evidence: `npm ci --ignore-scripts`, `npm audit --audit-level=moderate`, `npm run check`, `npm run security:check`, manual source review, and GitHub API query. Local tests are not substitutes for production validation. Playwright E2E: 11/11 passed (local Vite preview; not live-host header testing).
+**Status key:** PASS = code/config implemented and locally tested; PARTIAL = configured but requires deployment/owner verification; FAIL = risk remains without an available mitigation; N/A = no relevant attack surface. PASS for a Vercel header means the configuration passed local checks, **not** that production headers were observed. Evidence from this revision: `npm ci` (203 packages audited), `npm audit --audit-level=moderate` (0 vulnerabilities), `npm run check` (53 unit/component tests and production build/security checks), `npm run test:e2e` (21/21 browser tests), manual source review and prior GitHub API query. Browser tests use local Vite; they do not verify live hosting headers, RLS, TLS, or WAF behavior.
 
 ## 100-control register
 
@@ -12,11 +12,11 @@ Each row names the control, why it matters, status, and evidence or required act
 | # | Control / reason | Status and evidence or action |
 |---|---|---|
 | 1 | No fake customer login / avoid new attack surface | PASS — source review: no auth or admin routes. |
-| 2 | Admin MFA / resist credential theft | N/A — no site admin; GitHub MFA is #7. |
+| 2 | Admin MFA / resist credential theft | PARTIAL — Supabase owner API authorization requires an `aal2`/MFA JWT in `supabase/schema.sql`; owner must enroll and test the factor. GitHub/hosting MFA is #7/#10. |
 | 3 | Strong customer passwords / resist guessing | N/A — no accounts. |
-| 4 | Session expiration / resist hijacking | N/A — no sessions. |
+| 4 | Session expiration / resist hijacking | PARTIAL — no customer sessions; optional Supabase owner sessions are provider-managed. Set a short session lifetime and revoke sessions after device/account loss. |
 | 5 | Login rate limits / resist brute force | N/A — no login. |
-| 6 | Role-based authorization / prevent privilege escalation | N/A — no protected roles. |
+| 6 | Role-based authorization / prevent privilege escalation | PASS in schema — anon/authenticated table grants are limited; published rows are public, and owner operations require allowlist + AAL2 RLS. Live project verification remains required. |
 | 7 | GitHub account MFA/passkeys / protect deployment | PARTIAL — owner must enforce and verify in GitHub. |
 | 8 | Least-privilege CI credentials / limit compromise | PASS — workflow defaults `contents: read`; only deploy job has `pages: write`, `id-token: write`; checkout does not persist credentials. |
 | 9 | Production deploy approval / prevent unauthorized releases | PARTIAL — require reviewers on `github-pages` environment and protected main; not verifiable from repository. |
@@ -25,12 +25,12 @@ Each row names the control, why it matters, status, and evidence or required act
 ### 2. Database and data protection
 | # | Control / reason | Status and evidence or action |
 |---|---|---|
-| 11 | Parameterized SQL / prevent injection | N/A — no SQL/database. |
-| 12 | DB least-privilege user / limit breaches | N/A — no DB. |
-| 13 | DB encryption at rest / protect records | N/A — no DB. |
-| 14 | DB backup encryption / protect copies | N/A — no DB. |
-| 15 | DB network isolation / reduce exposure | N/A — no DB. |
-| 16 | Avoid storing enquiries in browser / protect customers | PASS — source review: WhatsApp redirect only; localStorage holds language and analytics consent, sessionStorage holds route only. |
+| 11 | Parameterized SQL / prevent injection | PASS — the browser issues a fixed Supabase REST GET with an explicit column allowlist and URLSearchParams; no user text is interpolated into SQL. The optional schema uses static SQL. |
+| 12 | DB least-privilege user / limit breaches | PARTIAL — explicit browser-role grants, RLS, private owner allowlist and AAL2 authorization are in `supabase/schema.sql`; must be applied and tested on the live project. |
+| 13 | DB encryption at rest / protect records | PARTIAL — optional catalogue is hosted by Supabase; verify provider-managed encryption and project settings. No customer enquiries are stored. |
+| 14 | DB backup encryption / protect copies | PARTIAL — no customer records; owner must keep any product-table export private and encrypted. |
+| 15 | DB network isolation / reduce exposure | PARTIAL — the public REST endpoint is intentionally reachable for published catalogue reads; RLS is the boundary. Verify project API settings and RLS on deployment. |
+| 16 | Avoid storing enquiries in browser / protect customers | PASS — repair/contact details are only sent by an explicit WhatsApp action; localStorage holds language, shortlist product data and device-local owner drafts, not customer enquiries/phone numbers; sessionStorage holds route state. |
 | 17 | Minimize collected data / limit disclosure | PASS — contact form asks message only; repair asks name, phone, date and service for WhatsApp enquiry; no site storage. |
 | 18 | Sensitive backup handling / avoid public exposure | PARTIAL — no data backups needed today; owner must keep any future private business exports outside `public/`/`dist/` and restrict access. |
 | 19 | Encrypt transport of enquiry / protect in transit | PARTIAL — WhatsApp URL is HTTPS and tested; hosting must serve site over HTTPS; WhatsApp privacy policies apply. |
@@ -45,7 +45,7 @@ Each row names the control, why it matters, status, and evidence or required act
 | 24 | Safe user-controlled navigation / avoid URL injection | PASS — WhatsApp URL uses fixed numeric shop config; `encodeURIComponent`; tests in `business.test.ts`. |
 | 25 | External tab isolation / prevent reverse tabnabbing | PASS — reviewed links and `window.open` use noopener/noreferrer. |
 | 26 | CSRF token / prevent forged writes | N/A — no state-changing server endpoint; client forms open WhatsApp. |
-| 27 | SQL injection tests / detect unsafe queries | N/A — no queries. |
+| 27 | SQL injection tests / detect unsafe queries | PASS — `catalogQueryParams()` builds fixed filters and explicit columns; unit tests verify no wildcard select and the 500-row cap. No browser write or raw SQL path exists. |
 | 28 | Path traversal protection / prevent file reads | N/A — static assets only, no file-serving application endpoint. |
 | 29 | HTML sanitization / prevent injected markup | PASS — customer input is rendered as React text in preview, URL-encoded for WhatsApp; no HTML interpretation. |
 | 30 | Structured-data safe serialization / prevent script injection | PARTIAL — runtime JSON-LD uses `JSON.stringify` and `textContent`, not executable code; validate third-party SEO crawlers after CSP deployment. |
@@ -87,17 +87,17 @@ Each row names the control, why it matters, status, and evidence or required act
 | 54 | DNS registrar lock/MFA / prevent takeover | PARTIAL — owner must enable and audit. |
 | 55 | DNSSEC where supported / prevent DNS forgery | PARTIAL — verify registrar and DNS provider support/activation. |
 | 56 | Deployment origin restrictions / stop hostile deployments | PARTIAL — configure production branch allowlist and protected environment in hosting. |
-| 57 | No public production secrets / reduce credential theft | PASS — no configured frontend secrets; `.gitignore` protects local credentials; static secret-pattern scan. |
-| 58 | No public data endpoints / avoid accidental data disclosure | PASS — build/source inspection: no server endpoints or public submissions. |
+| 57 | No public production secrets / reduce credential theft | PASS — only a public Supabase anon/publishable key may be used in `VITE_*`; build rejects service-role/secret keys and scans `dist`; `.gitignore` protects local credentials. |
+| 58 | No public data endpoints / avoid accidental data disclosure | PARTIAL — no application-owned endpoint or public submissions; optional Supabase REST intentionally exposes published catalogue columns only under RLS. Verify the live schema. |
 | 59 | Static host header support / enforce web protections | FAIL — current GitHub Pages deployment workflow cannot emit custom security headers; move production to Vercel or another header-capable host, or place a configured CDN in front. Do not treat `vercel.json` as active on Pages. |
 | 60 | HTTPS-only resource loading / avoid mixed content | PASS — source review: map and WhatsApp are HTTPS, fonts/images local; `upgrade-insecure-requests` configured for Vercel. |
 
 ### 7. API and integration security
 | # | Control / reason | Status and evidence or action |
 |---|---|---|
-| 61 | API authentication / prevent unauthorized calls | N/A — no own API. |
-| 62 | API schema validation / reject bad payloads | N/A — no API endpoint. |
-| 63 | API quotas / prevent resource exhaustion | N/A — no API endpoint. |
+| 61 | API authentication / prevent unauthorized calls | PARTIAL — the public catalogue GET is intentionally anonymous and RLS-limited to published rows; owner API access requires allowlist + AAL2. Test both against the live Supabase project. |
+| 62 | API schema validation / reject bad payloads | PARTIAL — database constraints/RLS and `productFromRow()` validation cover catalogue data; verify deployed schema and policies. |
+| 63 | API quotas / prevent resource exhaustion | PARTIAL — query cap is 500 rows and client cache avoids repeat reads; provider/CDN quotas and abuse throttling need owner configuration. |
 | 64 | CORS allowlist / prevent browser API abuse | N/A — no own cross-origin API. |
 | 65 | WhatsApp official number / prevent misdirection | PASS — shop config contains 917076884950; build-time numeric validation and tests. |
 | 66 | WhatsApp URL HTTPS / protect outbound message | PASS — `business.ts` constructs HTTPS only; tests. |
@@ -114,7 +114,7 @@ Each row names the control, why it matters, status, and evidence or required act
 | 73 | Transitive package review / reduce supply-chain risk | PARTIAL — npm audit includes transitives but not malicious/unpublished vulnerabilities; review changes before merging. |
 | 74 | No unnecessary production plugins / reduce exposure | PASS — package review: production deps React/router, icons and local fonts; dev deps build/test/image tools; no security plugin installed. |
 | 75 | Dependency integrity / prevent tampering | PASS — npm lockfile integrity metadata and `npm ci`; CI uses clean install. |
-| 76 | Secret-pattern scan / prevent accidental commits | PASS — local `security:check` on tracked source patterns; not a full historical secret scan. |
+| 76 | Secret-pattern scan / prevent accidental commits | PASS — build-time scan covers source and generated public assets, private-key/token patterns and decoded Supabase `service_role` JWTs; not a full historical secret scan. |
 | 77 | GitHub secret scanning / catch leaked credentials | PARTIAL — enable secret scanning and push protection in GitHub settings (availability varies); rotate any real exposed secret. |
 | 78 | SAST/static checks / catch dangerous patterns | PARTIAL — local review plus automated inline-script/header/secret checks, and `.github/workflows/codeql.yml` now runs CodeQL `security-and-quality` (build-mode `none`) on every PR, every push to `main`, and weekly. Results become visible under Security → Code scanning once merged to the default branch; CodeQL finds nothing until then. |
 | 79 | Branch protection / prevent unauthorized edits | PARTIAL — GitHub branch protection API returned 403 `Resource not accessible by integration`; owner must set ruleset for main (PR, approvals, status checks, block force push). |
@@ -123,11 +123,11 @@ Each row names the control, why it matters, status, and evidence or required act
 ### 9. Bot, spam and DDoS protection
 | # | Control / reason | Status and evidence or action |
 |---|---|---|
-| 81 | Server-side form rate limit / prevent spam | N/A — no submission endpoint. |
+| 81 | Server-side form rate limit / prevent spam | N/A — no submission endpoint. Contact UI has a duplicate-submit guard only; it is not a security rate limit. Configure provider/CDN throttling before adding a server form. |
 | 82 | Honeypot for server form / filter bots | N/A — no submission endpoint. |
 | 83 | CAPTCHA / slow automated submissions | N/A — no submission endpoint; avoid unnecessary tracker. |
-| 84 | Upload scanning / block malware | N/A — no uploads. |
-| 85 | Upload type/size limits / block payloads | N/A — no uploads. |
+| 84 | Upload scanning / block malware | PARTIAL — no server-side file processor; `/owner` parses local JSON only. Supabase product photos are owner-uploaded but not malware-scanned; use trusted images. |
+| 85 | Upload type/size limits / block payloads | PASS in code/schema — local JSON import capped at 1 MiB / 500 drafts; Supabase bucket is 2 MiB and JPEG/PNG/WebP only with owner AAL2 policies. Apply and test the SQL on the live project. |
 | 86 | CDN traffic throttling / resist floods | PARTIAL — enable hosting/CDN WAF/rate limiting if traffic warrants; test only with provider-approved non-destructive checks. |
 | 87 | Bot mitigation / protect availability | PARTIAL — use hosting/CDN controls; no site-side server to challenge requests. |
 | 88 | Origin shielding / prevent direct origin floods | PARTIAL — choose provider configuration; static Pages origin currently outside our control. |
@@ -150,9 +150,9 @@ Each row names the control, why it matters, status, and evidence or required act
 
 ## Findings and remediation
 
-Fixed in this branch: CSP-incompatible inline route/preload/404 scripts; missing response-header configuration for Vercel; weak repair select/length/type validation and contact message length/control checks; deployment workflow's extra branch deployment and broad Pages token in build; missing automated SCA/static checks and local secret ignore patterns. The existing Vercel header set lacked CSP, frame and cache policies. No SQL injection, auth bypass or CSRF endpoints exist. Existing WhatsApp encoding, React escaping and no-opener links were retained.
+Fixed in this branch: CSP-incompatible inline route/preload/404 scripts; missing response-header configuration for Vercel; weak form validation; bounded JSON draft import; safer Supabase grants, RLS and photo-bucket limits; fixed public-column REST query; build-time source/bundle secret checks; and production-only generic error handling. The site still has no customer login, payment or server-side form endpoint. Existing WhatsApp encoding, React escaping and no-opener links were retained.
 
-Added in the latest hardening pass: CodeQL SAST workflow; Dependabot configuration for npm and GitHub Actions; commit-SHA pinning of every CI action; a `Cross-Origin-Resource-Policy: same-origin` header; a check that `vercel.json` and `public/_headers` can no longer drift apart silently; and `scripts/verify-headers.mjs` (`npm run security:headers`) which fetches a deployed URL, compares it with the policy, and exits non-zero on any missing or altered header. That last script is the only way to close the gap below, because it tests production rather than configuration.
+Additional hardening documented in [`docs/SECURITY-CONTROLS.md`](docs/SECURITY-CONTROLS.md): input bounds now precede regex/JSON parsing; owner JSON import and photo storage are size/type limited; Supabase owner authorization requires allowlist + AAL2/MFA; frontend queries select explicit public columns; build scans source and `dist` for secrets and dangerous browser sinks; production error logging is suppressed. Existing controls include the CodeQL SAST workflow; Dependabot configuration for npm and GitHub Actions; commit-SHA pinning of every CI action; a `Cross-Origin-Resource-Policy: same-origin` header; a check that `vercel.json` and `public/_headers` cannot drift silently; and `scripts/verify-headers.mjs` (`npm run security:headers`), which checks a deployed URL rather than configuration intent.
 
 Remaining: GitHub Pages **does not honor `vercel.json`** and cannot set the configured headers. The active production host/domain is unconfirmed. HSTS, WAF, DNS/MFA, GitHub rules and alerts require owner-controlled configuration. GitHub protection API query returned 403; it was not changed. No live traffic, TLS, deployed-header, DDoS or destructive tests were performed. The site has no server-side limit on WhatsApp messages. The CSP may need adjustment for actual Maps iframe subresources: start with the narrow policy; inspect browser console and CSP reports after deploying on Vercel rather than adding wildcards or `unsafe-inline`. Optional future analytics endpoint requires explicit `connect-src` allowlisting and separate privacy review.
 
@@ -165,4 +165,4 @@ Remaining: GitHub Pages **does not honor `vercel.json`** and cannot set the conf
 5. **Rollback:** identify last known-good commit and its verified deployment in GitHub/host dashboard; roll back via host's deployment rollback UI (or revert via a reviewed PR to `main`), then recheck TLS/headers, phone/WhatsApp links, deep links and maps. Never force-push protected `main`. If credentials leak, revoke/rotate them before redeployment and investigate audit logs. If compromised, temporarily disable deployment, preserve non-sensitive evidence and notify owner.
 6. **Before each change:** run `npm ci`, `npm audit --audit-level=moderate`, `npm run check`, `npm run security:check`, review lockfile changes. Run safe browser tests (`npm run test:e2e`) in a controlled preview with installed browser; no live destructive scanning. For new backends/forms/auth, redo threat model and add server-side validation, rate limiting, CSRF, access control and data-backup controls.
 
-OWASP review: A01 access control, A02 crypto, A03 injection, A04 design, A05 misconfiguration, A06 vulnerable components, A07 authentication, A08 integrity, A09 logging, A10 SSRF were evaluated against the static architecture. Relevant ASVS areas include V1 architecture, V3 sessions (N/A), V4 access (N/A), V5 input, V8 data, V9 communications, V10 malicious code, V12 files (N/A), V13 API (N/A), V14 configuration. Automated checks do not prove an ASVS certification. Safe XSS validation covers rendered text and blocked inline execution in built HTML; no server CSRF/SQL/access-control tests can run without those features. Production response/TLS verification remains pending.
+OWASP review: A01 access control, A02 crypto, A03 injection, A04 design, A05 misconfiguration, A06 vulnerable components, A07 authentication, A08 integrity, A09 logging and A10 SSRF were evaluated against the static architecture and optional Supabase integration. Relevant ASVS areas include V1 architecture, V3 sessions (customer sessions N/A; owner sessions provider-managed), V4 access (RLS applies to the optional catalogue), V5 input, V8 data, V9 communications, V10 malicious code, V12 files (local JSON plus photo-bucket limits), V13 API (public read-only catalogue), and V14 configuration. Automated checks do not prove ASVS certification. Source checks do not replace live RLS/upload tests; production response/TLS verification remains pending.

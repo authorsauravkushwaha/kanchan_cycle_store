@@ -18,6 +18,8 @@ export interface ShortlistEntry {
 export const SHORTLIST_KEY = 'kanchan-shortlist-v1';
 export const SHORTLIST_LIMIT = 20;
 const MAX_QTY = 9;
+// 20 bounded product rows fit well below this; refuse oversized local data before JSON.parse.
+const MAX_SHORTLIST_STORAGE_LENGTH = 32 * 1024;
 
 export const entryFromProduct = (product: Product): ShortlistEntry => ({
   id: product.id,
@@ -31,10 +33,10 @@ export const entryFromProduct = (product: Product): ShortlistEntry => ({
 
 /** Tolerant reader: a corrupted or older stored list must never break a page. */
 export function parseShortlist(raw: string | null): ShortlistEntry[] {
-  if (!raw) return [];
+  if (!raw || raw.length > MAX_SHORTLIST_STORAGE_LENGTH) return [];
   try {
     const parsed: unknown = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return [];
+    if (!Array.isArray(parsed) || parsed.length > SHORTLIST_LIMIT) return [];
     const seen = new Set<string>();
     return parsed.flatMap(item => {
       if (!item || typeof item !== 'object') return [];
@@ -63,6 +65,9 @@ const localNumber = (value: number, language: Language) =>
   new Intl.NumberFormat(language === 'bn' ? 'bn-IN' : 'en-IN', { maximumFractionDigits: 0 }).format(value);
 const localDigits = (value: string, language: Language) =>
   language === 'bn' ? value.replace(/\d/g, digit => DIGITS[+digit]) : value;
+const safeMessageField = (value: unknown, max: number): string => typeof value === 'string'
+  ? value.slice(0, max * 4).replace(/[\u0000-\u001f\u007f]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, max)
+  : '';
 
 export interface ShortlistMessageOptions {
   language: Language;
@@ -79,7 +84,10 @@ export interface ShortlistMessageOptions {
  * copy-and-paste habits.
  */
 export function shortlistMessage(entries: ShortlistEntry[], options: ShortlistMessageOptions): string {
-  const { language, name = '', area = '', note = '', siteUrl = null } = options;
+  const { language, siteUrl = null } = options;
+  const name = safeMessageField(options.name, 80);
+  const area = safeMessageField(options.area, 80);
+  const note = safeMessageField(options.note, 300);
   const bn = language === 'bn';
   const lines: string[] = [
     bn ? 'নমস্কার, কাঞ্চন সাইকেল স্টোর্স। আমার পছন্দের তালিকা পাঠাচ্ছি:' : 'Hello Kanchan Cycle Stores. Here is my shortlist:',

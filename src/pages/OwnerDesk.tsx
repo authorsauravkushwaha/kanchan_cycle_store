@@ -5,7 +5,7 @@ import type { CategoryId } from '../config/shop';
 import { useLanguage } from '../i18n';
 import { SEO } from '../components/SEO';
 import { Notice } from '../components/UI';
-import { draftsToCatalogJson, draftsToCsv, emptyDraft, parseDrafts, validateDraft } from '../lib/stockDesk';
+import { draftsToCatalogJson, draftsToCsv, emptyDraft, MAX_DRAFTS, MAX_DRAFT_IMPORT_BYTES, MAX_DRAFT_STORAGE_BYTES, normalizeDraftSlug, parseDrafts, validateDraft } from '../lib/stockDesk';
 import type { DraftProduct } from '../lib/stockDesk';
 
 const DRAFT_KEY = 'kanchan-owner-draft-v1';
@@ -18,7 +18,7 @@ const DRAFT_KEY = 'kanchan-owner-draft-v1';
 export default function OwnerDesk() {
   const { t, l } = useLanguage();
   const [drafts, setDrafts] = useState<DraftProduct[]>(() => {
-    try { return parseDrafts(localStorage.getItem(DRAFT_KEY)); } catch { return []; }
+    try { return parseDrafts(localStorage.getItem(DRAFT_KEY), MAX_DRAFT_STORAGE_BYTES); } catch { return []; }
   });
   const [draft, setDraft] = useState<DraftProduct>(emptyDraft);
   const [editing, setEditing] = useState(false);
@@ -38,8 +38,10 @@ export default function OwnerDesk() {
 
   const save = () => {
     const problems = validateDraft(draft, drafts);
+    if (!editing && drafts.length >= MAX_DRAFTS) problems.push(`A maximum of ${MAX_DRAFTS} drafts is allowed.`);
     if (problems.length) { setErrors(problems); return; }
-    const normalized: DraftProduct = { ...draft, slug: draft.slug.trim().toLowerCase(), id: draft.id.trim() || draft.slug.trim().toLowerCase() };
+    const normalizedSlug = normalizeDraftSlug(draft.slug);
+    const normalized: DraftProduct = { ...draft, slug: normalizedSlug, id: normalizeDraftSlug(draft.id) || normalizedSlug };
     persist(editing ? drafts.map(item => item.key === normalized.key ? normalized : item) : [...drafts, normalized]);
     setDraft(emptyDraft());
     setEditing(false);
@@ -83,8 +85,8 @@ export default function OwnerDesk() {
       <p className="eyebrow"><span />{l({ bn: 'মালিকের জন্য', en: 'FOR THE OWNER' })}</p>
       <h1>{l({ bn: 'স্টক ডেস্ক', en: 'Stock desk' })}</h1>
       <p className="page-hero-description">{l({
-        bn: 'ফোন থেকেই সাইকেলের নাম, দাম ও স্টক লিখে রাখুন। শেষে CSV ডাউনলোড করে Supabase-এ আপলোড করুন, অথবা JSON কপি করে ওয়েবসাইটে যোগ করুন।',
-        en: 'Prepare product names, prices and stock on your phone. Download the CSV for Supabase, or copy the JSON into the website.',
+        bn: 'ফোন থেকেই সাইকেলের নাম, দাম ও স্টক লিখে রাখুন। CSV ডাউনলোড করে Supabase-এ আপলোড করুন, অথবা JSON কপি করে ওয়েবসাইটে যোগ করুন। খসড়া আমদানির ফাইল ১ MB ও ৫০০টি রেকর্ডের মধ্যে সীমিত।',
+        en: 'Prepare product names, prices and stock on your phone. Download CSV for Supabase or copy JSON into the website. Draft imports are limited to 1 MB and 500 records.',
       })}</p>
     </div></section>
     <section className="section"><div className="container owner-layout">
@@ -108,13 +110,38 @@ export default function OwnerDesk() {
         <button type="button" className="btn btn-secondary" onClick={() => void copy(csv, 'CSV')} disabled={!drafts.length}><ClipboardCopy size={18} aria-hidden="true" />{l({ bn: 'CSV কপি', en: 'Copy CSV' })}</button>
         <button type="button" className="btn btn-secondary" onClick={() => fileInput.current?.click()}><Upload size={18} aria-hidden="true" />{l({ bn: 'খসড়া আনুন', en: 'Import drafts' })}</button>
         <input ref={fileInput} type="file" accept="application/json,.json" aria-label={l({ bn: 'খসড়া JSON ফাইল বেছে নিন', en: 'Choose a draft JSON file' })} className="sr-only" onChange={async event => {
-          const file = event.target.files?.[0];
+          const input = event.currentTarget;
+          const file = input.files?.[0];
           if (!file) return;
-          const imported = parseDrafts(await file.text());
-          if (!imported.length) { setStatus(l({ bn: 'ফাইলটি পড়া যায়নি।', en: 'Could not read that file.' })); return; }
-          persist([...drafts, ...imported.filter(item => !drafts.some(existing => existing.slug === item.slug))]);
-          setStatus(l({ bn: 'খসড়া যোগ হয়েছে।', en: 'Drafts added.' }));
-          event.target.value = '';
+          try {
+            if (!file.name.toLowerCase().endsWith('.json')) {
+              setStatus(l({ bn: 'শুধু .json খসড়া ফাইল বেছে নিন।', en: 'Choose a .json draft file.' }));
+              return;
+            }
+            if (file.size > MAX_DRAFT_IMPORT_BYTES) {
+              setStatus(l({ bn: 'ফাইলটি ১ MB-এর বেশি। ছোট JSON ফাইল বেছে নিন।', en: 'File is larger than 1 MB. Choose a smaller JSON file.' }));
+              return;
+            }
+            const imported = parseDrafts(await file.text());
+            if (!imported.length) {
+              setStatus(l({ bn: 'ফাইলটি পড়া যায়নি বা এতে বৈধ খসড়া নেই।', en: 'Could not read the file or it contains no valid drafts.' }));
+              return;
+            }
+            const additions = imported.filter(item => !drafts.some(existing => existing.slug === item.slug));
+            const accepted = additions.slice(0, Math.max(0, MAX_DRAFTS - drafts.length));
+            if (!accepted.length) {
+              setStatus(l({ bn: 'কোনো নতুন খসড়া যোগ হয়নি; সীমা পূর্ণ বা সব খসড়া আগে থেকেই আছে।', en: 'No new drafts added; the limit is reached or all drafts already exist.' }));
+              return;
+            }
+            persist([...drafts, ...accepted]);
+            setStatus(accepted.length < imported.length
+              ? l({ bn: 'সীমার মধ্যে খসড়া যোগ হয়েছে; অতিরিক্ত বা আগে থাকা খসড়া বাদ গেছে।', en: 'Drafts added up to the limit; duplicates or extra drafts were skipped.' })
+              : l({ bn: 'খসড়া যোগ হয়েছে।', en: 'Drafts added.' }));
+          } catch {
+            setStatus(l({ bn: 'ফাইলটি পড়া যায়নি।', en: 'Could not read that file.' }));
+          } finally {
+            input.value = '';
+          }
         }} />
       </div>
       {status && <p className="inline-success" role="status"><Check size={16} aria-hidden="true" />{status}</p>}

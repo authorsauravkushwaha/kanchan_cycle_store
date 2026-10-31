@@ -15,8 +15,9 @@ class Boundary extends Component<{ children: ReactNode; fallback: (retry: () => 
   static getDerivedStateFromError() { return { failed: true }; }
 
   componentDidCatch(error: Error, info: ErrorInfo) {
-    // Keep this local: no network reporting, consistent with the privacy page.
-    console.error('Route failed to load', error.message, info.componentStack);
+    // Keep diagnostics local and development-only. Production visitors get the
+    // generic recovery UI, not component stacks or implementation details.
+    if (import.meta.env.DEV) console.error('Route failed to load', error.message, info.componentStack);
   }
 
   retry = () => {

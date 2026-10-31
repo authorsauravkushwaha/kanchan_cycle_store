@@ -47,6 +47,31 @@ test('all public routes, unique titles, footer links and 404 work', async ({ pag
   await expect(page.locator('h1')).toHaveText('গোপনীয়তার নীতি');
 });
 
+test('owner draft import is local, bounded and validates catalog JSON', async ({ page }) => {
+  await page.goto('/owner');
+  await expect(page.locator('.owner-layout')).toContainText('সুরক্ষিত অ্যাডমিন প্যানেল নয়');
+  const input = page.getByLabel('খসড়া JSON ফাইল বেছে নিন');
+  await input.setInputFiles({
+    name: 'too-large.json', mimeType: 'application/json',
+    buffer: Buffer.alloc(1024 * 1024 + 1, 0x20),
+  });
+  await expect(page.locator('.inline-success')).toContainText('১ MB-এর বেশি');
+  await input.setInputFiles({
+    name: 'catalog.json', mimeType: 'application/json',
+    buffer: Buffer.from(JSON.stringify([{
+      id: 'test-import-cycle', slug: 'test-import-cycle', kind: 'cycle', nameBn: 'পরীক্ষামূলক সাইকেল',
+      nameEn: 'Test import cycle', category: 'kids', brand: null, price: 5000,
+      descriptionBn: 'পরীক্ষার বিবরণ', descriptionEn: 'Test description',
+      specifications: { geared: false, frameSize: null, wheelSize: null, brakes: null, riderHeightCm: null, intendedUse: null },
+      availability: null, featured: false, photoUrl: null,
+    }]), 'utf8'),
+  });
+  await expect(page.locator('.inline-success')).toContainText('খসড়া যোগ হয়েছে');
+  await expect(page.locator('.owner-stats > div strong').first()).toHaveText('1');
+  const stored = await page.evaluate(() => localStorage.getItem('kanchan-owner-draft-v1'));
+  expect(stored).toContain('Test import cycle');
+});
+
 test('category links, supplied catalog, phone, directions and embedded map are correct', async ({ page }) => {
   await page.goto('/');
   for (const category of ['kids', 'student', 'city', 'geared', 'premium', 'electric']) {

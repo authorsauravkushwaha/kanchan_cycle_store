@@ -60,7 +60,7 @@ npm run preview          # Serve the production build locally
 npm run test:e2e         # Browser, keyboard, mobile, offline-relevant and axe checks
 npm run test:pwa         # Production service-worker and offline tests (build first)
 npm run check            # Unit tests + production build
-npm run security:check   # Run after build: headers, CSP, PWA and secret patterns
+npm run security:check   # Run the standalone header, PWA, RLS and secret checks (also part of build)
 npm run security:headers -- https://YOUR-DOMAIN  # Check headers the live site actually sends
 npm run icons            # Regenerate the Android icon set from vector artwork
 ```
@@ -247,5 +247,7 @@ claimed without measuring it.
 
 ## Security
 
-See [SECURITY_REPORT.md](SECURITY_REPORT.md) for the original 100-control audit and
-[docs/SECURITY-NOTES.md](docs/SECURITY-NOTES.md) for the PWA/Supabase delta.
+See [docs/SECURITY-CONTROLS.md](docs/SECURITY-CONTROLS.md) for the current
+site-specific controls and honest scope limits, [SECURITY_REPORT.md](SECURITY_REPORT.md)
+for the broader audit/runbook, and [docs/SECURITY-NOTES.md](docs/SECURITY-NOTES.md)
+for PWA/Supabase deployment notes.

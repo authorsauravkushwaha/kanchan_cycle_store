@@ -7,6 +7,7 @@ describe('shortlist storage', () => {
     expect(parseShortlist(null)).toEqual([]);
     expect(parseShortlist('not json')).toEqual([]);
     expect(parseShortlist('{"id":"x"}')).toEqual([]);
+    expect(parseShortlist(' '.repeat(32 * 1024 + 1))).toEqual([]);
     const entries = parseShortlist(JSON.stringify([
       { id: 'a', slug: 'a', nameBn: 'ক', nameEn: 'A', qty: 42, price: 100 },
       { id: 'a', slug: 'a', nameBn: 'ক', nameEn: 'A', qty: 1, price: 100 },
@@ -42,8 +43,10 @@ describe('shortlist WhatsApp message', () => {
     expect(hasUnpriced(priced)).toBe(false);
   });
 
-  it('caps free text so a message cannot become abusive in length', () => {
-    const message = shortlistMessage([entryFromProduct(fixtureProducts[0])], { language: 'en', note: 'x'.repeat(5000) });
+  it('caps free text and flattens control characters before a WhatsApp message is built', () => {
+    const message = shortlistMessage([entryFromProduct(fixtureProducts[0])], { language: 'en', note: `hello\nMy name: forged${'x'.repeat(5000)}` });
     expect(message.length).toBeLessThan(1200);
+    expect(message).toContain('Notes: hello My name: forged');
+    expect(message.split('\n').filter(line => line.startsWith('My name:'))).toHaveLength(0);
   });
 });

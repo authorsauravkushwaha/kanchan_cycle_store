@@ -1,8 +1,9 @@
 # Security notes for the Android-first release
 
-This is a delta against the original 100-control audit in
-[`SECURITY_REPORT.md`](../SECURITY_REPORT.md). It records what the Android/PWA
-and live-catalogue work added, what it removed, and what still needs a human.
+This supplements the broader audit in [`SECURITY_REPORT.md`](../SECURITY_REPORT.md)
+and the current site-specific control map in [`SECURITY-CONTROLS.md`](SECURITY-CONTROLS.md).
+It records what the Android/PWA and optional Supabase catalogue add, what still
+needs an owner or deployment setting, and what cannot be proven from source alone.
 
 The approach follows the Cloudflare security-audit skill's structure: *enumerate
 the attack surface → check each control → state what is untested*. An autonomous
@@ -16,16 +17,17 @@ and not against a Vercel preview URL shared by someone else.
 | --- | --- | --- |
 | Service worker (`public/sw.js`) | Cache poisoning, serving a stale or injected page | Same-origin only; precache list is fixed; network-first navigations; versioned caches; no `eval`; no cross-origin caching |
 | Web app manifest + install prompt | Spoofed install identity, oversized prompts | Icons and names are local; no external icon host; prompt is dismissible and rate-limited on the device |
-| Live catalogue (Supabase) | Public data exposure, write abuse | RLS: anon can select `published = true` only; writes require an allowlisted authenticated email; no service key in the bundle |
+| Live catalogue (Supabase) | Public data exposure, write abuse | RLS: public roles read published rows; only an allowlisted authenticated owner with AAL2/MFA can read drafts or write; browser grants are explicit; service keys are rejected from build output |
 | Product photo URLs | Tracking pixels, mixed content | HTTPS only, host restricted to the configured Supabase project, no credentials in URL |
 | Shortlist in `localStorage` | Personal data leaking between users on a shared phone | Stores product names and quantities only, never name or phone; cleared by the customer |
-| `/owner` stock desk | Looks like an admin panel but has no authentication | Explicitly documented as device-local and not secure; no network writes; `noindex`; not in navigation |
+| `/owner` stock desk | Looks like an admin panel but has no authentication; local JSON import | Explicitly documented as device-local and not secure; no network writes; `noindex`; `.json` only, 1 MiB maximum, 500 records maximum, bounded schema validation; not in navigation |
 | n8n workflows | Service-role key leakage, exposed editor | Key only in n8n env/credentials; repository contains expressions, not values; `sb_secret_` patterns are blocked by `security:check` |
 
 ## Controls verified automatically
 
-`npm run build && npm run security:check` now checks, in addition to the original
-header/inline-script/secret checks:
+`npm run build` now runs `scripts/security-check.mjs` before succeeding;
+`npm run security:check` can also be run separately. It checks, in addition to the
+original header/inline-script/secret checks:
 
 - `manifest-src 'self'` and `worker-src 'self'` are present (without them the
   install prompt and service worker are silently blocked).
@@ -36,12 +38,22 @@ header/inline-script/secret checks:
 - The offline page contains a working `tel:` link.
 - If `VITE_SUPABASE_URL` is set, the exact project host appears in `connect-src`
   and `img-src` — the build fails instead of shipping a broken or over-broad CSP.
-- No private keys, GitHub tokens, AWS keys or Supabase secret keys in tracked files.
+- Supabase RLS contains a private owner allowlist and requires an `aal2` (MFA)
+  JWT for owner access; the allowlist is not readable by anon/authenticated roles.
+- The browser catalogue query selects an explicit allowlist of public columns,
+  filters to published rows and caps results at 500.
+- The local owner JSON import is capped at 1 MiB / 500 drafts; bucket image
+  restrictions enforce 2 MiB plus JPEG/PNG/WebP-only extension and MIME checks.
+- No private keys, GitHub tokens, AWS keys or Supabase secret keys in source or
+  built public assets. A decoded Supabase JWT with `role=service_role` is rejected.
 - `vercel.json` and `public/_headers` describe the *same* policy. A host reads only
   one of them, so before this check a header could be tightened in one file and
   silently left weak in the other.
 - `Cross-Origin-Resource-Policy: same-origin` is present, so other sites cannot
   embed this site's images or scripts as subresources.
+- Browser source is checked for `dangerouslySetInnerHTML`, `innerHTML`, `eval`,
+  `new Function`, and clipboard read APIs; input checks cap values before regex or
+  JSON parsing.
 
 ## Automated scanning: dependencies, secrets, code
 
@@ -81,11 +93,13 @@ before they ever see the new config.
 
 1. **Real-device install and offline test** on Android Chrome (see
    [`ANDROID.md`](ANDROID.md)). Cache behaviour cannot be proven in CI.
-2. **Supabase RLS test as the anon key**: confirm unpublished rows return `[]`
-   and that an `insert` returns 401/403.
-3. **Owner account hygiene**: unique password, 2FA on the Supabase account and on
-   GitHub, and the owner's email removed from `owner_allowlist` if the account
-   changes hands.
+2. **Supabase RLS test with separate identities**: as anon, confirm only published
+   rows return and writes fail; as a signed-in non-owner and allowlisted AAL1
+   owner, confirm unpublished reads/writes fail; as the allowlisted AAL2 owner,
+   confirm the intended operations succeed. Test photo MIME/type/size rejection.
+3. **Owner account hygiene**: unique password, MFA enabled and enrolled on the
+   Supabase account and GitHub, public Supabase sign-up disabled if unused, and
+   the owner's email removed from `owner_allowlist` if the account changes hands.
 4. **Hosting headers**: `vercel.json` and `public/_headers` must match the host
    actually used. GitHub Pages applies neither — it cannot set a CSP, so treat a
    GitHub Pages deployment as a preview, not the production site.
@@ -107,7 +121,8 @@ before they ever see the new config.
 - No login for customers, so no password reset, session fixation or account
   takeover surface.
 - No payment processing, so no PCI scope and no card data.
-- No server of our own, so no API keys to rotate and no database to patch.
+- No application server or customer write API; the optional Supabase project still
+  needs provider updates, RLS review and owner credential rotation.
 - No analytics by default, so no cookie banner and no third-party tracking.
 - No push notifications, so no notification permission prompt to misuse.
 

@@ -18,6 +18,10 @@ describe('safe recommendations', () => {
     const matches = recommendProducts(fixtureProducts, { ...answers, rider: 'adult', age: '30', budget: '5000-10000', use: 'commuting' });
     expect(matches.map(p => p.id)).toEqual(['test-city']);
   });
+  it('rejects oversized numeric strings before running the quiz validation regex', () => {
+    expect(validateQuizStep(1, { ...answers, age: '9'.repeat(2_000_000) })).toBe('quiz.errorAge');
+    expect(validateQuizStep(2, { ...answers, height: '9'.repeat(2_000_000) })).toBe('quiz.errorHeight');
+  });
   it('does not infer fit when height is supplied without manufacturer measurements', () => {
     expect(recommendProducts(fixtureProducts, { ...answers, rider: 'adult', age: '30', height: '190', budget: '5000-10000' })).toEqual([]);
   });
@@ -55,5 +59,11 @@ describe('untrusted repair form values', () => {
   });
   it('rejects oversized phone numbers and control characters', () => {
     expect(validateRepair({ ...valid, phone: '1'.repeat(23), details: 'hi\u0000there' }, '2026-10-30')).toMatchObject({ phone: 'form.errorPhone', details: 'form.errorDetails' });
+  });
+  it('bounds very long inputs before normalization or regular-expression work', () => {
+    const huge = '9'.repeat(2_000_000);
+    expect(validateRepair({ ...valid, name: huge, phone: huge, details: huge }, '2026-10-30')).toMatchObject({ name: 'form.errorName', phone: 'form.errorPhone', details: 'form.errorDetails' });
+    expect(normalizePhone(huge)).toBe('');
+    expect(validateRepair(null as unknown as typeof valid, '2026-10-30')).toHaveProperty('name', 'form.errorName');
   });
 });

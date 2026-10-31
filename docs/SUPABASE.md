@@ -22,24 +22,29 @@ Owner's phone ──► Supabase (products table) ──► website (read-only a
 | Keeps the last good catalogue on the phone | Let the browser write to the database |
 | Enforces “published only” with row-level security | Publish unverified prices — `NULL` stays “ask the shop” |
 
-Enquiries still go to WhatsApp, exactly as before. There is no customer database
-in this project, so there is nothing to leak.
+Enquiries still go to WhatsApp, exactly as before. The optional database contains
+product catalogue data only; this project does not store customer enquiries.
 
 ## One-time setup (about 15 minutes)
 
 1. Create a project at <https://supabase.com>. Choose the **Mumbai (ap-south-1)**
    region — the shop's visitors are in West Bengal.
 2. Open **SQL Editor → New query**, paste all of `supabase/schema.sql`, press **Run**.
-3. In **Authentication → Users**, create one user for the owner (email + password,
-   or a magic link). Copy that exact email.
+3. In **Authentication → Users**, create one user for the owner and copy that exact
+   email. Disable public sign-ups if customers do not need Supabase accounts, require
+   email confirmation, and enroll the owner in **Authentication → MFA** (TOTP or a
+   stronger supported factor). The schema's `is_owner()` requires a signed JWT with
+   `aal2`; a valid password/session alone is not enough for API writes.
 4. Back in the SQL editor, add that email to the allowlist:
    ```sql
    insert into public.owner_allowlist (email, note)
    values ('owner@example.com', 'Shop owner')
    on conflict (email) do nothing;
    ```
-   Without this row the owner can read the dashboard but cannot edit products
-   through the API. Row-level security is on for every table.
+   Without this row, a signed-in account cannot edit products through the API.
+   Even an allowlisted account needs an MFA-authenticated (`aal2`) session.
+   Row-level security is on for every table; the browser roles cannot read the
+   allowlist directly.
 5. In **Project Settings → API**, copy:
    - **Project URL** → `VITE_SUPABASE_URL`
    - **anon / public key** → `VITE_SUPABASE_ANON_KEY`
@@ -57,8 +62,10 @@ you have checked it. Leave `availability` empty if you are not sure — the site
 shows “stock to confirm” rather than guessing.
 
 **Photos:** upload the shop's own photographs to the `product-photos` bucket
-(public read, owner-only write, 2 MB limit), then paste the public URL into
-`photo_url`. Use real photographs of the actual bicycle, never a stock image.
+(public read, owner-only AAL2 write, 2 MB limit). The schema applies the limit to
+an existing bucket too, and accepts only JPEG, PNG or WebP extensions/MIME types;
+SVG and other active formats are rejected. There is no antivirus scanner, so use
+trusted images from the shop's phone. Paste the public URL into `photo_url`.
 
 The website reads the table immediately; publish a change by flipping
 `published` (or just edit a published row).
@@ -126,5 +133,5 @@ write, no service key in the browser.
 | Empty catalogue | No `published = true` rows, or RLS blocked the read | Check the SQL `select` as anon; publish rows |
 | Works locally, blocked in production | CSP missing the exact host | Edit `vercel.json` + `public/_headers`, rebuild |
 | Old stock on a phone | Service worker served the cached page | Pull to refresh; the SW updates on the next visit |
-| Owner cannot save | Email not in `owner_allowlist` | Insert the email, sign in again |
+| Owner cannot save | Email not allowlisted, or session is only AAL1 | Add the exact email to `owner_allowlist`, enroll MFA, refresh/sign in with an AAL2 session |
 | Photo missing | URL not HTTPS, or a different host | Re-upload to `product-photos`, use that URL |

@@ -98,7 +98,7 @@ export const shop = {
   },
   /** The owner-uploaded portrait fills the homepage hero background. */
   heroPhoto: {
-    src: '/images/kanchan-store-hero.jpeg', smallSrc: '/images/kanchan-store-hero.jpeg', smallWidth: 1024, width: 1024, height: 1536,
+    src: '/images/kanchan-store-hero.jpeg', smallSrc: '/images/kanchan-store-hero.jpeg', smallWidth: 960, width: 960, height: 1280,
     alt: { bn: 'কোলাঘাটে কাঞ্চন সাইকেল স্টোর্সের ভিতরে দোকানদার', en: 'The shopkeeper inside Kanchan Cycle Stores in Kolaghat' },
     caption: { bn: 'কাঞ্চন সাইকেল স্টোর্স, কোলাঘাট', en: 'Kanchan Cycle Stores, Kolaghat' },
   },

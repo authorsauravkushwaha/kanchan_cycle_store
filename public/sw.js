@@ -50,7 +50,7 @@ self.addEventListener('install', event => {
 self.addEventListener('activate', event => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
-    await Promise.all(keys.filter(key => !key.startsWith(VERSION)).map(key => caches.delete(key)));
+    await Promise.all(keys.filter(key => key.startsWith('kanchan-') && !key.startsWith(`${VERSION}-`)).map(key => caches.delete(key)));
     if (self.registration.navigationPreload) await self.registration.navigationPreload.disable();
     await self.clients.claim();
   })());
@@ -101,9 +101,9 @@ async function cacheFirst(request) {
 async function handleNavigate(event) {
   try {
     const response = await fetch(event.request);
-    if (response && response.ok) {
+    if (response && response.ok && new URL(event.request.url).pathname === BASE) {
       const cache = await caches.open(SHELL_CACHE);
-      cache.put(INDEX_URL, response.clone());
+      await cache.put(INDEX_URL, response.clone());
     }
     return response;
   } catch {

@@ -18,9 +18,10 @@ the app.
 | Works offline once visited | Home, last catalogue, shop details, offline page |
 | A shortlist saved on the phone | Same list, still on the phone |
 
-The install prompt appears after a few seconds, at most once every 14 days. It
-never blocks the page, and the same option is always available in the menu and
-footer (“অ্যাপ হিসেবে রাখুন”).
+A small install offer may appear after some time, at most once every 14 days. It
+does not block the page. Installation help is also available in the menu and
+footer (“অ্যাপ হিসেবে রাখুন”). The app is free to use and needs no account;
+normal mobile data and call charges may apply.
 
 ## How to install on Android
 
@@ -43,8 +44,8 @@ catalogue. After one visit:
 
 - the home page, shop address, phone and WhatsApp links still open;
 - the last catalogue and prices are shown with a “saved catalogue” note;
-- calling and WhatsApp use the phone's own network, so they work whenever there
-  is any signal, even if the page was cached;
+- calling needs mobile service; WhatsApp and directions need a working data connection,
+  even when their buttons are visible on a cached page;
 - Google Maps is never cached (it is a third-party service) — the “directions”
   button opens the Maps app instead.
 

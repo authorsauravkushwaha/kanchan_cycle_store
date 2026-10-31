@@ -48,11 +48,11 @@ function MobileNavigation({ open, onClose }: { open: boolean; onClose: () => voi
       return () => { document.body.style.overflow = previous; };
     }
   }, [open]);
-  return <dialog ref={ref} id="mobile-navigation" className="mobile-drawer" aria-label={t('nav.menu')} onCancel={onClose} onClose={onClose} onClick={event => { if (event.target === ref.current) onClose(); }}>
+  return <dialog ref={ref} id="mobile-navigation" className="mobile-drawer" aria-label={t('nav.menu')} onCancel={event => { if (event.target === event.currentTarget) onClose(); }} onClose={event => { if (event.target === event.currentTarget) onClose(); }} onClick={event => { if (event.target === ref.current) onClose(); }}>
     <div className="drawer-inner">
       <div className="drawer-top"><span className="drawer-label"><Bike size={23} aria-hidden="true" />{l(shop.name)}</span><button className="icon-button" onClick={onClose} aria-label={t('nav.close')} autoFocus><X size={23} /></button></div>
-      <nav aria-label={t('nav.primary')} className="drawer-links">{navigation.map(item => <NavLink key={item.to} to={item.to} end={item.to === '/'} onClick={onClose}>{t(item.key)}<ArrowUpRight size={18} aria-hidden="true" /></NavLink>)}<NavLink to="/list" onClick={onClose}>{t('list.nav')}{count > 0 && <span className="drawer-count">{count}</span>}<ArrowUpRight size={18} aria-hidden="true" /></NavLink><NavLink to="/recommendation" onClick={onClose}>{t('nav.quiz')}<ArrowUpRight size={18} aria-hidden="true" /></NavLink></nav>
-      <div className="drawer-bottom"><LanguageSwitcher /><WhatsAppButton className="w-full" /><DirectionsButton variant="text" /><a href={phoneHref()} className="drawer-phone" onClick={() => track('phone_click')}><Phone size={16} aria-hidden="true" />{shop.contact.phoneDisplay}</a><p>{shop.hours.confirmed ? l(shop.hours.display) : t('common.hoursPending')}</p><InstallHelpButton /><ShareButton className="drawer-share" /></div>
+      <nav aria-label={t('nav.primary')} className="drawer-links">{navigation.map(item => <NavLink key={item.to} to={item.to} end={item.to === '/'} onClick={onClose}>{t(item.key)}<ArrowUpRight size={18} aria-hidden="true" /></NavLink>)}<NavLink to="/list" onClick={onClose}>{t('list.nav')}{count > 0 && <span className="drawer-count">{count}</span>}<ArrowUpRight size={18} aria-hidden="true" /></NavLink><NavLink to="/recommendation" onClick={onClose}>{t('nav.quiz')}<ArrowUpRight size={18} aria-hidden="true" /></NavLink><InstallHelpButton className="drawer-install" /></nav>
+      <div className="drawer-bottom"><LanguageSwitcher /><WhatsAppButton className="w-full" /><DirectionsButton variant="text" /><a href={phoneHref()} className="drawer-phone" onClick={() => track('phone_click')}><Phone size={16} aria-hidden="true" />{shop.contact.phoneDisplay}</a><p>{shop.hours.confirmed ? l(shop.hours.display) : t('common.hoursPending')}</p><ShareButton className="drawer-share" /></div>
     </div>
   </dialog>;
 }

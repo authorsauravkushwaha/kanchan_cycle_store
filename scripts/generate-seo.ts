@@ -58,16 +58,21 @@ if (!index.includes('route-restore.js')) throw new Error('Missing GitHub Pages r
 // Inject every hashed JS/CSS asset into the service worker precache list, so a
 // customer who installs the app can open pages they have not visited yet offline.
 const assets = await readdir(resolve(dist, 'assets'));
-const precacheAssets = assets.filter(name => /\.(?:js|css)$/.test(name)).map(name => `assets/${name}`);
+const precacheAssets = assets.filter(name => /\.(?:js|css|woff2)$/.test(name)).map(name => `assets/${name}`);
+precacheAssets.push('route-restore.js');
 let worker = await readFile(resolve(dist, 'sw.js'), 'utf8');
 if (!worker.includes('const PRECACHE_ASSETS = [];')) throw new Error('Service worker precache placeholder was not found.');
 worker = worker.replace('const PRECACHE_ASSETS = [];', `const PRECACHE_ASSETS = ${JSON.stringify(precacheAssets)};`);
 // A new build gets a new cache name, so old shells are deleted on activation.
-const buildId = createHash('sha1').update(precacheAssets.join('|')).digest('hex').slice(0, 8);
+const hash = createHash('sha1').update(precacheAssets.join('|'));
+for (const file of ['index.html', 'manifest.webmanifest', 'offline.html', 'offline.css', 'route-restore.js', 'sw.js']) {
+  hash.update(await readFile(resolve(dist, file)));
+}
+const buildId = hash.digest('hex').slice(0, 8);
 if (!worker.includes("const VERSION = 'kanchan-v1';")) throw new Error('Service worker version placeholder was not found.');
 worker = worker.replace("const VERSION = 'kanchan-v1';", `const VERSION = 'kanchan-${buildId}';`);
 await writeFile(resolve(dist, 'sw.js'), worker);
-console.log(`Offline precache: ${precacheAssets.length} JS/CSS files.`);
+console.log(`Offline precache: ${precacheAssets.length} app assets.`);
 
 // Preload critical Bengali fonts before the JS bundle. The shop portrait is
 // below the fold in the redesigned homepage, so it is deliberately lazy-loaded.

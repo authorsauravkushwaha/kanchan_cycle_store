@@ -58,8 +58,8 @@ test('category links, supplied catalog, phone, directions and embedded map are c
     else await expect(page.locator('.product-card').first()).toBeVisible();
   }
   await page.goto('/cycles');
-  await expect(page.locator('.product-card')).toHaveCount(22);
-  await expect(page.locator('.product-card-photo img')).toHaveCount(22);
+  await expect(page.locator('.product-card')).toHaveCount(23);
+  await expect(page.locator('.product-card-photo img')).toHaveCount(23);
   await page.locator('.product-card h3 a').first().click();
   await expect(page.locator('.product-detail-photo img')).toBeVisible();
   await expect(page.locator('.product-detail-info .product-price')).toContainText('দাম জানতে যোগাযোগ করুন');
@@ -295,11 +295,11 @@ test('supplied images load and pages do not produce application errors', async (
       .map(img => new URL(img.currentSrc || img.src, location.origin).pathname));
     if (path === '/') expect(photographs).toEqual([
       '/images/kanchan-store-hero.jpeg',
-      // The three featured premium models appear in the homepage featured row.
-      '/images/cycles/cycle-20.webp', '/images/cycles/cycle-21.webp', '/images/cycles/cycle-22.webp',
+      // Featured premium models appear in the homepage featured row.
+      '/images/cycles/cycle-20.webp', '/images/cycles/cycle-21.webp', '/images/cycles/cycle-22.webp', '/images/cycles/cycle-23.webp',
     ]);
     else if (path === '/cycles') {
-      expect(photographs).toHaveLength(22);
+      expect(photographs).toHaveLength(23);
       expect(photographs.every(photo => photo.startsWith('/images/cycles/'))).toBe(true);
     } else expect(photographs, path).toEqual([]);
   }

@@ -11,17 +11,20 @@ export function HeroSection() {
   const benefits = [{ icon: Bike }, { icon: MapPin }, { icon: Wrench }];
   return <>
     <section className="hero-neu" aria-labelledby="hero-title" data-scroll-scene="hero">
-      <div className="hero-ambient-grid" aria-hidden="true" />
+      <div className="hero-backdrop">
+        <img className="hero-backdrop-image" src={asset(shop.heroPhoto.src)} alt={l(shop.heroPhoto.alt)} width={shop.heroPhoto.width} height={shop.heroPhoto.height} fetchPriority="high" decoding="async" />
+        <span className="hero-backdrop-scrim" aria-hidden="true" />
+      </div>
       <div className="container hero-neu-grid">
         <div className="hero-copy">
           <p className="eyebrow hero-eyebrow"><span className="location-dot" />{t('hero.eyebrow')}</p>
           <h1 id="hero-title">{t('hero.title1')}</h1>
           <p className="hero-description">{t('hero.description')}</p>
-          <div className="hero-actions"><Link to="/cycles" className="btn btn-primary hero-explore">{t('action.viewCycles')}<ArrowRight size={18} aria-hidden="true" /></Link><DirectionsButton /></div>
+          <div className="hero-actions"><Link to="/cycles" className="btn btn-yellow hero-explore">{t('action.viewCycles')}<ArrowRight size={18} aria-hidden="true" /></Link><DirectionsButton className="hero-ghost" /></div>
           <p className="hero-note"><span><Check size={13} strokeWidth={2.5} aria-hidden="true" /></span>{t('hero.note')}</p>
           <a href="#about-store" className="hero-scroll-cue"><span className="scroll-cue-icon"><ArrowDown size={16} aria-hidden="true" /></span>{l({ bn: 'স্ক্রল করুন। নতুন পথ দেখুন।', en: 'A little scroll. A new perspective.' })}</a>
         </div>
-        <HeroPortrait />
+        <HeroCaption />
       </div>
       <div className="container hero-bottom-line"><span>{l({ bn: 'ছোট্ট দোকান। অনেকটা পথ।', en: 'A LOCAL SHOP. A WORLD OF POSSIBILITIES.' })}</span><span aria-hidden="true">{l({ bn: 'কোলাঘাট · পশ্চিমবঙ্গ', en: 'KOLAGHAT · WEST BENGAL' })}<span className="tiny-cross">+</span></span></div>
     </section>
@@ -38,26 +41,21 @@ export function HeroSection() {
 }
 
 /**
- * The owner's own portrait leads the first screen. It is the only photograph on
- * the site, so it is loaded eagerly and never cropped below the shoulders.
+ * The owner's photograph now bleeds across the whole first screen, so the
+ * caption floats over the image instead of framing it. The alt text above
+ * carries the same story for screen readers.
  */
-function HeroPortrait() {
+function HeroCaption() {
   const { l } = useLanguage();
-  return <figure className="hero-portrait">
-    <div className="hero-portrait-frame">
-      <img src={asset(shop.heroPhoto.src)} alt={l(shop.heroPhoto.alt)} width={shop.heroPhoto.width} height={shop.heroPhoto.height} fetchPriority="high" decoding="async" />
-      <span className="hero-portrait-veil" aria-hidden="true" />
-      <figcaption className="hero-portrait-caption">
-        <span className="hero-portrait-role">{l({ bn: 'দোকানের মালিক', en: 'THE SHOPKEEPER' })}</span>
-        <strong>{l(shop.heroPhoto.caption)}</strong>
-        <span className="hero-portrait-place"><MapPin size={12} aria-hidden="true" />{l({ bn: 'কোলাঘাট, পশ্চিমবঙ্গ', en: 'Kolaghat, West Bengal' })}</span>
-      </figcaption>
-    </div>
-    <Link to="/about" className="hero-portrait-badge">
-      <span className="hero-portrait-badge-icon"><ArrowUpRight size={19} aria-hidden="true" /></span>
-      <span><small>{l({ bn: 'দোকান সম্পর্কে', en: 'ABOUT THE SHOP' })}</small><strong>{l({ bn: 'আমাদের কথা জানুন', en: 'Meet the store' })}</strong></span>
+  return <aside className="hero-caption" aria-label={l({ bn: 'দোকান পরিচিতি', en: 'About the shop' })}>
+    <span className="hero-caption-role">{l({ bn: 'দোকানের মালিক', en: 'THE SHOPKEEPER' })}</span>
+    <strong>{l(shop.heroPhoto.caption)}</strong>
+    <span className="hero-caption-place"><MapPin size={12} aria-hidden="true" />{l({ bn: 'কোলাঘাট, পশ্চিমবঙ্গ', en: 'Kolaghat, West Bengal' })}</span>
+    <Link to="/about" className="hero-caption-link">
+      <span>{l({ bn: 'আমাদের কথা জানুন', en: 'Meet the store' })}</span>
+      <ArrowUpRight size={16} aria-hidden="true" />
     </Link>
-  </figure>;
+  </aside>;
 }
 
 /** The illustrated bicycle gets its own stage once the portrait leads the hero. */

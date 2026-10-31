@@ -17,7 +17,7 @@ describe('contact configuration', () => {
   });
   it('keeps unconfirmed hours, prices, inventory, offers and reviews unpublished', () => {
     expect(shop.hours.confirmed).toBe(false);
-    expect(shop.catalog).toHaveLength(22);
+    expect(shop.catalog).toHaveLength(23);
     expect(shop.catalog.every(product => product.price === null && product.availability === null)).toBe(true);
     expect(validateCatalog(shop.catalog, shop.categories.map(c => c.id))).toEqual([]);
     expect(shop.offers).toEqual([]);
@@ -26,15 +26,21 @@ describe('contact configuration', () => {
     // Only the owner-confirmed "bicycle repair & servicing" service is published as confirmed.
     expect(shop.services.filter(service => service.confirmed).map(service => service.id)).toEqual(['general']);
   });
-  it('lists the Hercules Defender premium models without inventing price or stock', () => {
+  it('lists premium models without inventing shop price or stock', () => {
     const premium = shop.catalog.filter(product => product.category === 'premium');
     expect(premium.map(product => product.slug)).toEqual([
-      'hercules-defender-fx-dd', 'hercules-defender-rf-vb', 'hercules-top-gear-defender-fx-dd',
+      'hercules-defender-fx-dd', 'hercules-defender-rf-vb', 'hercules-top-gear-defender-fx-dd', 'tata-stryder-harris-x-ic-dd',
     ]);
     // Manufacturer-listed prices live in the description; the shop price stays unknown.
     expect(premium.every(product => product.price === null && product.availability === null)).toBe(true);
     expect(premium.every(product => product.photoUrl?.startsWith('/images/cycles/'))).toBe(true);
-    expect(premium.every(product => product.brand === 'Hercules')).toBe(true);
+    expect(premium.slice(0, 3).every(product => product.brand === 'Hercules')).toBe(true);
+    const harris = premium[3];
+    expect(harris).toMatchObject({ brand: 'Tata Stryder', nameEn: 'Tata Stryder Harris-X IC DD', featured: true });
+    expect(harris.price).toBeNull();
+    expect(harris.availability).toBeNull();
+    expect(harris.specifications).toMatchObject({ geared: false, frameSize: '17 in', wheelSize: '26 in', brakes: 'Dual disc' });
+    expect(harris.descriptionEn).toContain('26 × 2.35 inch nylon tyres');
   });
   it('uses the exact supplied coordinates and postal address', () => {
     expect(shop.coordinates).toEqual({ latitude: 22.4452382, longitude: 87.8751764 });

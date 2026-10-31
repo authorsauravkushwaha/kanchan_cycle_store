@@ -112,11 +112,11 @@ WhatsApp Business, reviews, seasonal stock, and the 30-day plan.
 
 ## Catalogue and unconfirmed information
 
-The catalogue includes 23 product photographs supplied by the shop, including
-Hercules Defender and Tata Stryder Harris-X IC DD premium models. Manufacturer-listed
-prices are quoted for the Hercules models; the shop price and stock still need
-confirming. Prices and availability are not guessed, and the supplied specifications
-are shown in each product description. The shop can confirm current details directly.
+The catalogue includes 23 product photographs supplied by the shop across 21
+bicycles, including the Hercules Top Gear Defender FX DD and Tata Stryder
+Harris-X IC DD premium models. Prices and availability are not guessed, and the
+supplied specifications are shown in each product description. The shop can
+confirm current details directly.
 
 Add products in either of two ways:
 

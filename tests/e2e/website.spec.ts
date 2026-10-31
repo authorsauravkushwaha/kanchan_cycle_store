@@ -58,11 +58,22 @@ test('category links, supplied catalog, phone, directions and embedded map are c
     else await expect(page.locator('.product-card').first()).toBeVisible();
   }
   await page.goto('/cycles');
-  await expect(page.locator('.product-card')).toHaveCount(23);
-  await expect(page.locator('.product-card-photo img')).toHaveCount(23);
+  await expect(page.locator('.product-card')).toHaveCount(21);
+  await expect(page.locator('.product-card-photo img')).toHaveCount(21);
   await page.locator('.product-card h3 a').first().click();
   await expect(page.locator('.product-detail-photo img')).toBeVisible();
+  await expect(page.locator('.product-detail-photo img')).toHaveAttribute('src', /cycle-20\.webp$/);
+  await expect(page.locator('.product-photo-thumb')).toHaveCount(2);
+  await page.locator('.product-photo-thumb').nth(1).click();
+  await expect(page.locator('.product-detail-photo img')).toHaveAttribute('src', /cycle-21\.webp$/);
   await expect(page.locator('.product-detail-info .product-price')).toContainText('দাম জানতে যোগাযোগ করুন');
+  await page.goto('/cycles/hercules-defender-fx-dd');
+  await expect(page).toHaveURL(/\/cycles\/hercules-top-gear-defender-fx-dd$/);
+  await page.goto('/cycles/tata-stryder-harris-x-ic-dd');
+  await expect(page.locator('.product-detail-photo img')).toHaveAttribute('src', /cycle-23\.webp$/);
+  await expect(page.locator('.product-photo-thumb')).toHaveCount(2);
+  await page.locator('.product-photo-thumb').nth(1).click();
+  await expect(page.locator('.product-detail-photo img')).toHaveAttribute('src', /cycle-22\.webp$/);
   await page.goto('/contact');
   await expect(page.locator('.contact-phone')).toHaveAttribute('href', 'tel:+917076884950');
   const directions = page.locator('.contact-card a[href*="google.com/maps"]').first();
@@ -270,7 +281,7 @@ test('primary pages pass automated WCAG A/AA checks on desktop and mobile', asyn
   test.setTimeout(90000);
   for (const width of [1440, 390]) {
     await page.setViewportSize({ width, height: 900 });
-    for (const path of ['/', '/cycles', '/list', '/services', '/recommendation', '/contact']) {
+    for (const path of ['/', '/cycles', '/cycles/hercules-top-gear-defender-fx-dd', '/list', '/services', '/recommendation', '/contact']) {
       await page.goto(path);
       await page.evaluate(() => document.fonts.ready);
       const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).exclude('iframe').analyze();
@@ -296,10 +307,10 @@ test('supplied images load and pages do not produce application errors', async (
     if (path === '/') expect(photographs).toEqual([
       '/images/kanchan-store-hero.jpeg',
       // Featured premium models appear in the homepage featured row.
-      '/images/cycles/cycle-20.webp', '/images/cycles/cycle-21.webp', '/images/cycles/cycle-22.webp', '/images/cycles/cycle-23.webp',
+      '/images/cycles/cycle-20.webp', '/images/cycles/cycle-23.webp',
     ]);
     else if (path === '/cycles') {
-      expect(photographs).toHaveLength(23);
+      expect(photographs).toHaveLength(21);
       expect(photographs.every(photo => photo.startsWith('/images/cycles/'))).toBe(true);
     } else expect(photographs, path).toEqual([]);
   }

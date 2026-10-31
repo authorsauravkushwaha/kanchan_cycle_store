@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, Navigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Check, Copy } from 'lucide-react';
 import { useCatalog } from '../inventory';
-import { asset } from '../config/shop';
+import { legacyCycleSlugs } from '../config/cycles';
+import { asset, productPhotos } from '../config/shop';
 import { useLanguage } from '../i18n';
 import { categoryFor } from '../lib/catalog';
 import { SEO } from '../components/SEO';
@@ -13,12 +14,17 @@ import NotFound from './NotFound';
 
 export default function ProductDetail() {
   const { slug } = useParams();
-  const { t, l, language, price, productName } = useLanguage();
+  const { t, l, language, number, price, productName } = useLanguage();
   const [copyState, setCopyState] = useState<'idle' | 'copied' | 'failed'>('idle');
+  const [selectedPhoto, setSelectedPhoto] = useState<{ slug: string; index: number }>({ slug: '', index: 0 });
   const { products, loading } = useCatalog();
   const product = products.find(item => item.slug === slug);
+  if (!product && slug && legacyCycleSlugs[slug]) return <Navigate to={`/cycles/${legacyCycleSlugs[slug]}`} replace />;
   if (!product && loading) return <div className="route-loading" role="status"><span className="route-loading-wheel" aria-hidden="true" />{l({ bn: 'তালিকা আনা হচ্ছে…', en: 'Loading the catalogue…' })}</div>;
   if (!product) return <NotFound productMissing />;
+  const photos = productPhotos(product);
+  const activePhotoIndex = selectedPhoto.slug === product.slug && selectedPhoto.index < photos.length ? selectedPhoto.index : 0;
+  const activePhoto = photos[activePhotoIndex];
   const specs = product.specifications;
   const rows = [
     { label: t('product.brand'), value: product.brand },
@@ -34,7 +40,12 @@ export default function ProductDetail() {
     <SEO title={productName(product)} description={product.price === null ? 'seo.cyclesDescription' : 'seo.cyclesDescription'} product={product} />
     <div className="container"><Breadcrumbs items={[{ label: isAccessory ? t('nav.accessories') : t('nav.cycles'), to: isAccessory ? '/accessories' : '/cycles' }, { label: productName(product) }]} /></div>
     <section className="product-detail section"><div className="container"><div className="product-detail-grid">
-      {product.photoUrl ? <div className="product-detail-photo"><img src={asset(product.photoUrl)} alt={productName(product)} /></div> : <ProductIconPanel label={l(categoryFor(product.category).name)} />}
+      {activePhoto ? <div className="product-detail-media">
+        <div className="product-detail-photo"><img src={asset(activePhoto)} alt={photos.length > 1 ? `${productName(product)} — ${t('product.photoOf', { current: number(activePhotoIndex + 1), total: number(photos.length) })}` : productName(product)} /></div>
+        {photos.length > 1 && <div className="product-photo-thumbs" role="group" aria-label={t('product.photos')}>
+          {photos.map((photo, index) => <button key={photo} type="button" className={`product-photo-thumb ${index === activePhotoIndex ? 'is-active' : ''}`} aria-pressed={index === activePhotoIndex} aria-label={t('product.selectPhoto', { current: number(index + 1), total: number(photos.length) })} onClick={() => setSelectedPhoto({ slug: product.slug, index })}><img src={asset(photo)} alt="" loading="lazy" /></button>)}
+        </div>}
+      </div> : <ProductIconPanel label={l(categoryFor(product.category).name)} />}
       <div className="product-detail-info"><span className="product-category">{l(categoryFor(product.category).name)}</span><h1>{productName(product)}</h1><p className={`product-price ${product.price === null ? 'unknown-price' : ''}`}>{product.price === null ? t('common.unknownPrice') : price(product.price)}</p><p className={`stock-label ${product.availability === 'in-stock' ? 'stock-available' : ''}`}><span />{product.availability === null ? t('common.unknownStock') : product.availability === 'in-stock' ? t('common.inStock') : t('common.outOfStock')}</p><p className="product-description">{language === 'bn' ? product.descriptionBn : product.descriptionEn}</p>
         <div className="product-detail-enquiry"><h2>{isAccessory ? t('action.askPrice') : t('product.enquiryTitle')}</h2><p>{isAccessory ? t('accessories.description') : t('product.enquiryText')}</p><div className="product-detail-actions"><WhatsAppButton message={productEnquiry(product, language)} event="product_enquiry_click" productId={product.id} placement="product-detail" /><AddToList product={product} /></div><small>{t('common.whatsappNote')}</small></div>
         <button className="copy-link" onClick={async () => { try { await navigator.clipboard.writeText(window.location.href); setCopyState('copied'); } catch { setCopyState('failed'); } }}>{copyState === 'copied' ? <Check size={16} /> : <Copy size={16} />}{copyState === 'copied' ? t('action.copied') : t('action.copyLink')}</button><p className="copy-status" role="status">{copyState === 'failed' ? t('action.copyFailed') : ''}</p>

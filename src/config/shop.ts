@@ -50,10 +50,11 @@ export interface Product {
   availability: Availability;
   featured: boolean;
   /**
-   * Owner-supplied product photograph. Static photos use local asset paths;
+   * Owner-supplied product photograph(s). Static photos use local asset paths;
    * live (Supabase) photos must use HTTPS on an approved host.
    */
   photoUrl?: string | null;
+  photoUrls?: string[];
 }
 export interface Service {
   id: string;
@@ -179,6 +180,13 @@ export const shop = {
 export const asset = (path: string): string => {
   if (/^https:\/\//i.test(path)) return path;
   return `${import.meta.env.BASE_URL}${path.replace(/^\/+/, '')}`;
+};
+export const productPhotos = (product: Product): string[] => {
+  const urls = [
+    ...(product.photoUrl ? [product.photoUrl] : []),
+    ...(product.photoUrls ?? []),
+  ].filter((url): url is string => Boolean(url && url.trim()));
+  return [...new Set(urls)];
 };
 export const addressLines = (language: Language): string[] => {
   const postalCode = language === 'bn' ? shop.address.postalCode.replace(/\d/g, digit => '০১২৩৪৫৬৭৮৯'[+digit]) : shop.address.postalCode;

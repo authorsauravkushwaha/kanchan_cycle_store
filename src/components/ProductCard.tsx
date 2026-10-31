@@ -1,6 +1,6 @@
 import { ArrowUpRight, Bike, Tag } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { asset } from '../config/shop';
+import { asset, productPhotos } from '../config/shop';
 import type { Product } from '../config/shop';
 import { useLanguage } from '../i18n';
 import { categoryFor } from '../lib/catalog';
@@ -16,10 +16,11 @@ export function productEnquiry(product: Product, language: 'bn' | 'en') {
 export function ProductCard({ product }: { product: Product }) {
   const { t, l, price, productName, language } = useLanguage();
   const category = categoryFor(product.category);
+  const coverPhoto = productPhotos(product)[0];
   const specPreview = [product.specifications.frameSize, product.specifications.wheelSize,
     product.specifications.geared !== null ? product.specifications.geared ? t('catalog.geared') : t('catalog.nongeared') : null].filter(Boolean).join(' · ');
   return <article className="product-card">
-    {product.photoUrl && <Link className="product-card-photo" to={`/cycles/${product.slug}`} tabIndex={-1} aria-hidden="true"><img src={asset(product.photoUrl)} alt="" loading="lazy" /></Link>}
+    {coverPhoto && <Link className="product-card-photo" to={`/cycles/${product.slug}`} tabIndex={-1} aria-hidden="true"><img src={asset(coverPhoto)} alt="" loading="lazy" /></Link>}
     <div className="product-card-body">
       <div className="product-card-top"><span className="product-category">{l(category.name)}</span>{product.brand && <span className="product-brand">{product.brand}</span>}</div>
       <h3><Link to={`/cycles/${product.slug}`}>{productName(product)}<ArrowUpRight size={18} aria-hidden="true" /></Link></h3>

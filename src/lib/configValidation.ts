@@ -12,7 +12,6 @@ export function validateCatalog(products: Product[], categoryIds: string[]): str
     if (!product.nameBn.trim() || !product.nameEn.trim()) errors.push(`${label}: both names are required.`);
     if (!product.descriptionBn.trim() || !product.descriptionEn.trim()) errors.push(`${label}: both descriptions are required.`);
     if (!categoryIds.includes(product.category)) errors.push(`${label}: unknown category.`);
-    if ((product.kind === 'accessory') !== (product.category === 'accessories')) errors.push(`${label}: kind and category disagree.`);
     if (product.price !== null && (!Number.isFinite(product.price) || product.price < 0)) errors.push(`${label}: price must be null or a nonnegative finite number.`);
     if (![null, 'in-stock', 'out-of-stock'].includes(product.availability)) errors.push(`${label}: invalid availability.`);
     if (product.specifications.geared !== null && typeof product.specifications.geared !== 'boolean') errors.push(`${label}: gearing must be true, false or null.`);

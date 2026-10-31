@@ -25,7 +25,7 @@ if (configuredUrl) {
 }
 const canIndex = Boolean(websiteUrl && shop.seo.indexingEnabled);
 // /owner is deliberately excluded: it is a device-local tool, not a public page.
-const routes = ['/', '/cycles', '/accessories', '/services', '/recommendation', '/list', '/offers', '/about', '/contact', '/privacy'];
+const routes = ['/', '/cycles', '/services', '/recommendation', '/list', '/offers', '/about', '/contact', '/privacy'];
 for (const product of shop.catalog) routes.push(`/cycles/${encodeURIComponent(product.slug)}`);
 const escape = (text: string) => text.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
 if (canIndex && websiteUrl) {

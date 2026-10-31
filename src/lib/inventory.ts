@@ -48,8 +48,10 @@ function securePhoto(value: unknown): string | null {
 export function productFromRow(row: Record<string, unknown>): Product | null {
   const id = clean(row.id, 80);
   const slug = clean(row.slug, 80);
-  const kind = row.kind === 'accessory' ? 'accessory' : 'cycle';
-  const category = (clean(row.category, 30) || (kind === 'accessory' ? 'accessories' : 'city')) as CategoryId;
+  // The website lists cycles only; accessory rows are ignored.
+  if (row.kind === 'accessory') return null;
+  const kind = 'cycle' as const;
+  const category = (clean(row.category, 30) || 'city') as CategoryId;
   if (!id || !slugSafe(slug) || !categoryIds.has(category)) return null;
   const priceValue = row.price === null || row.price === undefined || row.price === '' ? null : Number(row.price);
   const price = priceValue !== null && Number.isFinite(priceValue) && priceValue >= 0 ? Math.round(priceValue) : null;
@@ -77,8 +79,8 @@ export function productFromRow(row: Record<string, unknown>): Product | null {
     category,
     brand: optional(row.brand, 60),
     price,
-    descriptionBn: clean(row.description_bn, 600) || (kind === 'accessory' ? 'বিস্তারিত জানতে দোকানে জিজ্ঞাসা করুন।' : 'বিস্তারিত ও স্টক জানতে দোকানে জিজ্ঞাসা করুন।'),
-    descriptionEn: clean(row.description_en, 600) || (kind === 'accessory' ? 'Ask the shop for details.' : 'Ask the shop for details and stock.'),
+    descriptionBn: clean(row.description_bn, 600) || 'বিস্তারিত ও স্টক জানতে দোকানে জিজ্ঞাসা করুন।',
+    descriptionEn: clean(row.description_en, 600) || 'Ask the shop for details and stock.',
     specifications: {
       geared,
       frameSize: optional(row.frame_size, 40),

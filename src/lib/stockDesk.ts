@@ -10,7 +10,8 @@ export interface DraftProduct {
   key: string;
   id: string;
   slug: string;
-  kind: 'cycle' | 'accessory';
+  /** The website lists cycles only. */
+  kind: 'cycle';
   nameBn: string;
   nameEn: string;
   category: CategoryId;
@@ -54,8 +55,6 @@ export function validateDraft(draft: DraftProduct, others: DraftProduct[]): stri
   if (!slugify(draft.slug)) errors.push('Slug must use a–z, 0–9 and dashes.');
   if (others.some(other => other.key !== draft.key && slugify(other.slug) === slugify(draft.slug))) errors.push('Slug is already used by another draft.');
   if (!categoryIds.includes(draft.category)) errors.push('Choose a valid category.');
-  if (draft.kind === 'cycle' && draft.category === 'accessories') errors.push('A cycle cannot use the accessories category.');
-  if (draft.kind === 'accessory' && draft.category !== 'accessories') errors.push('An accessory must use the accessories category.');
   if (draft.price.trim()) {
     const price = Number(draft.price);
     if (!Number.isFinite(price) || price < 0) errors.push('Price must be zero or more, or left empty.');
@@ -156,7 +155,7 @@ export function parseDrafts(raw: string | null): DraftProduct[] {
         key: typeof value.key === 'string' ? value.key : base.key,
         id: typeof value.id === 'string' ? value.id : '',
         slug: value.slug,
-        kind: value.kind === 'accessory' ? 'accessory' as const : 'cycle' as const,
+        kind: 'cycle' as const,
         nameBn: value.nameBn, nameEn: typeof value.nameEn === 'string' ? value.nameEn : value.nameBn,
         category: categoryIds.includes(value.category as CategoryId) ? value.category as CategoryId : 'student',
         brand: typeof value.brand === 'string' ? value.brand : '',

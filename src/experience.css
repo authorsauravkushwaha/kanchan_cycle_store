@@ -224,7 +224,7 @@ html[lang='bn'] .hero-caption strong { font-size: 19px; font-weight: 600; }
 .product-category { background: var(--surface); box-shadow: inset 2px 2px 5px #cdd7c7, inset -2px -2px 5px #fafff4; }
 .empty-state { background: var(--surface); border: 0; box-shadow: var(--neo-inset); padding: 55px 30px; }
 .empty-icon { background: var(--surface); border-color: #f8fbf3; box-shadow: var(--neo); border-radius: 50%; width: 76px; height: 76px; margin-bottom: 25px; }
-.catalog-help, .accessories-aside, .source-card, .about-promise-grid { background: var(--surface); border-color: #f7faf2; box-shadow: var(--neo-sm); }
+.catalog-help, .source-card, .about-promise-grid { background: var(--surface); border-color: #f7faf2; box-shadow: var(--neo-sm); }
 .catalog-help-icon, .source-icon { background: var(--surface); border-color: #f7faf2; box-shadow: var(--neo-sm); }
 .guide-section { background: var(--soft); padding-top: 10px; }
 .guide-panel { background: var(--green-dark); box-shadow: 10px 12px 26px #bcc9b5, -8px -8px 22px #fafff3; border: 1px solid #3c5843; }

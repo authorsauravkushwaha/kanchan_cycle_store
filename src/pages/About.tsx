@@ -1,4 +1,4 @@
-import { Bike, MapPin, Wrench } from 'lucide-react';
+import { Bike, Wrench } from 'lucide-react';
 import { addressLines, shop } from '../config/shop';
 import { useLanguage } from '../i18n';
 import { SEO } from '../components/SEO';
@@ -10,7 +10,6 @@ export default function About() {
   const { t, l, language } = useLanguage();
   const offers = [
     { Icon: Bike, title: { bn: 'সাইকেল বিক্রি', en: 'Bicycle sales' }, text: { bn: 'আপনার ব্যবহার, মাপ ও বাজেট অনুযায়ী কী কী বিকল্প আছে জেনে নিন।', en: 'Ask about cycle options for your intended use, fit and budget.' } },
-    { Icon: MapPin, title: { bn: 'অ্যাক্সেসরিজ', en: 'Accessories' }, text: { bn: 'কোন অ্যাক্সেসরিজ দোকানে পাওয়া যাচ্ছে, সরাসরি জিজ্ঞাসা করুন।', en: 'Ask the shop which accessories are currently available.' } },
     { Icon: Wrench, title: { bn: 'মেরামত ও সার্ভিসিং', en: 'Repair & servicing' }, text: { bn: 'সাইকেলের সমস্যার কথা জানান এবং পরিষেবা, খরচ ও সময় নিয়ে কথা বলুন।', en: 'Describe the issue and ask about service, cost and timing.' } },
   ];
   return <>
@@ -24,7 +23,7 @@ export default function About() {
       <aside className="about-facts glass-panel" aria-label={l({ bn: 'দোকানের তথ্য', en: 'Shop details' })}>
         <p className="eyebrow"><span />{l({ bn: 'এক নজরে', en: 'AT A GLANCE' })}</p>
         <dl>
-          <div><dt>{l({ bn: 'কী পাওয়া যায়', en: 'What we offer' })}</dt><dd>{l({ bn: 'সাইকেল বিক্রি, অ্যাক্সেসরিজ, মেরামত ও সার্ভিসিং', en: 'Cycle sales, accessories, repair & servicing' })}</dd></div>
+          <div><dt>{l({ bn: 'কী পাওয়া যায়', en: 'What we offer' })}</dt><dd>{l({ bn: 'সাইকেল বিক্রি, মেরামত ও সার্ভিসিং', en: 'Cycle sales, repair & servicing' })}</dd></div>
           <div><dt>{t('common.address')}</dt><dd>{addressLines(language).join(', ')}</dd></div>
           <div><dt>{t('common.hours')}</dt><dd>{l(shop.hours.display)}<small className="hours-caveat">{l(shop.hours.caveat)}</small></dd></div>
         </dl>

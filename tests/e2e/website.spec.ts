@@ -28,7 +28,7 @@ test('Bengali is the default; English and reload persistence work', async ({ pag
 });
 
 test('all public routes, unique titles, footer links and 404 work', async ({ page }) => {
-  const routes = [['/', 'আপনার যাত্রা শুরু হোক সঠিক সাইকেলে'], ['/cycles', 'পছন্দের সাইকেল'], ['/accessories', 'সাইকেলের অ্যাক্সেসরিজ'], ['/services', 'সাইকেলের সমস্যার'], ['/recommendation', 'কোন সাইকেলটি'], ['/offers', 'সঠিক পছন্দ'], ['/about', 'পরিচয় হোক'], ['/contact', 'কাছের দোকানেই'], ['/privacy', 'গোপনীয়তার নীতি'], ['/list', 'আমার পছন্দের তালিকা']];
+  const routes = [['/', 'আপনার যাত্রা শুরু হোক সঠিক সাইকেলে'], ['/cycles', 'পছন্দের সাইকেল'], ['/services', 'সাইকেলের সমস্যার'], ['/recommendation', 'কোন সাইকেলটি'], ['/offers', 'সঠিক পছন্দ'], ['/about', 'পরিচয় হোক'], ['/contact', 'কাছের দোকানেই'], ['/privacy', 'গোপনীয়তার নীতি'], ['/list', 'আমার পছন্দের তালিকা']];
   const titles = new Set<string>();
   for (const [path, heading] of routes) {
     await page.goto(path);
@@ -252,7 +252,7 @@ test('mobile drawer is keyboard accessible and bottom actions stay usable', asyn
 test('English navigation and localized validation work across the site', async ({ page }) => {
   await page.goto('/');
   await page.locator('.site-header').getByRole('button', { name: 'EN', exact: true }).click();
-  const routes = [['/', 'Every Journey Begins With the Right Bicycle.'], ['/cycles', 'Find your kind of bicycle'], ['/accessories', 'Bicycle accessories'], ['/services', 'Tell us what’s playing up'], ['/recommendation', 'What’s your kind of bicycle?'], ['/offers', 'The right choice comes first'], ['/about', 'A little about us'], ['/contact', 'Your local shop is a message away'], ['/privacy', 'Privacy policy']];
+  const routes = [['/', 'Every Journey Begins With the Right Bicycle.'], ['/cycles', 'Find your kind of bicycle'], ['/services', 'Tell us what’s playing up'], ['/recommendation', 'What’s your kind of bicycle?'], ['/offers', 'The right choice comes first'], ['/about', 'A little about us'], ['/contact', 'Your local shop is a message away'], ['/privacy', 'Privacy policy']];
   for (const [path, heading] of routes) {
     await page.goto(path);
     await expect(page.locator('h1')).toContainText(heading);
@@ -293,7 +293,7 @@ test('primary pages pass automated WCAG A/AA checks on desktop and mobile', asyn
 test('supplied images load and pages do not produce application errors', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', error => errors.push(error.message));
-  for (const path of ['/', '/cycles', '/accessories', '/services', '/recommendation', '/offers', '/about', '/contact', '/privacy']) {
+  for (const path of ['/', '/cycles', '/services', '/recommendation', '/offers', '/about', '/contact', '/privacy']) {
     await page.goto(path);
     await page.locator('h1').waitFor();
     await page.evaluate(async () => {

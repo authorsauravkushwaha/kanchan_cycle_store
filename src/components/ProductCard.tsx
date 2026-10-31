@@ -1,4 +1,4 @@
-import { ArrowUpRight, Bike, Tag } from 'lucide-react';
+import { ArrowUpRight, Bike } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { asset, productPhotos } from '../config/shop';
 import type { Product } from '../config/shop';
@@ -36,18 +36,6 @@ export function ProductCard({ product }: { product: Product }) {
   </article>;
 }
 export function ProductGrid({ products }: { products: Product[] }) { return <div className="product-grid">{products.map(product => <ProductCard key={product.id} product={product} />)}</div>; }
-export function AccessoryCard({ product }: { product: Product }) {
-  const { t, price, productName, language } = useLanguage();
-  return <article className="product-card accessory-card">
-    <div className="product-card-body">
-      <div className="product-card-top"><span className="product-category">{t('nav.accessories')}</span><Tag size={16} aria-hidden="true" /></div>
-      <h3><Link to={`/cycles/${product.slug}`}>{productName(product)}<ArrowUpRight size={18} aria-hidden="true" /></Link></h3>
-      <p className={`product-price ${product.price === null ? 'unknown-price' : ''}`}>{product.price === null ? t('common.unknownPrice') : price(product.price)}</p>
-      <p className="stock-label"><span />{product.availability === null ? t('common.unknownStock') : product.availability === 'in-stock' ? t('common.inStock') : t('common.outOfStock')}</p>
-      <div className="product-card-actions accessory-actions"><WhatsAppButton variant="secondary" className="btn-compact" message={productEnquiry(product, language)} productId={product.id} event="product_enquiry_click" placement="accessory-card">{t('action.askPrice')}</WhatsAppButton><AddToList product={product} /></div>
-    </div>
-  </article>;
-}
 export function ProductIconPanel({ label }: { label: string }) {
   return <div className="product-icon-panel" aria-hidden="true"><Bike size={64} strokeWidth={1} /><span>{label}</span></div>;
 }

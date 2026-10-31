@@ -16,10 +16,9 @@ export default function Home() {
   const featured = cycles.filter(product => product.featured).slice(0, 4);
   const offers = verifiedOffers();
   const visitIcons = [ScanEye, MessagesSquare, Ruler, Wrench];
-  const offeringIcons = [Bike, Check, Wrench];
+  const offeringIcons = [Bike, Wrench];
   const offeringCopy = [
     { bn: 'সাইকেল বিক্রি', en: 'Bicycle sales' },
-    { bn: 'অ্যাক্সেসরিজ', en: 'Bicycle accessories' },
     { bn: 'মেরামত ও সার্ভিসিং', en: 'Repair and servicing' },
   ];
   return <>
@@ -29,14 +28,14 @@ export default function Home() {
     <section className="section home-about-section" id="about-store">
       <div className="container home-about-grid">
         <div className="home-about-copy" data-reveal>
-          <SectionHeading eyebrow={l({ bn: 'কাঞ্চন সাইকেল স্টোর্স', en: 'KANCHAN CYCLE STORES' })} title={l({ bn: 'আপনার কাছের সাইকেল স্টোর', en: 'Your neighbourhood cycle store' })} description={l({ bn: 'সাইকেল, অ্যাক্সেসরিজ এবং মেরামত পরিষেবার জন্য কোলাঘাটে আপনার স্থানীয় ঠিকানা। কী পাওয়া যাচ্ছে, দাম ও স্টক—দোকানে সরাসরি জেনে নিন।', en: 'Your local destination in Kolaghat for bicycles, accessories and repair services. Ask the shop directly about current options, prices and stock.' })} />
+          <SectionHeading eyebrow={l({ bn: 'কাঞ্চন সাইকেল স্টোর্স', en: 'KANCHAN CYCLE STORES' })} title={l({ bn: 'আপনার কাছের সাইকেল স্টোর', en: 'Your neighbourhood cycle store' })} description={l({ bn: 'সাইকেল ও মেরামত পরিষেবার জন্য কোলাঘাটে আপনার স্থানীয় ঠিকানা। কী পাওয়া যাচ্ছে, দাম ও স্টক—দোকানে সরাসরি জেনে নিন।', en: 'Your local destination in Kolaghat for bicycles and repair services. Ask the shop directly about current options, prices and stock.' })} />
           <TextLink to="/about">{l({ bn: 'আমাদের সম্পর্কে জানুন', en: 'More about the store' })}</TextLink>
           <p className="home-shop-signature"><MapPin size={14} aria-hidden="true" /><span><strong>{l(shop.heroPhoto.caption)}</strong>{l({ bn: ' — দোকানে তোলা ছবি', en: ' — photographed inside the shop' })}</span></p>
         </div>
         <div className="home-offering-panel glass-panel" aria-label={l({ bn: 'দোকানের পরিষেবা', en: 'What the shop offers' })} data-reveal>
           {offeringCopy.map((item, index) => {
             const Icon = offeringIcons[index];
-            return <div className="home-offering" key={item.en}><span className="home-offering-icon"><Icon size={21} strokeWidth={1.6} aria-hidden="true" /></span><div><strong>{l(item)}</strong><span>{l([{ bn: 'আপনার প্রয়োজন ও বাজেটের কথা বলুন', en: 'Tell us what you need and your budget' }, { bn: 'উপলব্ধতা দোকানে জেনে নিন', en: 'Ask the shop about availability' }, { bn: 'সমস্যার কথা জানিয়ে পরামর্শ নিন', en: 'Describe the issue and ask for advice' }][index])}</span></div><ArrowRight size={16} aria-hidden="true" /></div>;
+            return <div className="home-offering" key={item.en}><span className="home-offering-icon"><Icon size={21} strokeWidth={1.6} aria-hidden="true" /></span><div><strong>{l(item)}</strong><span>{l([{ bn: 'আপনার প্রয়োজন ও বাজেটের কথা বলুন', en: 'Tell us what you need and your budget' }, { bn: 'সমস্যার কথা জানিয়ে পরামর্শ নিন', en: 'Describe the issue and ask for advice' }][index])}</span></div><ArrowRight size={16} aria-hidden="true" /></div>;
           })}
         </div>
       </div>

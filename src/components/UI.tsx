@@ -67,8 +67,8 @@ export function ShareButton({ className = '', label }: { className?: string; lab
   const share = async () => {
     const url = shop.websiteUrl || window.location.origin;
     const text = l({
-      bn: 'কোলাঘাটে কাঞ্চন সাইকেল স্টোর্স — সাইকেল, অ্যাক্সেসরিজ ও মেরামত।',
-      en: 'Kanchan Cycle Stores in Kolaghat — cycles, accessories and repairs.',
+      bn: 'কোলাঘাটে কাঞ্চন সাইকেল স্টোর্স — সাইকেল ও মেরামত।',
+      en: 'Kanchan Cycle Stores in Kolaghat — cycles and repairs.',
     });
     try {
       if (navigator.share) {

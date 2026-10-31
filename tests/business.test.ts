@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { productPhotos, shop } from '../src/config/shop';
+import type { Product } from '../src/config/shop';
 import { whatsappHref, productUrl } from '../src/lib/business';
 import { fixtureProducts } from './fixtures';
 import { validateCatalog } from '../src/lib/configValidation';
@@ -59,8 +60,8 @@ describe('catalog validation', () => {
   it('accepts explicitly unknown information in valid records', () => {
     expect(validateCatalog(fixtureProducts, shop.categories.map(c => c.id))).toEqual([]);
   });
-  it('rejects duplicate slugs, negative prices and inconsistent categories', () => {
-    const invalid = { ...fixtureProducts[0], slug: fixtureProducts[1].slug, price: -1, category: 'accessories' as const };
+  it('rejects duplicate slugs, negative prices and unknown categories', () => {
+    const invalid = { ...fixtureProducts[0], slug: fixtureProducts[1].slug, price: -1, category: 'accessories' as unknown as Product['category'] };
     const errors = validateCatalog([invalid, fixtureProducts[1]], shop.categories.map(c => c.id));
     expect(errors.join(' ')).toMatch(/slug|price|kind/);
     expect(errors.length).toBeGreaterThanOrEqual(3);

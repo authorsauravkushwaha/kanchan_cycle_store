@@ -120,15 +120,11 @@ export default function OwnerDesk() {
       {status && <p className="inline-success" role="status"><Check size={16} aria-hidden="true" />{status}</p>}
 
       <form id="stock-form" className="owner-form" onSubmit={event => { event.preventDefault(); save(); }}>
-        <h2>{editing ? l({ bn: 'খসড়া সম্পাদনা', en: 'Edit draft' }) : l({ bn: 'নতুন সাইকেল বা জিনিস', en: 'Add a cycle or item' })}</h2>
+        <h2>{editing ? l({ bn: 'খসড়া সম্পাদনা', en: 'Edit draft' }) : l({ bn: 'নতুন সাইকেল', en: 'Add a cycle' })}</h2>
         <div className="form-grid">
           {field({ bn: 'বাংলা নাম', en: 'Bengali name' }, input('nameBn', 'text', 'স্ট্রাইডার ১৬'))}
           {field({ bn: 'English name', en: 'English name' }, input('nameEn', 'text', 'Stryder 16'))}
           {field({ bn: 'Slug (ইংরেজি, হাইফেন)', en: 'Slug (lowercase, dashes)' }, input('slug', 'text', 'stryder-16'), { bn: 'যেমন stryder-16', en: 'e.g. stryder-16' })}
-          {field({ bn: 'ধরন', en: 'Type' }, <select value={draft.kind} onChange={event => update('kind', event.target.value as DraftProduct['kind'])}>
-            <option value="cycle">{l({ bn: 'সাইকেল', en: 'Cycle' })}</option>
-            <option value="accessory">{l({ bn: 'অ্যাক্সেসরিজ', en: 'Accessory' })}</option>
-          </select>)}
           {field({ bn: 'শ্রেণি', en: 'Category' }, <select value={draft.category} onChange={event => update('category', event.target.value as CategoryId)}>
             {shop.categories.map(category => <option key={category.id} value={category.id}>{l(category.name)}</option>)}
           </select>)}

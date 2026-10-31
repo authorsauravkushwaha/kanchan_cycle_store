@@ -71,7 +71,7 @@ Browser binaries are never part of the website bundle.
 
 ## Routes
 
-`/`, `/cycles`, `/cycles/:slug`, `/accessories`, `/services`, `/recommendation`,
+`/`, `/cycles`, `/cycles/:slug`, `/services`, `/recommendation`,
 `/list`, `/offers`, `/about`, `/contact`, `/privacy`, plus an accessible 404.
 `/owner` is a device-local tool for the shop owner and is not linked publicly.
 

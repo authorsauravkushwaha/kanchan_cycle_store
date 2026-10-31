@@ -6,7 +6,6 @@ import { cacheIsFresh, fetchLiveCatalog, initialCatalog, inventoryConfigured, me
 interface CatalogValue {
   products: Product[];
   cycles: Product[];
-  accessories: Product[];
   /** True only while a live request is in flight. The UI never blocks on it. */
   loading: boolean;
   /** A cached catalogue is being shown because the network is unavailable. */
@@ -59,7 +58,6 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
   const value = useMemo<CatalogValue>(() => ({
     products,
     cycles: products.filter(product => product.kind === 'cycle'),
-    accessories: products.filter(product => product.kind === 'accessory'),
     loading, stale, configured: inventoryConfigured, refresh: () => void refresh(),
   }), [products, loading, stale, refresh]);
 

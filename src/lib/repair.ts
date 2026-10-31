@@ -25,7 +25,7 @@ export function validateRepair(fields: RepairFields, today = localToday()): Part
   if (Array.from(fields.name.trim()).length < 2 || fields.name.length > 100 || /[\u0000-\u001f\u007f]/.test(fields.name)) errors.name = 'form.errorName';
   const phone = normalizePhone(fields.phone);
   if (!/^\+?[1-9]\d{9,14}$/.test(phone)) errors.phone = 'form.errorPhone';
-  if (fields.bikeType !== 'other' && !shop.categories.some(category => category.id === fields.bikeType && category.id !== 'accessories')) errors.bikeType = 'form.errorBike';
+  if (fields.bikeType !== 'other' && !shop.categories.some(category => category.id === fields.bikeType)) errors.bikeType = 'form.errorBike';
   if (!shop.services.some(service => service.id === fields.service)) errors.service = 'form.errorService';
   if (!validDate(fields.date) || fields.date < today) errors.date = 'form.errorDate';
   if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(fields.time)) errors.time = 'form.errorTime';

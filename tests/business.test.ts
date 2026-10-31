@@ -17,7 +17,9 @@ describe('contact configuration', () => {
   });
   it('keeps unconfirmed hours, prices, inventory, offers and reviews unpublished', () => {
     expect(shop.hours.confirmed).toBe(false);
-    expect(shop.catalog).toEqual([]);
+    expect(shop.catalog).toHaveLength(19);
+    expect(shop.catalog.every(product => product.price === null && product.availability === null)).toBe(true);
+    expect(validateCatalog(shop.catalog, shop.categories.map(c => c.id))).toEqual([]);
     expect(shop.offers).toEqual([]);
     expect(shop.reviews).toEqual([]);
     expect(shop.services.every(service => service.price === null)).toBe(true);

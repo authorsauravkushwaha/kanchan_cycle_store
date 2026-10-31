@@ -1,11 +1,12 @@
+import { suppliedCycles } from './cycles.ts';
+
 /**
  * কাঞ্চন সাইকেল স্টোর্স — the single owner-configuration file.
  * Read OWNER_CHECKLIST.md before changing verification flags.
  * Never turn an unknown price, stock level, service or offer into a claim.
  * Only the values in this file need editing for routine business updates.
  *
- * Design note: the owner-uploaded portrait is the sole photograph rendered on
- * the website; it is used only as the full-bleed background of the homepage hero.
+ * Product photographs supplied by the owner are included in the catalogue.
  */
 export type Language = 'bn' | 'en';
 export type Localized = { bn: string; en: string };
@@ -49,9 +50,8 @@ export interface Product {
   availability: Availability;
   featured: boolean;
   /**
-   * Optional photograph supplied by the owner for a live (Supabase) product.
-   * Must be an HTTPS URL on an approved host. The static seed catalogue stays
-   * text-only, and no stock photography is ever used.
+   * Owner-supplied product photograph. Static photos use local asset paths;
+   * live (Supabase) photos must use HTTPS on an approved host.
    */
   photoUrl?: string | null;
 }
@@ -95,7 +95,7 @@ export const shop = {
       en: 'New cycles, accessories and repairs — talk to the shop in Kolaghat.',
     },
   },
-  /** The owner-uploaded portrait fills the homepage hero background; it is the only photograph on the site. */
+  /** The owner-uploaded portrait fills the homepage hero background. */
   heroPhoto: {
     src: '/images/kanchan-store-hero.jpeg', smallSrc: '/images/kanchan-store-hero.jpeg', smallWidth: 1024, width: 1024, height: 1536,
     alt: { bn: 'কোলাঘাটে কাঞ্চন সাইকেল স্টোর্সের ভিতরে দোকানদার', en: 'The shopkeeper inside Kanchan Cycle Stores in Kolaghat' },
@@ -146,13 +146,8 @@ export const shop = {
     { id: 'electric', name: { bn: 'ইলেকট্রিক সাইকেল', en: 'Electric cycles' }, subtitle: { bn: 'নতুন ধরনের পথচলা', en: 'Explore a different ride' }, availabilityConfirmed: false },
     { id: 'accessories', name: { bn: 'সাইকেলের অ্যাক্সেসরিজ', en: 'Cycle accessories' }, subtitle: { bn: 'যাত্রার ছোট্ট সঙ্গী', en: 'The little essentials' }, availabilityConfirmed: false },
   ] as Category[],
-  /**
-   * No product records were provided. Do not add fictional products to fill space.
-   * A complete, commented example is in OWNER_CHECKLIST.md (not in public data).
-   * Price, specifications and availability must be checked by the owner.
-   * Product images are never used on this website — cards are text-only.
-   */
-  catalog: [] as Product[],
+  /** Owner-supplied photos; price and stock remain unconfirmed. */
+  catalog: suppliedCycles as Product[],
   services: [
     {
       id: 'general',

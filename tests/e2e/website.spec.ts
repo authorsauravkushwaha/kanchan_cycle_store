@@ -7,7 +7,7 @@ async function useTestCatalog(page: Page) {
   await page.route('**/src/config/shop.ts*', async route => {
     const response = await route.fetch();
     const source = await response.text();
-    const body = source.replace('catalog: [],', `catalog: ${JSON.stringify(fixtureProducts)},`);
+    const body = source.replace('catalog: suppliedCycles,', `catalog: ${JSON.stringify(fixtureProducts)},`);
     if (body === source) throw new Error('Test catalog injection point was not found.');
     await route.fulfill({ response, body });
   });
@@ -47,17 +47,22 @@ test('all public routes, unique titles, footer links and 404 work', async ({ pag
   await expect(page.locator('h1')).toHaveText('গোপনীয়তার নীতি');
 });
 
-test('category links, empty catalog, phone, directions and embedded map are correct', async ({ page }) => {
+test('category links, supplied catalog, phone, directions and embedded map are correct', async ({ page }) => {
   await page.goto('/');
   for (const category of ['kids', 'student', 'city', 'geared', 'electric']) {
     await page.goto('/');
     await page.locator(`.category-card[href="/cycles?category=${category}"]`).click();
     await expect(page).toHaveURL(new RegExp(`category=${category}`));
     await expect(page.getByLabel('সাইকেলের ধরন', { exact: true })).toHaveValue(category);
-    await expect(page.getByRole('heading', { name: 'পছন্দের সাইকেলটি দোকানে খুঁজুন' })).toBeVisible();
+    if (category === 'electric') await expect(page.locator('.empty-state')).toBeVisible();
+    else await expect(page.locator('.product-card').first()).toBeVisible();
   }
   await page.goto('/cycles');
-  await expect(page.locator('.empty-state')).toContainText('অনলাইন তালিকা এখনও প্রকাশ করা হয়নি');
+  await expect(page.locator('.product-card')).toHaveCount(19);
+  await expect(page.locator('.product-card-photo img')).toHaveCount(19);
+  await page.locator('.product-card h3 a').first().click();
+  await expect(page.locator('.product-detail-photo img')).toBeVisible();
+  await expect(page.locator('.product-detail-info .product-price')).toContainText('দাম জানতে যোগাযোগ করুন');
   await page.goto('/contact');
   await expect(page.locator('.contact-phone')).toHaveAttribute('href', 'tel:+917076884950');
   const directions = page.locator('.contact-card a[href*="google.com/maps"]').first();
@@ -274,7 +279,7 @@ test('primary pages pass automated WCAG A/AA checks on desktop and mobile', asyn
   }
 });
 
-test('only the uploaded hero image loads and pages do not produce application errors', async ({ page }) => {
+test('supplied images load and pages do not produce application errors', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', error => errors.push(error.message));
   for (const path of ['/', '/cycles', '/accessories', '/services', '/recommendation', '/offers', '/about', '/contact', '/privacy']) {
@@ -286,10 +291,13 @@ test('only the uploaded hero image loads and pages do not produce application er
     });
     const broken = await page.evaluate(() => Array.from(document.images).filter(img => img.complete && img.naturalWidth === 0).map(img => img.src));
     expect(broken, path).toEqual([]);
-    // The supplied portrait is the only photograph; it fills the homepage hero background.
     const photographs = await page.evaluate(() => Array.from(document.images)
       .map(img => new URL(img.currentSrc || img.src, location.origin).pathname));
-    expect(photographs, path).toEqual(path === '/' ? ['/images/kanchan-store-hero.jpeg'] : []);
+    if (path === '/') expect(photographs).toEqual(['/images/kanchan-store-hero.jpeg']);
+    else if (path === '/cycles') {
+      expect(photographs).toHaveLength(19);
+      expect(photographs.every(photo => photo.startsWith('/images/cycles/'))).toBe(true);
+    } else expect(photographs, path).toEqual([]);
   }
   expect(errors).toEqual([]);
 });

@@ -1,5 +1,6 @@
 import { ArrowUpRight, Bike, Tag } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { asset } from '../config/shop';
 import type { Product } from '../config/shop';
 import { useLanguage } from '../i18n';
 import { categoryFor } from '../lib/catalog';
@@ -11,13 +12,14 @@ export function productEnquiry(product: Product, language: 'bn' | 'en') {
   const name = language === 'bn' ? product.nameBn : product.nameEn;
   return `${language === 'bn' ? `নমস্কার, আমি ${name} সম্পর্কে জানতে চাই। দাম ও স্টক সম্পর্কে জানাবেন?` : `Hello, I’d like to know about ${name}. Could you confirm the price and stock?`}\n${productUrl(product.slug)}`;
 }
-/** Every product card is text-only: name, category, verified facts and enquiry buttons. */
+/** Product photographs are shown when supplied by the shop. */
 export function ProductCard({ product }: { product: Product }) {
   const { t, l, price, productName, language } = useLanguage();
   const category = categoryFor(product.category);
   const specPreview = [product.specifications.frameSize, product.specifications.wheelSize,
     product.specifications.geared !== null ? product.specifications.geared ? t('catalog.geared') : t('catalog.nongeared') : null].filter(Boolean).join(' · ');
   return <article className="product-card">
+    {product.photoUrl && <Link className="product-card-photo" to={`/cycles/${product.slug}`} tabIndex={-1} aria-hidden="true"><img src={asset(product.photoUrl)} alt="" loading="lazy" /></Link>}
     <div className="product-card-body">
       <div className="product-card-top"><span className="product-category">{l(category.name)}</span>{product.brand && <span className="product-brand">{product.brand}</span>}</div>
       <h3><Link to={`/cycles/${product.slug}`}>{productName(product)}<ArrowUpRight size={18} aria-hidden="true" /></Link></h3>

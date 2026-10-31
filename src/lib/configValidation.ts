@@ -19,6 +19,10 @@ export function validateCatalog(products: Product[], categoryIds: string[]): str
     const range = product.specifications.riderHeightCm;
     if (range && (!Number.isFinite(range.min) || !Number.isFinite(range.max) || range.min <= 0 || range.max < range.min)) errors.push(`${label}: invalid rider height range.`);
     if (product.specifications.intendedUse?.some(use => !['school', 'commuting', 'recreation', 'mixed'].includes(use))) errors.push(`${label}: invalid intended use.`);
+    if (product.photoUrls !== undefined) {
+      if (!Array.isArray(product.photoUrls) || product.photoUrls.some(url => typeof url !== 'string' || !url.trim())) errors.push(`${label}: photoUrls must contain nonempty strings.`);
+      else if (new Set(product.photoUrls).size !== product.photoUrls.length) errors.push(`${label}: photoUrls must not contain duplicate entries.`);
+    }
   }
   return errors;
 }

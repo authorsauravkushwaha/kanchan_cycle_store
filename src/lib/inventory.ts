@@ -64,6 +64,10 @@ export function productFromRow(row: Record<string, unknown>): Product | null {
   const nameBn = clean(row.name_bn, 120) || clean(row.name_en, 120);
   const nameEn = clean(row.name_en, 120) || nameBn;
   if (!nameBn || !nameEn) return null;
+  const photoUrl = securePhoto(row.photo_url);
+  const extraPhotos = Array.isArray(row.photo_urls)
+    ? [...new Set((row.photo_urls as unknown[]).map(securePhoto).filter((url): url is string => Boolean(url)))]
+    : null;
   return {
     id,
     slug,
@@ -85,7 +89,8 @@ export function productFromRow(row: Record<string, unknown>): Product | null {
     },
     availability,
     featured: row.featured === true,
-    photoUrl: securePhoto(row.photo_url),
+    photoUrl: photoUrl ?? extraPhotos?.[0] ?? null,
+    ...(extraPhotos && extraPhotos.length ? { photoUrls: extraPhotos } : {}),
   };
 }
 
@@ -126,7 +131,7 @@ function writeCachedCatalog(products: Product[]) {
         wheel_size: product.specifications.wheelSize, brakes: product.specifications.brakes,
         rider_height_min: product.specifications.riderHeightCm?.min ?? null,
         rider_height_max: product.specifications.riderHeightCm?.max ?? null,
-        intended_use: product.specifications.intendedUse, availability: product.availability, featured: product.featured, photo_url: product.photoUrl ?? null,
+        intended_use: product.specifications.intendedUse, availability: product.availability, featured: product.featured, photo_url: product.photoUrl ?? null, photo_urls: product.photoUrls ?? null,
       })),
     }));
   } catch { /* Storage quota is optional; live data still renders. */ }

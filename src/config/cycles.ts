@@ -25,46 +25,12 @@ const cyclePhotos: { nameEn: string; nameBn: string; category: CategoryId; brand
 ];
 
 /**
- * Premium Hercules Defender models supplied by the owner.
+ * Premium models photographed at the shop and supplied by the owner.
  *
- * The shop gave the manufacturer's official listed prices, not the price it
- * charges, so `price` stays null and the enquiry flow asks the shop. The listed
- * price is mentioned in the description with that caveat. Stock is likewise
- * unconfirmed (`availability: null`), and unknown specifications stay null.
+ * Shop prices and stock remain unconfirmed (`price: null`, `availability: null`),
+ * and unknown specifications stay null so the enquiry flow asks the shop directly.
  */
 const premiumCycles: Product[] = [
-  {
-    id: 'hercules-defender-fx-dd',
-    slug: 'hercules-defender-fx-dd',
-    kind: 'cycle',
-    nameBn: 'হারকিউলিস ডিফেন্ডার FX DD',
-    nameEn: 'Hercules Defender FX DD',
-    category: 'premium',
-    brand: 'Hercules',
-    price: null,
-    descriptionBn: 'স্টিল ফ্রেমের হারকিউলিস ডিফেন্ডার FX DD — ডুয়াল ডিস্ক ব্রেক, ফ্রন্ট সাসপেনশন ও ডাবল-ওয়াল অ্যালয় রিম। সিঙ্গেল-স্পিড, ইন্টারনাল ব্রেক কেবলিং, মাডগার্ড ও PU কমফোর্ট স্যাডল সহ; ২৬, ২৭.৫ ও ২৯ ইঞ্চি চাকার অপশন। ১৩ বছর বা তার বেশি বয়সীদের জন্য প্রস্তাবিত; ফ্রেম ও ফর্কে ২ বছরের ওয়ারেন্টি। প্রস্তুতকারকের তালিকাভুক্ত মূল্য ₹১১,৬৫৭–₹১২,১৯১ — দোকানের বর্তমান দাম ও স্টক জেনে নিন।',
-    descriptionEn: 'Steel-frame Hercules Defender FX DD with dual disc brakes, front suspension and double-wall alloy rims. Single-speed, with internal brake cabling, mudguards and a PU comfort saddle; 26, 27.5 and 29 inch wheel options. Recommended for riders aged 13 and above, with a 2-year warranty on the frame and fork. Official listed price ₹11,657–₹12,191 — ask the shop for its current price and stock.',
-    specifications: { geared: false, frameSize: null, wheelSize: '26 / 27.5 / 29 in', brakes: 'Dual disc', riderHeightCm: null, intendedUse: null },
-    availability: null,
-    featured: true,
-    photoUrl: '/images/cycles/cycle-20.webp',
-  },
-  {
-    id: 'hercules-defender-rf-vb',
-    slug: 'hercules-defender-rf-vb',
-    kind: 'cycle',
-    nameBn: 'হারকিউলিস ডিফেন্ডার RF VB',
-    nameEn: 'Hercules Defender RF VB',
-    category: 'premium',
-    brand: 'Hercules',
-    price: null,
-    descriptionBn: 'হারকিউলিস ডিফেন্ডার RF VB — সহজ গড়ন ও সাশ্রয়ী দামের ডিফেন্ডার। স্টিল ফ্রেম, রিজিড ফ্রন্ট ফর্ক, V-ব্রেক ও ডাবল-ওয়াল অ্যালয় রিম; ২৬ ইঞ্চি চাকা, সিঙ্গেল-স্পিড। দৈনন্দিন যাতায়াতের জন্য। প্রস্তুতকারকের তালিকাভুক্ত মূল্য ₹১০,০১৬ — দোকানের বর্তমান দাম ও স্টক জেনে নিন।',
-    descriptionEn: 'A simpler, value-focused Hercules Defender RF VB. Steel frame, rigid front fork, V-brakes and double-wall alloy rims on 26 inch wheels; single-speed. Built for everyday riding. Official listed price ₹10,016 — ask the shop for its current price and stock.',
-    specifications: { geared: false, frameSize: null, wheelSize: '26 in', brakes: 'V-brakes', riderHeightCm: null, intendedUse: null },
-    availability: null,
-    featured: true,
-    photoUrl: '/images/cycles/cycle-21.webp',
-  },
   {
     id: 'hercules-top-gear-defender-fx-dd',
     slug: 'hercules-top-gear-defender-fx-dd',
@@ -79,7 +45,8 @@ const premiumCycles: Product[] = [
     specifications: { geared: true, frameSize: null, wheelSize: null, brakes: 'Dual disc', riderHeightCm: null, intendedUse: null },
     availability: null,
     featured: true,
-    photoUrl: '/images/cycles/cycle-22.webp',
+    photoUrl: '/images/cycles/cycle-20.webp',
+    photoUrls: ['/images/cycles/cycle-20.webp', '/images/cycles/cycle-21.webp'],
   },
   {
     id: 'tata-stryder-harris-x-ic-dd',
@@ -96,8 +63,15 @@ const premiumCycles: Product[] = [
     availability: null,
     featured: true,
     photoUrl: '/images/cycles/cycle-23.webp',
+    photoUrls: ['/images/cycles/cycle-23.webp', '/images/cycles/cycle-22.webp'],
   },
 ];
+
+/** Old consolidated Defender slugs redirect to the single geared Defender listing. */
+export const legacyCycleSlugs: Record<string, string> = {
+  'hercules-defender-fx-dd': 'hercules-top-gear-defender-fx-dd',
+  'hercules-defender-rf-vb': 'hercules-top-gear-defender-fx-dd',
+};
 
 const photographedCycles: Product[] = cyclePhotos.map((cycle, index) => {
   const id = `supplied-cycle-${String(index + 1).padStart(2, '0')}`;

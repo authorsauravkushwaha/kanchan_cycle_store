@@ -6,9 +6,11 @@ export interface QuizAnswers { rider: string; age: string; height: string; budge
 export const emptyAnswers: QuizAnswers = { rider: '', age: '', height: '', budget: '', use: '', gear: '' };
 export const quizFields = ['rider', 'age', 'height', 'budget', 'use', 'gear'] as const;
 export function validateQuizStep(step: number, answers: QuizAnswers): TranslationKey | null {
+  if (!answers || typeof answers !== 'object') return 'quiz.errorRider';
   if (step === 0 && !['child', 'student', 'adult', 'commuter'].includes(answers.rider)) return 'quiz.errorRider';
-  if (step === 1 && (!/^\d+$/.test(answers.age) || +answers.age < 2 || +answers.age > 100)) return 'quiz.errorAge';
-  if (step === 2 && answers.height && (!/^\d+$/.test(answers.height) || +answers.height < 80 || +answers.height > 220)) return 'quiz.errorHeight';
+  // Number inputs have no reliable maxlength; cap the string before regex work.
+  if (step === 1 && (typeof answers.age !== 'string' || answers.age.length > 3 || !/^\d+$/.test(answers.age) || +answers.age < 2 || +answers.age > 100)) return 'quiz.errorAge';
+  if (step === 2 && answers.height && (typeof answers.height !== 'string' || answers.height.length > 3 || !/^\d+$/.test(answers.height) || +answers.height < 80 || +answers.height > 220)) return 'quiz.errorHeight';
   if (step === 3 && answers.budget !== 'unsure' && !shop.budgets.some(b => b.id === answers.budget)) return 'quiz.errorBudget';
   if (step === 4 && !['school', 'commuting', 'recreation', 'mixed'].includes(answers.use)) return 'quiz.errorUse';
   if (step === 5 && !['geared', 'non-geared', 'unsure'].includes(answers.gear)) return 'quiz.errorGear';

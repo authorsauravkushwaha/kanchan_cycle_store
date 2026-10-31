@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { mergeCatalog, productFromRow } from '../src/lib/inventory';
+import { CATALOG_COLUMNS, catalogQueryParams, isForbiddenSupabaseKey, mergeCatalog, productFromRow } from '../src/lib/inventory';
 
 const row = {
   id: 'stryder-16', slug: 'stryder-16', kind: 'cycle', name_bn: 'স্ট্রাইডার ১৬', name_en: 'Stryder 16',
@@ -10,6 +10,26 @@ const row = {
 };
 
 describe('live catalogue rows', () => {
+  it('uses a fixed, minimal public-column query rather than selecting every database field', () => {
+    const query = catalogQueryParams();
+    expect(query.get('select')?.split(',')).toEqual([...CATALOG_COLUMNS]);
+    expect(query.get('select')).not.toContain('*');
+    expect(query.get('published')).toBe('eq.true');
+    expect(query.get('limit')).toBe('500');
+    expect(query.get('order')).toBe('sort_order.asc,id.asc');
+    expect([...CATALOG_COLUMNS]).not.toContain('updated_at');
+    expect([...CATALOG_COLUMNS]).not.toContain('published');
+    expect([...CATALOG_COLUMNS]).not.toContain('sort_order');
+  });
+
+  it('refuses Supabase service-role and secret keys, but accepts an anon JWT', () => {
+    const base64url = (text: string) => btoa(text).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+    const jwt = (role: string) => `${base64url('{"alg":"none"}')}.${base64url(JSON.stringify({ role }))}.signature`;
+    expect(isForbiddenSupabaseKey(jwt('service_role'))).toBe(true);
+    expect(isForbiddenSupabaseKey(jwt('anon'))).toBe(false);
+    expect(isForbiddenSupabaseKey(`sb_${'secret_'}${'x'.repeat(16)}`)).toBe(true);
+  });
+
   it('maps a valid row without turning unknowns into claims', () => {
     const product = productFromRow(row)!;
     expect(product.nameEn).toBe('Stryder 16');

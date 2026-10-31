@@ -15,11 +15,43 @@ import type { CategoryId, Product, UseCase } from '../config/shop';
  */
 const CACHE_KEY = 'kanchan-catalog-cache-v2';
 const CACHE_MAX_AGE = 1000 * 60 * 60 * 24; // Revalidate in the background after a day.
+const CACHE_MAX_LENGTH = 2 * 1024 * 1024; // Refuse corrupted/hostile localStorage before JSON.parse.
 
 const SUPABASE_URL = (import.meta.env.VITE_SUPABASE_URL || '').replace(/\/+$/, '');
 const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 
-export const inventoryConfigured = /^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(SUPABASE_URL) && SUPABASE_KEY.length > 20;
+/** VITE_ values are public. Never let a service-role or secret key reach fetch(). */
+export function isForbiddenSupabaseKey(value: string): boolean {
+  if (value.startsWith('sb_secret_')) return true;
+  const payloadPart = value.split('.')[1];
+  if (!payloadPart) return false;
+  try {
+    const base64 = payloadPart.replace(/-/g, '+').replace(/_/g, '/').padEnd(Math.ceil(payloadPart.length / 4) * 4, '=');
+    const payload = JSON.parse(atob(base64)) as { role?: unknown };
+    return payload.role === 'service_role';
+  } catch { return false; }
+}
+
+export const inventoryConfigured = /^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(SUPABASE_URL)
+  && SUPABASE_KEY.length > 20
+  && !isForbiddenSupabaseKey(SUPABASE_KEY);
+
+/** Public response columns only. Do not replace this with `select=*`: new private columns must stay private. */
+export const CATALOG_COLUMNS = [
+  'id', 'slug', 'kind', 'name_bn', 'name_en', 'category', 'brand', 'price',
+  'description_bn', 'description_en', 'geared', 'frame_size', 'wheel_size', 'brakes',
+  'rider_height_min', 'rider_height_max', 'intended_use', 'availability', 'featured', 'photo_url',
+] as const;
+
+/** Fixed, allowlisted REST query: no user-controlled SQL/filter fragments are accepted. */
+export function catalogQueryParams(): URLSearchParams {
+  return new URLSearchParams({
+    select: CATALOG_COLUMNS.join(','),
+    published: 'eq.true',
+    order: 'sort_order.asc,id.asc',
+    limit: '500',
+  });
+}
 
 export interface CatalogSnapshot {
   products: Product[];
@@ -29,7 +61,7 @@ export interface CatalogSnapshot {
 
 const categoryIds = new Set<CategoryId>(shop.categories.map(category => category.id));
 const uses = new Set<UseCase>(['school', 'commuting', 'recreation', 'mixed']);
-const clean = (value: unknown, max: number): string => typeof value === 'string' ? value.trim().slice(0, max) : '';
+const clean = (value: unknown, max: number): string => typeof value === 'string' ? value.slice(0, max).trim() : '';
 const optional = (value: unknown, max: number): string | null => clean(value, max) || null;
 const slugSafe = (value: string) => /^[a-z0-9][a-z0-9-]{1,78}[a-z0-9]$/.test(value);
 /** Only plain HTTPS image URLs from the configured Supabase project are shown. */
@@ -61,14 +93,14 @@ export function productFromRow(row: Record<string, unknown>): Product | null {
   const max = Number(row.rider_height_max);
   const riderHeightCm = Number.isFinite(min) && Number.isFinite(max) && min > 0 && max >= min && max < 250 ? { min, max } : null;
   const intendedUse = Array.isArray(row.intended_use)
-    ? (row.intended_use as unknown[]).map(use => String(use)).filter((use): use is UseCase => uses.has(use as UseCase))
+    ? (row.intended_use as unknown[]).slice(0, 4).map(use => String(use)).filter((use): use is UseCase => uses.has(use as UseCase))
     : null;
   const nameBn = clean(row.name_bn, 120) || clean(row.name_en, 120);
   const nameEn = clean(row.name_en, 120) || nameBn;
   if (!nameBn || !nameEn) return null;
   const photoUrl = securePhoto(row.photo_url);
   const extraPhotos = Array.isArray(row.photo_urls)
-    ? [...new Set((row.photo_urls as unknown[]).map(securePhoto).filter((url): url is string => Boolean(url)))]
+    ? [...new Set((row.photo_urls as unknown[]).slice(0, 10).map(securePhoto).filter((url): url is string => Boolean(url)))]
     : null;
   return {
     id,
@@ -110,9 +142,9 @@ const dedupe = (products: Product[]): Product[] => {
 export function readCachedCatalog(): CatalogSnapshot | null {
   try {
     const raw = localStorage.getItem(CACHE_KEY);
-    if (!raw) return null;
+    if (!raw || raw.length > CACHE_MAX_LENGTH) return null;
     const parsed = JSON.parse(raw) as { products?: unknown; fetchedAt?: unknown };
-    if (!Array.isArray(parsed.products)) return null;
+    if (!Array.isArray(parsed.products) || parsed.products.length > 500) return null;
     const products = dedupe(parsed.products.map(row => row && typeof row === 'object' ? productFromRow(row as Record<string, unknown>) : null)
       .filter((product): product is Product => Boolean(product)));
     if (!products.length) return null;
@@ -146,12 +178,7 @@ export function cacheIsFresh(snapshot: CatalogSnapshot | null): boolean {
 /** Public, read-only catalogue request. Returns null when it cannot be used. */
 export async function fetchLiveCatalog(signal?: AbortSignal): Promise<Product[] | null> {
   if (!inventoryConfigured) return null;
-  const query = new URLSearchParams({
-    select: '*',
-    published: 'eq.true',
-    order: 'sort_order.asc,id.asc',
-    limit: '500',
-  });
+  const query = catalogQueryParams();
   const response = await fetch(`${SUPABASE_URL}/rest/v1/products?${query.toString()}`, {
     signal,
     headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`, Accept: 'application/json' },
@@ -161,7 +188,7 @@ export async function fetchLiveCatalog(signal?: AbortSignal): Promise<Product[] 
   });
   if (!response.ok) throw new Error(`Catalogue request failed (${response.status})`);
   const rows: unknown = await response.json();
-  if (!Array.isArray(rows)) throw new Error('Catalogue response was not a list.');
+  if (!Array.isArray(rows) || rows.length > 500) throw new Error('Catalogue response was not a valid list.');
   const products = dedupe(rows.map(row => row && typeof row === 'object' ? productFromRow(row as Record<string, unknown>) : null)
     .filter((product): product is Product => Boolean(product)));
   writeCachedCatalog(products);

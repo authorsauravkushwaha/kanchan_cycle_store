@@ -959,3 +959,14 @@ html[lang='bn'] .install-kicker { letter-spacing: .4px; text-transform: none; fo
 .route-error h1 { font-size: 25px; color: var(--green-dark); }
 .route-error p { margin-top: 10px; font-size: 13.5px; color: var(--muted); line-height: 1.7; }
 .route-error-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 20px; }
+
+/* A non-blocking install offer and reachable help on small Android screens. */
+.drawer-links .drawer-install { display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 14px 8px; font-size: 16px; color: var(--green); border-bottom: 1px solid #eef1e9; }
+.install-offer { position: fixed; z-index: 55; right: 12px; bottom: 12px; display: flex; align-items: center; gap: 10px; max-width: min(440px, calc(100% - 24px)); padding: 10px 12px; background: var(--paper); color: var(--green-dark); border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 10px 35px #0b2a1f33; font-size: 13px; font-weight: 700; }
+.install-offer > span { flex: 1; }
+.install-offer .icon-button { flex: none; min-width: 44px; min-height: 44px; }
+.install-dialog { max-height: 100dvh; overflow-y: auto; }
+@media (max-width: 760px) {
+  body { padding-bottom: calc(66px + env(safe-area-inset-bottom)); }
+  .install-offer { left: 10px; right: 10px; bottom: calc(76px + env(safe-area-inset-bottom)); max-width: none; }
+}

@@ -31,6 +31,9 @@ test.describe('installed-app behaviour', () => {
     }
     await expect.poll(() => page.evaluate(() => Boolean(navigator.serviceWorker.controller)), { timeout: 15000 }).toBe(true);
 
+    // A non-app navigation must not replace the cached app shell.
+    await page.goto('/offline.html');
+
     // Every hashed build file is precached, so unvisited tabs open offline too.
     await context.setOffline(true);
     const routes: [string, string][] = [

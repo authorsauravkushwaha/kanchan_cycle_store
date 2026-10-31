@@ -6,7 +6,7 @@ import { usePwa } from '../pwa';
 function InstallDialog({ open, auto, onClose }: { open: boolean; auto: boolean; onClose: (dismissed: boolean) => void }) {
   const ref = useRef<HTMLDialogElement>(null);
   const { t, l } = useLanguage();
-  const { promptInstall, dismissInstall, isStandalone } = usePwa();
+  const { canInstall, promptInstall, dismissInstall, isStandalone } = usePwa();
   const [message, setMessage] = useState<string | null>(null);
   const titleId = useId();
   const [busy, setBusy] = useState(false);
@@ -47,10 +47,10 @@ function InstallDialog({ open, auto, onClose }: { open: boolean; auto: boolean; 
       <ul className="install-benefits">
         <li><Check size={15} strokeWidth={2.6} aria-hidden="true" />{l({ bn: 'হোম স্ক্রিন থেকে এক চাপে খুলবে', en: 'One tap from the home screen' })}</li>
         <li><Check size={15} strokeWidth={2.6} aria-hidden="true" />{l({ bn: 'ধীর ইন্টারনেটেও দোকানের তথ্য দেখা যাবে', en: 'Shop details keep working on a weak signal' })}</li>
-        <li><Check size={15} strokeWidth={2.6} aria-hidden="true" />{l({ bn: 'উপরের ব্রাউজার বার ছাড়াই পুরো পর্দা', en: 'Full screen, no browser bars' })}</li>
+        <li><Check size={15} strokeWidth={2.6} aria-hidden="true" />{l({ bn: 'বিনামূল্যে ব্যবহার করুন, অ্যাকাউন্টের দরকার নেই', en: 'Free to use, no account needed' })}</li>
       </ul>
       <div className="install-actions">
-        <button type="button" className="btn btn-primary" onClick={install} disabled={busy}><Download size={18} aria-hidden="true" />{t('install.cta')}</button>
+        {canInstall && <button type="button" className="btn btn-primary" onClick={install} disabled={busy}><Download size={18} aria-hidden="true" />{t('install.cta')}</button>}
         <button type="button" className="btn btn-secondary" onClick={() => close(true)}>{t('install.later')}</button>
       </div>
       <div className="install-how" role="note">
@@ -64,22 +64,32 @@ function InstallDialog({ open, auto, onClose }: { open: boolean; auto: boolean; 
 
 /** Appears once per fortnight, only when the browser is actually offering an install. */
 export function InstallPrompt() {
-  const { canInstall, installDismissed, isStandalone } = usePwa();
+  const { canInstall, installDismissed, isStandalone, dismissInstall } = usePwa();
+  const { t, l } = useLanguage();
   const [open, setOpen] = useState(false);
+  const [showOffer, setShowOffer] = useState(false);
   useEffect(() => {
     if (!canInstall || installDismissed || isStandalone) return;
     let later = 0;
     let done = false;
-    const show = () => { if (!done) { done = true; setOpen(true); } };
+    const show = () => { if (!done && document.visibilityState === 'visible') { done = true; setShowOffer(true); } };
     /* Ask once the visitor has actually engaged, not the moment they arrive
        from Google Maps. Falling back to a single quiet offer after 40 seconds. */
     const first = window.setTimeout(() => {
-      if (window.scrollY > 320 || document.visibilityState !== 'visible') show();
+      if (window.scrollY > 320 && document.visibilityState === 'visible') show();
       else later = window.setTimeout(show, 25000);
     }, 15000);
     return () => { window.clearTimeout(first); window.clearTimeout(later); };
   }, [canInstall, installDismissed, isStandalone]);
-  return <InstallDialog open={open} auto onClose={() => setOpen(false)} />;
+  if (!canInstall || installDismissed || isStandalone) return null;
+  return <>
+    {showOffer && !open && <aside className="install-offer" aria-label={t('install.title')}>
+      <span>{l({ bn: 'বিনামূল্যে ফোনে রাখুন', en: 'Keep this free app on your phone' })}</span>
+      <button type="button" className="btn btn-primary btn-compact" onClick={() => setOpen(true)}>{t('install.cta')}</button>
+      <button type="button" className="icon-button" aria-label={t('install.close')} onClick={() => { dismissInstall(); setShowOffer(false); }}><X size={18} aria-hidden="true" /></button>
+    </aside>}
+    <InstallDialog open={open} auto onClose={() => { setOpen(false); setShowOffer(false); }} />
+  </>;
 }
 
 /** A permanent, discreet entry point in the drawer and footer. */

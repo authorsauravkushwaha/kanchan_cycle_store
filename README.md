@@ -110,16 +110,15 @@ Budget and planning guidance is in
 **[docs/SALES_PLAYBOOK.md](docs/SALES_PLAYBOOK.md)** — Google Business Profile,
 WhatsApp Business, reviews, seasonal stock, and the 30-day plan.
 
-## Why the catalogue starts empty
+## Catalogue and unconfirmed information
 
-No verified product data, prices or stock levels were supplied. The repository
-therefore ships `catalog: []` and never invents products, discounts, ratings,
-warranties or years in business. Every unknown stays visibly unknown, and a test
-(`tests/business.test.ts`) enforces that.
+The catalogue includes the 19 product photographs supplied by the shop. Prices,
+stock and specifications remain unconfirmed, and are not guessed. The shop can
+confirm these details directly; tests enforce that the supplied entries stay unpriced.
 
 Add products in either of two ways:
 
-1. **Static (no backend):** edit `shop.catalog` in `src/config/shop.ts`, rebuild.
+1. **Static (no backend):** edit the supplied entries in `src/config/cycles.ts` or `shop.catalog` in `src/config/shop.ts`, then rebuild.
 2. **Live (phone updates):** follow [docs/SUPABASE.md](docs/SUPABASE.md), then use
    `/owner` to export the CSV and import it into Supabase. Flipping `published`
    changes the live site without a rebuild.

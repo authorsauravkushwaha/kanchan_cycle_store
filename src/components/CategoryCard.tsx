@@ -1,4 +1,4 @@
-import { ArrowUpRight, Baby, Bell, Bike, Cog, GraduationCap, Zap } from 'lucide-react';
+import { ArrowUpRight, Baby, Bell, Bike, Cog, Crown, GraduationCap, Zap } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { shop } from '../config/shop';
@@ -6,7 +6,7 @@ import type { CategoryId } from '../config/shop';
 import { useLanguage } from '../i18n';
 
 const categoryIcons: Record<CategoryId, LucideIcon> = {
-  kids: Baby, student: GraduationCap, city: Bike, geared: Cog, electric: Zap, accessories: Bell,
+  kids: Baby, student: GraduationCap, city: Bike, geared: Cog, premium: Crown, electric: Zap, accessories: Bell,
 };
 /** Text-only category card: an icon, a number, the category name and a prompt. */
 export function CategoryCard({ id, index }: { id: CategoryId; index: number }) {

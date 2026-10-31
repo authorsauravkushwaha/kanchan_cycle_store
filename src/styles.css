@@ -175,6 +175,10 @@ html[lang='en'] .hero-description { font-size: 15.5px; line-height: 1.85; }
 /* ---------- Categories ---------- */
 .categories-section { background: var(--paper); }
 .category-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+/* Seven categories leave one card behind on a three-column row; the last card
+   becomes a full-width banner instead of an orphan. */
+.category-grid > .category-card:last-child:nth-child(3n + 1) { grid-column: 1 / -1; flex-direction: row; align-items: flex-start; gap: 14px; }
+.category-grid > .category-card:last-child:nth-child(3n + 1) .category-card-body > p { min-height: 0; }
 .category-card { position: relative; display: flex; flex-direction: column; gap: 16px; padding: 24px 24px 22px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--paper); transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease, background .18s ease; }
 .category-card:hover { border-color: #b7c8ac; box-shadow: var(--shadow); transform: translateY(-2px); background: #fdfefb; }
 .category-icon { width: 46px; height: 46px; border-radius: 13px; background: var(--soft); color: var(--green); display: inline-flex; align-items: center; justify-content: center; transition: background .18s ease, color .18s ease; }

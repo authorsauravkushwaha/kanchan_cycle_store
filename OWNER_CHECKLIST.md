@@ -42,7 +42,7 @@ All routine settings live in **`src/config/shop.ts`**. Do not publish a detail m
   kind: 'cycle',
   nameBn: 'আসল মডেলের নাম লিখুন',
   nameEn: 'Replace with the real model name',
-  category: 'city', // kids | student | city | geared | electric | accessories
+  category: 'city', // kids | student | city | geared | premium | electric | accessories
   brand: null, // A verified brand string, or null.
   price: null, // A verified INR number, e.g. 5499; never a string or a guess.
   descriptionBn: 'দোকান থেকে যাচাই করা বিবরণ লিখুন।',

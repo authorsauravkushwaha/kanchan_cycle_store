@@ -49,7 +49,7 @@ test('all public routes, unique titles, footer links and 404 work', async ({ pag
 
 test('category links, supplied catalog, phone, directions and embedded map are correct', async ({ page }) => {
   await page.goto('/');
-  for (const category of ['kids', 'student', 'city', 'geared', 'electric']) {
+  for (const category of ['kids', 'student', 'city', 'geared', 'premium', 'electric']) {
     await page.goto('/');
     await page.locator(`.category-card[href="/cycles?category=${category}"]`).click();
     await expect(page).toHaveURL(new RegExp(`category=${category}`));
@@ -58,8 +58,8 @@ test('category links, supplied catalog, phone, directions and embedded map are c
     else await expect(page.locator('.product-card').first()).toBeVisible();
   }
   await page.goto('/cycles');
-  await expect(page.locator('.product-card')).toHaveCount(19);
-  await expect(page.locator('.product-card-photo img')).toHaveCount(19);
+  await expect(page.locator('.product-card')).toHaveCount(22);
+  await expect(page.locator('.product-card-photo img')).toHaveCount(22);
   await page.locator('.product-card h3 a').first().click();
   await expect(page.locator('.product-detail-photo img')).toBeVisible();
   await expect(page.locator('.product-detail-info .product-price')).toContainText('দাম জানতে যোগাযোগ করুন');
@@ -293,9 +293,13 @@ test('supplied images load and pages do not produce application errors', async (
     expect(broken, path).toEqual([]);
     const photographs = await page.evaluate(() => Array.from(document.images)
       .map(img => new URL(img.currentSrc || img.src, location.origin).pathname));
-    if (path === '/') expect(photographs).toEqual(['/images/kanchan-store-hero.jpeg']);
+    if (path === '/') expect(photographs).toEqual([
+      '/images/kanchan-store-hero.jpeg',
+      // The three featured premium models appear in the homepage featured row.
+      '/images/cycles/cycle-20.webp', '/images/cycles/cycle-21.webp', '/images/cycles/cycle-22.webp',
+    ]);
     else if (path === '/cycles') {
-      expect(photographs).toHaveLength(19);
+      expect(photographs).toHaveLength(22);
       expect(photographs.every(photo => photo.startsWith('/images/cycles/'))).toBe(true);
     } else expect(photographs, path).toEqual([]);
   }

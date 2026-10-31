@@ -10,7 +10,7 @@ import { suppliedCycles } from './cycles.ts';
  */
 export type Language = 'bn' | 'en';
 export type Localized = { bn: string; en: string };
-export type CategoryId = 'kids' | 'student' | 'city' | 'geared' | 'electric' | 'accessories';
+export type CategoryId = 'kids' | 'student' | 'city' | 'geared' | 'premium' | 'electric' | 'accessories';
 export type Availability = 'in-stock' | 'out-of-stock' | null;
 export type UseCase = 'school' | 'commuting' | 'recreation' | 'mixed';
 
@@ -143,6 +143,9 @@ export const shop = {
     { id: 'student', name: { bn: 'স্টুডেন্ট সাইকেল', en: 'Student cycles' }, subtitle: { bn: 'স্কুল থেকে কলেজের পথে', en: 'For the everyday journey' }, availabilityConfirmed: false },
     { id: 'city', name: { bn: 'দৈনন্দিন ব্যবহারের সাইকেল', en: 'Everyday city cycles' }, subtitle: { bn: 'চেনা পথে প্রতিদিন', en: 'Make the daily ride yours' }, availabilityConfirmed: false },
     { id: 'geared', name: { bn: 'গিয়ার সাইকেল', en: 'Geared cycles' }, subtitle: { bn: 'পথ বদলাক, উৎসাহ নয়', en: 'A little more adventure' }, availabilityConfirmed: false },
+    // Premium models are sold through the shop, but stock and shop prices still
+    // need confirming in person, so availabilityConfirmed stays false.
+    { id: 'premium', name: { bn: 'প্রিমিয়াম সাইকেল', en: 'Premium cycles' }, subtitle: { bn: 'বাছাই করা উন্নত মডেল', en: 'Hand-picked, higher-spec models' }, availabilityConfirmed: false },
     { id: 'electric', name: { bn: 'ইলেকট্রিক সাইকেল', en: 'Electric cycles' }, subtitle: { bn: 'নতুন ধরনের পথচলা', en: 'Explore a different ride' }, availabilityConfirmed: false },
     { id: 'accessories', name: { bn: 'সাইকেলের অ্যাক্সেসরিজ', en: 'Cycle accessories' }, subtitle: { bn: 'যাত্রার ছোট্ট সঙ্গী', en: 'The little essentials' }, availabilityConfirmed: false },
   ] as Category[],

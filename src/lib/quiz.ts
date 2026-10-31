@@ -18,7 +18,7 @@ export function validateQuizStep(step: number, answers: QuizAnswers): Translatio
 export function recommendProducts(products: Product[], answers: QuizAnswers): Product[] {
   if (quizFields.some((_, step) => validateQuizStep(step, answers))) return [];
   const preferredCategories: Record<string, string[]> = {
-    child: ['kids'], student: ['student', 'city', 'geared'], adult: ['city', 'geared', 'electric'], commuter: ['city', 'geared', 'electric'],
+    child: ['kids'], student: ['student', 'city', 'geared'], adult: ['city', 'geared', 'premium', 'electric'], commuter: ['city', 'geared', 'premium', 'electric'],
   };
   const budget = shop.budgets.find(b => b.id === answers.budget);
   const candidates = products.filter(product => {

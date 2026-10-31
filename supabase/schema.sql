@@ -51,7 +51,7 @@ alter table public.products add constraint products_kind_check check (kind in ('
 
 alter table public.products drop constraint if exists products_category_check;
 alter table public.products add constraint products_category_check
-  check (category in ('kids', 'student', 'city', 'geared', 'electric', 'accessories'));
+  check (category in ('kids', 'student', 'city', 'geared', 'premium', 'electric', 'accessories'));
 
 alter table public.products drop constraint if exists products_kind_category_check;
 alter table public.products add constraint products_kind_category_check check (

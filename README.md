@@ -112,7 +112,9 @@ WhatsApp Business, reviews, seasonal stock, and the 30-day plan.
 
 ## Catalogue and unconfirmed information
 
-The catalogue includes the 19 product photographs supplied by the shop. Prices,
+The catalogue includes the 22 product photographs supplied by the shop, including the
+Hercules Defender premium models (their manufacturer-listed prices are quoted in
+the descriptions; the shop price and stock still need confirming). Prices,
 stock and specifications remain unconfirmed, and are not guessed. The shop can
 confirm these details directly; tests enforce that the supplied entries stay unpriced.
 

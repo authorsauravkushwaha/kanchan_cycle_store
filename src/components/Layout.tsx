@@ -14,7 +14,7 @@ import { MotionExperience, useMotion } from './MotionExperience';
 
 export const navigation: { to: string; key: TranslationKey }[] = [
   { to: '/', key: 'nav.home' }, { to: '/cycles', key: 'nav.cycles' },
-  { to: '/accessories', key: 'nav.accessories' }, { to: '/services', key: 'nav.services' },
+  { to: '/services', key: 'nav.services' },
   { to: '/offers', key: 'nav.offers' }, { to: '/about', key: 'nav.about' }, { to: '/contact', key: 'nav.contact' },
 ];
 function LanguageSwitcher() {

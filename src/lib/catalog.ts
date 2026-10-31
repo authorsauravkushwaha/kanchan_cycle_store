@@ -10,7 +10,7 @@ export function parseFilters(params: URLSearchParams): CatalogFilters {
   const sort = params.get('sort') || 'featured';
   return {
     query: (params.get('q') || '').slice(0, 120),
-    category: shop.categories.some(c => c.id === category && c.id !== 'accessories') ? category : '',
+    category: shop.categories.some(c => c.id === category) ? category : '',
     budget: shop.budgets.some(b => b.id === budget) ? budget : '',
     gear: ['geared', 'non-geared'].includes(gear) ? gear : '',
     sort: ['featured', 'price-asc', 'price-desc', 'name'].includes(sort) ? sort : 'featured',

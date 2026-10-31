@@ -8,7 +8,7 @@ const CycleScene = lazy(() => import('./CycleScene').then(module => ({ default: 
 
 export function HeroSection() {
   const { t, l } = useLanguage();
-  const benefits = [{ icon: Bike }, { icon: MapPin }, { icon: Wrench }];
+  const benefits = [{ icon: Bike }, { icon: Wrench }];
   return <>
     <section className="hero-neu" aria-labelledby="hero-title" data-scroll-scene="hero">
       <div className="hero-backdrop">
@@ -30,11 +30,9 @@ export function HeroSection() {
     </section>
     <section className="benefits benefits-neu" aria-label={l({ bn: 'দোকানে আপনার জন্য', en: 'Here for your next ride' })}><div className="container benefits-grid">{benefits.map(({ icon: Icon }, index) => <div className="benefit" key={index} data-reveal><span className="benefit-icon"><Icon size={25} strokeWidth={1.5} aria-hidden="true" /></span><div><h2>{l([
       { bn: 'পছন্দমতো সাইকেল', en: 'A ride that feels like you' },
-      { bn: 'অ্যাক্সেসরিজের খোঁজ', en: 'Accessories for the ride' },
       { bn: 'মেরামত নিয়ে কথা বলুন', en: 'Care for every kilometre' },
     ][index])}</h2><p>{l([
       { bn: 'আপনার প্রয়োজনের কথা জানান', en: 'Tell us what you are looking for' },
-      { bn: 'দোকানে উপলব্ধতা জেনে নিন', en: 'Ask what is available in store' },
       { bn: 'পরিষেবা সম্পর্কে জেনে নিন', en: 'Ask what help is available' },
     ][index])}</p></div><span className="benefit-index" aria-hidden="true">0{index + 1}</span></div>)}</div></section>
   </>;

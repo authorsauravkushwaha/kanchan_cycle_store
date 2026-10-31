@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import type { CategoryId } from '../src/config/shop';
 import { draftsToCatalogJson, draftsToCsv, draftToProduct, emptyDraft, parseDrafts, validateDraft } from '../src/lib/stockDesk';
 
 const draft = {
@@ -17,8 +18,8 @@ describe('owner stock desk', () => {
     expect(errors.join(' ')).toMatch(/Slug/);
   });
 
-  it('rejects a negative price and a cycle in the accessory category', () => {
-    const errors = validateDraft({ ...draft, price: '-1', category: 'accessories' }, []);
+  it('rejects a negative price and an unknown category', () => {
+    const errors = validateDraft({ ...draft, price: '-1', category: 'accessories' as unknown as CategoryId }, []);
     expect(errors.join(' ')).toMatch(/Price/);
     expect(errors.join(' ')).toMatch(/category/);
   });

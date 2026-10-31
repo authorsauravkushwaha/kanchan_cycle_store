@@ -18,8 +18,7 @@ All routine settings live in **`src/config/shop.ts`**. Do not publish a detail m
 |---|---|---|
 | Opening hours | Supplied 9 AM–9 PM daily is recorded, **not shown publicly** | Confirm the interpretation, then set `hours.confirmed: true`. Update days/times/display text if different. |
 | WhatsApp ownership | Links use the supplied number | Send a real test enquiry and confirm the shop receives it. No message was sent during development. |
-| Bicycle catalog | Empty; useful enquiry state instead of fake products | Add verified names, brands, specifications, prices and stock. Product cards stay text-only — the site has no product images. |
-| Accessories | Enquiry topics only; no claimed inventory | Add real accessory records or confirm the enquiry topics are useful. |
+| Bicycle catalog | Cycles only; the website lists no accessories or other items | Add verified names, brands, specifications, prices and stock. Product cards stay text-only unless a photograph is supplied. |
 | Repair services | Six possible topics, all marked as requiring availability confirmation | Set `confirmed: true` only for services actually offered. Add a price only when verified. |
 | Shop photograph | Your own portrait is the only photograph on the site: it fills the whole first screen of the homepage edge to edge, with a floating caption labelled দোকানের মালিক / The shopkeeper | Confirm you are happy with the crop and caption, or send a replacement portrait (1024 × 1536, face in the upper third). Check the crop on a desktop, a phone and a phone held sideways. |
 | Offers | No discounts published; useful buying tips shown | Add only genuine, owner-approved offers with `verified: true`. |
@@ -42,7 +41,7 @@ All routine settings live in **`src/config/shop.ts`**. Do not publish a detail m
   kind: 'cycle',
   nameBn: 'আসল মডেলের নাম লিখুন',
   nameEn: 'Replace with the real model name',
-  category: 'city', // kids | student | city | geared | premium | electric | accessories
+  category: 'city', // kids | student | city | geared | premium | electric
   brand: null, // A verified brand string, or null.
   price: null, // A verified INR number, e.g. 5499; never a string or a guess.
   descriptionBn: 'দোকান থেকে যাচাই করা বিবরণ লিখুন।',
@@ -60,7 +59,7 @@ All routine settings live in **`src/config/shop.ts`**. Do not publish a detail m
 }
 ```
 
-For an accessory, use `kind: 'accessory'` and `category: 'accessories'`. Its detail page and WhatsApp enquiry work through the same catalog. Product records have **no image fields** — product cards are text-only by design, so a missing photograph never leaves an empty placeholder.
+The website lists cycles only — there is no accessory catalog, accessories page or accessory category. Product records have **no image fields** — product cards are text-only by design, so a missing photograph never leaves an empty placeholder.
 
 ## Before announcing the website
 

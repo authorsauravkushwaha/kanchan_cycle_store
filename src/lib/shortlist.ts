@@ -50,7 +50,7 @@ export function parseShortlist(raw: string | null): ShortlistEntry[] {
         slug: row.slug.slice(0, 120),
         nameBn: row.nameBn.slice(0, 160),
         nameEn: row.nameEn.slice(0, 160),
-        kind: row.kind === 'accessory' ? 'accessory' as const : 'cycle' as const,
+        kind: 'cycle' as const,
         price,
         qty,
       }];

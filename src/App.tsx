@@ -11,7 +11,6 @@ import Home from './pages/Home';
 
 const Cycles = lazy(() => import('./pages/Cycles'));
 const ProductDetail = lazy(() => import('./pages/ProductDetail'));
-const Accessories = lazy(() => import('./pages/Accessories'));
 const Services = lazy(() => import('./pages/Services'));
 const Recommendation = lazy(() => import('./pages/Recommendation'));
 const Shortlist = lazy(() => import('./pages/Shortlist'));
@@ -37,7 +36,6 @@ export default function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/cycles" element={<Cycles />} />
                 <Route path="/cycles/:slug" element={<ProductDetail />} />
-                <Route path="/accessories" element={<Accessories />} />
                 <Route path="/services" element={<Services />} />
                 <Route path="/recommendation" element={<Recommendation />} />
                 <Route path="/list" element={<Shortlist />} />

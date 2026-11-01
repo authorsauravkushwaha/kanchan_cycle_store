@@ -212,7 +212,7 @@ Every one of these is a single line in `src/config/shop.ts` (or the `/owner` sto
 | `npx playwright test` | 22 end-to-end tests — **pass** (catalogue filters, quiz, shortlist, repair form, images, a11y) |
 | `npx tsc -b` | **pass** |
 | `npm run security:check` | **pass** |
-| `npm run build` | **pass** — main JS 441 kB / 133 kB gzip, `public/images` 3.7 MB → 2.9 MB with variants |
+| `npm run build` | **pass** — main JS 442 kB / 133 kB gzip; a phone now downloads one 400 px variant per cycle (24 variants, 375 kB in total, ~15 kB each) instead of a 257 kB original |
 
 Related documents: `OWNER_CHECKLIST.md` (the shop-side tasks), `docs/SALES_PLAYBOOK.md` (how to answer an
 enquiry), `docs/SECURITY-CONTROLS.md` (privacy and headers), `docs/ANDROID.md` (install on a phone).

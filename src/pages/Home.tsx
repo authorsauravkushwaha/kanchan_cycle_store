@@ -30,7 +30,7 @@ export default function Home() {
         <div className="home-about-copy" data-reveal>
           <SectionHeading eyebrow={l({ bn: 'কাঞ্চন সাইকেল স্টোর্স', en: 'KANCHAN CYCLE STORES' })} title={l({ bn: 'আপনার কাছের সাইকেল স্টোর', en: 'Your neighbourhood cycle store' })} description={l({ bn: 'সাইকেল ও মেরামত পরিষেবার জন্য কোলাঘাটে আপনার স্থানীয় ঠিকানা। কী পাওয়া যাচ্ছে, দাম ও স্টক—দোকানে সরাসরি জেনে নিন।', en: 'Your local destination in Kolaghat for bicycles and repair services. Ask the shop directly about current options, prices and stock.' })} />
           <TextLink to="/about">{l({ bn: 'আমাদের সম্পর্কে জানুন', en: 'More about the store' })}</TextLink>
-          <p className="home-shop-signature"><MapPin size={14} aria-hidden="true" /><span><strong>{l(shop.heroPhoto.caption)}</strong>{l({ bn: ' — দোকানে তোলা ছবি', en: ' — photographed inside the shop' })}</span></p>
+          <p className="home-shop-signature"><MapPin size={14} aria-hidden="true" /><span><strong>{t('hero.photoTitle')}</strong>{l({ bn: ' — ', en: ' — ' })}{t('common.shopPhoto')}</span><Link className="text-link" to="/about#our-shop">{t('hero.photoLink')}<ArrowRight size={16} aria-hidden="true" /></Link></p>
         </div>
         <div className="home-offering-panel glass-panel" aria-label={l({ bn: 'দোকানের পরিষেবা', en: 'What the shop offers' })} data-reveal>
           {offeringCopy.map((item, index) => {

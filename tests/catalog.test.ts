@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { defaultFilters, filterProducts, parseFilters } from '../src/lib/catalog';
+import { defaultFilters, filterProducts, matchProducts, parseFilters } from '../src/lib/catalog';
 import { fixtureProducts } from './fixtures';
 const filter = (changes: Partial<typeof defaultFilters>) => filterProducts(fixtureProducts, { ...defaultFilters, ...changes }, 'en').map(p => p.id);
 describe('catalog search, filters and sorting', () => {
@@ -9,6 +9,12 @@ describe('catalog search, filters and sorting', () => {
     expect(filter({ query: 'test brand' })).toEqual(['test-city', 'test-geared']);
     expect(fixtureProducts).toHaveLength(3);
   });
+  it('also searches the cycle description, not only the title', () => {
+    // Customers type a brand, a purpose or a word from the description and
+    // expect to find the cycle, not an exact title match.
+    expect(filter({ query: 'fixture' })).toEqual(['test-city', 'test-kids', 'test-geared']);
+    expect(filter({ query: 'স্বয়ংক্রিয়' })).toEqual(['test-city', 'test-kids', 'test-geared']);
+  });
   it('filters every cycle category', () => {
     expect(filter({ category: 'kids' })).toEqual(['test-kids']);
     expect(filter({ category: 'city' })).toEqual(['test-city']);
@@ -16,14 +22,23 @@ describe('catalog search, filters and sorting', () => {
     expect(filter({ category: 'student' })).toEqual([]);
     expect(filter({ category: 'electric' })).toEqual([]);
   });
-  it('does not treat unknown gearing as non-geared', () => {
-    expect(filter({ gear: 'geared' })).toEqual(['test-geared']);
-    expect(filter({ gear: 'non-geared' })).toEqual(['test-city']);
+  it('never treats unknown gearing as non-geared', () => {
+    // A cycle whose gearing the shop has not confirmed is still listed, but it
+    // is marked as unconfirmed instead of being silently dropped.
+    const matches = matchProducts(fixtureProducts, { ...defaultFilters, gear: 'geared' }, 'en');
+    expect(matches.map(match => match.product.id)).toEqual(['test-geared', 'test-kids']);
+    expect(matches.map(match => match.status)).toEqual(['confirmed', 'unconfirmed']);
+    expect(matches[1].pending).toEqual(['gear']);
   });
-  it('excludes unknown prices from budget filters', () => {
-    expect(filter({ budget: 'under-5000' })).toEqual([]);
-    expect(filter({ budget: '5000-10000' })).toEqual(['test-city']);
-    expect(filter({ budget: '10000-20000' })).toEqual(['test-geared']);
+  it('keeps cycles with an unconfirmed price in budget results, last and flagged', () => {
+    const matches = matchProducts(fixtureProducts, { ...defaultFilters, budget: 'under-5000' }, 'en');
+    expect(matches.map(match => match.product.id)).toEqual(['test-kids']);
+    expect(matches[0].status).toBe('unconfirmed');
+    expect(matches[0].pending).toEqual(['budget']);
+    // A confirmed price outside the budget is still excluded; the cycle whose
+    // price is unknown stays in the list, after the confirmed matches.
+    expect(filter({ budget: '5000-10000' })).toEqual(['test-city', 'test-kids']);
+    expect(filter({ budget: '10000-20000' })).toEqual(['test-geared', 'test-kids']);
   });
   it('sorts verified prices and leaves unknown prices last in both directions', () => {
     expect(filter({ sort: 'price-asc' })).toEqual(['test-city', 'test-geared', 'test-kids']);

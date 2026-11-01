@@ -18,10 +18,39 @@ export function localToday(date = new Date()): string {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 }
 
+/**
+ * Turns the many ways a customer writes a mobile number into one dialable form:
+ * Bengali digits, spaces, dashes, brackets, a leading +91 / 91 country code and
+ * the Indian trunk prefix 0 are all accepted. Rejecting "07076884950" cost the
+ * shop enquiries from people who simply wrote their number the usual way.
+ */
 export function normalizePhone(phone: string): string {
   // Callers normally validate first; keep this exported helper safe on its own too.
   if (typeof phone !== 'string' || phone.length > FIELD_LIMITS.phone) return '';
-  return phone.trim().replace(/[০-৯]/g, digit => String('০১২৩৪৫৬৭৮৯'.indexOf(digit))).replace(/[\s()\-]/g, '');
+  const cleaned = phone.trim()
+    .replace(/[০-৯]/g, digit => String('০১২৩৪৫৬৭৮৯'.indexOf(digit)))
+    .replace(/[\s()\-.]/g, '');
+  if (!cleaned) return '';
+  let prefix = '';
+  let body = cleaned;
+  if (body.startsWith('+')) { prefix = '+'; body = body.slice(1); }
+  else if (body.startsWith('00')) { prefix = '+'; body = body.slice(2); }
+  if (!/^\d+$/.test(body)) return '';
+  // A bare 91 country code in front of a ten-digit Indian mobile.
+  if (!prefix && body.length === 12 && body.startsWith('91')) body = body.slice(2);
+  // The Indian trunk prefix: 0 followed by a ten-digit number.
+  if (body.length === 11 && body.startsWith('0')) body = body.slice(1);
+  return `${prefix}${body}`;
+}
+
+/** Ten to fifteen digits with no trunk prefix, after normalisation. */
+export function isValidPhone(value: string): boolean {
+  const normalized = normalizePhone(value);
+  if (!normalized) return false;
+  const body = normalized.startsWith('+') ? normalized.slice(1) : normalized;
+  if (!/^\d+$/.test(body)) return false;
+  if (body.length < 10 || body.length > 15) return false;
+  return !body.startsWith('0');
 }
 
 export function validDate(value: string): boolean {
@@ -51,11 +80,13 @@ export function validateRepair(fields: RepairFields, today = localToday()): Part
   }
 
   if (!errors.name && (Array.from(fields.name.trim()).length < 2 || CONTROL_CHARS.test(fields.name))) errors.name = ERROR_KEYS.name;
-  if (!errors.phone && !/^\+?[1-9]\d{9,14}$/.test(normalizePhone(fields.phone))) errors.phone = ERROR_KEYS.phone;
+  if (!errors.phone && !isValidPhone(fields.phone)) errors.phone = ERROR_KEYS.phone;
   if (!errors.bikeType && fields.bikeType !== 'other' && !shop.categories.some(category => category.id === fields.bikeType)) errors.bikeType = ERROR_KEYS.bikeType;
   if (!errors.service && !shop.services.some(service => service.id === fields.service)) errors.service = ERROR_KEYS.service;
-  if (!errors.date && (!validDate(fields.date) || fields.date < today)) errors.date = ERROR_KEYS.date;
-  if (!errors.time && !/^([01]\d|2[0-3]):[0-5]\d$/.test(fields.time)) errors.time = ERROR_KEYS.time;
+  // A preferred date and time help the shop, but blocking the whole enquiry
+  // until both are picked lost customers who only wanted a price.
+  if (!errors.date && fields.date && (!validDate(fields.date) || fields.date < today)) errors.date = ERROR_KEYS.date;
+  if (!errors.time && fields.time && !/^([01]\d|2[0-3]):[0-5]\d$/.test(fields.time)) errors.time = ERROR_KEYS.time;
   if (!errors.details && CONTROL_CHARS.test(fields.details)) errors.details = ERROR_KEYS.details;
   if (!errors.source && fields.source && !['google', 'friend', 'passing', 'social', 'other'].includes(fields.source)) errors.source = ERROR_KEYS.source;
   return errors;

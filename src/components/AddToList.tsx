@@ -13,7 +13,7 @@ import { useShortlist } from '../shortlist';
 export function AddToList({ product, variant = 'secondary', className = '', short = false }: {
   product: Product; variant?: 'secondary' | 'text' | 'primary'; className?: string; short?: boolean;
 }) {
-  const { t, l } = useLanguage();
+  const { t } = useLanguage();
   const { add, has, remove } = useShortlist();
   const [notice, setNotice] = useState<string | null>(null);
   const saved = has(product.id);
@@ -37,7 +37,7 @@ export function AddToList({ product, variant = 'secondary', className = '', shor
   return <div className={`add-to-list ${className}`}>
     <button type="button" className={`btn btn-${variant === 'text' ? 'text' : variant} ${variant === 'text' ? '' : 'btn-compact'}`} onClick={() => {
       const result = add(product);
-      setNotice(result === 'added' ? t('list.added') : result === 'exists' ? t('list.added') : l({ bn: 'তালিকা ভর্তি হয়েছে (২০টি)', en: 'Your list is full (20 items)' }));
+      setNotice(result === 'added' ? t('list.added') : result === 'exists' ? t('list.alreadyAdded') : t('list.full'));
       if (result === 'added') track('shortlist_add', { productId: product.id, placement: 'product' });
     }}>
       <Heart size={16} aria-hidden="true" /><span>{short ? t('list.add') : t('list.add')}</span>

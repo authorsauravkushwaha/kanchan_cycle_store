@@ -5,11 +5,14 @@ import type { Product } from '../config/shop';
 import { useLanguage } from '../i18n';
 import type { TranslationKey } from '../i18n';
 
-export function SEO({ title, description, product, noindex = false }: { title: string; description: TranslationKey; product?: Product; noindex?: boolean }) {
+export function SEO({ title, description, descriptionText, product, noindex = false }: { title: string; description: TranslationKey; descriptionText?: string; product?: Product; noindex?: boolean }) {
   const { t, l, language, productName } = useLanguage();
   const { pathname } = useLocation();
   useEffect(() => {
-    const pageTitle = `${title} | ${l(shop.name)}`;
+    // Local search needs the town in the title: "সাইকেল | কাঞ্চন সাইকেল স্টোর্স |
+    // কোলাঘাট" is what a Kolaghat customer typed into Google.
+    const locality = l(shop.address.locality);
+    const pageTitle = title.includes(locality) ? `${title} | ${l(shop.name)}` : `${title} | ${l(shop.name)} | ${locality}`;
     document.title = pageTitle;
     const meta = (key: string, content: string, property = false) => {
       const attribute = property ? 'property' : 'name';
@@ -17,9 +20,10 @@ export function SEO({ title, description, product, noindex = false }: { title: s
       if (!element) { element = document.createElement('meta'); element.setAttribute(attribute, key); document.head.append(element); }
       element.content = content;
     };
-    meta('description', t(description));
+    const summary = descriptionText?.trim() || t(description);
+    meta('description', summary);
     meta('robots', !shop.seo.indexingEnabled || noindex ? 'noindex, follow' : 'index, follow');
-    meta('og:title', pageTitle, true); meta('og:description', t(description), true);
+    meta('og:title', pageTitle, true); meta('og:description', summary, true);
     meta('og:locale', language === 'bn' ? 'bn_IN' : 'en_IN', true);
     meta('og:type', 'website', true);
     const origin = shop.websiteUrl?.replace(/\/+$/, '');
@@ -29,15 +33,26 @@ export function SEO({ title, description, product, noindex = false }: { title: s
       if (!canonical) { canonical = document.createElement('link'); canonical.rel = 'canonical'; document.head.append(canonical); }
       canonical.href = canonicalUrl;
       meta('og:url', canonicalUrl, true);
-      // The only image ever shared is the shop’s own photograph of its premises.
-      meta('og:image', new URL(asset(shop.heroPhoto.src), `${origin}/`).href, true);
-      meta('og:image:alt', l(shop.heroPhoto.alt), true);
     } else { canonical?.remove(); }
+    // The shared picture is always the shop's own photograph of its premises,
+    // and it is shared even on a preview domain so a WhatsApp forward still
+    // shows the shop instead of a blank card.
+    const imageBase = origin || (typeof window !== 'undefined' ? window.location.origin : 'https://example.invalid');
+    const imageUrl = new URL(asset(shop.heroPhoto.src), `${imageBase}/`).href;
+    meta('og:image', imageUrl, true);
+    meta('og:image:alt', l(shop.heroPhoto.alt), true);
+    meta('og:image:width', String(shop.heroPhoto.width), true);
+    meta('og:image:height', String(shop.heroPhoto.height), true);
+    meta('twitter:card', 'summary_large_image');
+    meta('twitter:title', pageTitle);
+    meta('twitter:description', summary);
+    meta('twitter:image', imageUrl);
     const data: Record<string, unknown> = {
       '@context': 'https://schema.org', '@type': 'Store',
       name: shop.name.en, alternateName: shop.name.bn,
       geo: { '@type': 'GeoCoordinates', ...shop.coordinates },
       hasMap: shop.directionsUrl,
+      image: imageUrl,
     };
     if (shop.address.confirmed) data.address = { '@type': 'PostalAddress', streetAddress: shop.address.street.en, addressLocality: shop.address.locality.en, addressRegion: shop.address.region.en, postalCode: shop.address.postalCode, addressCountry: shop.address.countryCode };
     if (shop.contact.phone) data.telephone = shop.contact.phone;

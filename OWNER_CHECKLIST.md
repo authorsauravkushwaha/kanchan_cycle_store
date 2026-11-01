@@ -18,9 +18,10 @@ All routine settings live in **`src/config/shop.ts`**. Do not publish a detail m
 |---|---|---|
 | Opening hours | Supplied 9 AM–9 PM daily is recorded, **not shown publicly** | Confirm the interpretation, then set `hours.confirmed: true`. Update days/times/display text if different. |
 | WhatsApp ownership | Links use the supplied number | Send a real test enquiry and confirm the shop receives it. No message was sent during development. |
-| Bicycle catalog | Cycles only; the website lists no accessories or other items | Add verified names, brands, specifications, prices and stock. Product cards stay text-only unless a photograph is supplied. |
+| Bicycle catalog | 22 cycles, **no price and no stock status confirmed yet**. Every cycle says "ask the shop". | Add verified names, brands, specifications, prices and stock. This is the single biggest reason a customer leaves the site. |
+| Cycle photographs | 24 photographs across 22 cycles. 19 cycles show the brand's catalogue picture and 3 cycles show your own shop photographs (the Brooks ride-on, the Hercules Defender and the electric cycle). Each product page says which one it is. | Walk the shop once with the photo list below and check every model against its picture. |
 | Repair services | Six possible topics, all marked as requiring availability confirmation | Set `confirmed: true` only for services actually offered. Add a price only when verified. |
-| Shop photograph | Your own portrait is the only photograph on the site: it fills the whole first screen of the homepage edge to edge, with a floating caption labelled দোকানের মালিক / The shopkeeper | Confirm you are happy with the crop and caption, or send a replacement portrait (1024 × 1536, face in the upper third). Check the crop on a desktop, a phone and a phone held sideways. |
+| Shop photographs | The homepage hero is the team photograph `kanchan-team-hero.jpeg` (two shop workers, captioned "কাঞ্চন সাইকেল স্টোর্স, কোলাঘাট"). Six real photographs of the shop — storefront, showroom, display, corner, children's cycles, workshop — are on the About page. | Check the hero crop on a desktop, a tablet, a portrait phone and a phone held sideways. Check that the About gallery captions match what each picture really shows. Replace any picture that misleads. |
 | Offers | No discounts published; useful buying tips shown | Add only genuine, owner-approved offers with `verified: true`. |
 | Reviews | No names, ratings or testimonials fabricated | Supply authentic reviews with permission and a genuine source URL, or a real review link. |
 | Production domain | `websiteUrl: null`; preview noindex | Set the actual HTTPS URL after deployment. |
@@ -29,6 +30,75 @@ All routine settings live in **`src/config/shop.ts`**. Do not publish a detail m
 | Email / social profiles | Omitted | Optional: add only real, actively used details. |
 | Analytics | No endpoint, no tracking requests | Optional: configure a privacy-appropriate HTTPS endpoint and update the privacy policy before collecting consent. |
 | Announcement | Generic contact invitation, no offer claim | Edit the bilingual text or set `announcement.enabled: false`. |
+
+## The launch blockers — in the order they cost you customers
+
+The full list of 100 findings, with evidence and what was fixed, is in
+**[`docs/CUSTOMER_LOSS_AUDIT.md`](docs/CUSTOMER_LOSS_AUDIT.md)**. The same list is shown live on the
+private `/owner` page, in Bengali, so nobody has to remember it.
+
+| # | Blocker | What it costs you | Owner action |
+|---|---|---|---|
+| 1 | `websiteUrl: null` | You cannot share a link to your own shop from WhatsApp, Google or anywhere else. Every product link can point at the wrong address. | After deploying, set `websiteUrl` to the real HTTPS URL. |
+| 2 | `seo.indexingEnabled: false` | Google is told not to list the site. Nobody finds you by searching "সাইকেলের দোকান কোলাঘাট". | Read the site, then set it to `true` and rebuild. |
+| 3 | No published prices | Every cycle reads "ask the shop"; the budget filter cannot do its job; most customers leave at this point. | Write the shop prices down, export the CSV from `/owner`, publish it. |
+| 4 | No confirmed stock | Nobody walks over without checking first. | Mark the cycles you are certain about. |
+| 5 | Opening hours unconfirmed | A customer who arrives at 9.30 PM finds a closed shop. | Check the times and set `hours.confirmed: true`. |
+| 6 | No reviews, no offers, no social links, no email, no analytics | No proof, no reach, and no way to see where enquiries come from. | Add only the real ones. |
+
+## Photo review — check every model against its picture
+
+Walk the shop with this table. Every picture below is on the website. **catalogue** means it is the
+brand's catalogue picture and the product page says so; **shop** means it is your own photograph of a
+cycle that is in the shop.
+
+| File | Cycle name (Bengali) | Picture type | Check |
+|---|---|---|---|
+| `cycle-01.webp` | ক্লাসিক স্টেপ-থ্রু সাইকেল | catalogue | |
+| `cycle-02.webp` | অ্যাভন মল্লিকা | catalogue | |
+| `cycle-03.webp` | হিরো স্প্রিন্ট অ্যাটিউড | catalogue | |
+| `cycle-04.webp` | লিডার ব্রিজ | catalogue | |
+| `cycle-05.webp` | ব্রুকস শিশুদের রাইড-অন | shop | **Mismatch.** The name says *Brooks kids ride-on*, the picture is a **BSA motorised ride-on**. Change the photo or the name — never both silently. |
+| `cycle-06.webp` | অ্যাভন ওয়াকা ওয়াকা | catalogue | |
+| `cycle-07.webp` | ব্রুকস শিশুদের ট্রাইসাইকেল | catalogue | |
+| `cycle-08.webp` | বিএমভি সাদা সাইকেল | catalogue | |
+| `cycle-09.webp` | বিএসএ মাডহক | catalogue | |
+| `cycle-10.webp` | কসমিক সাইকেল | catalogue | |
+| `cycle-11.webp` | বিএমভি এক্স৬ সবুজ সাইকেল | catalogue | |
+| `cycle-12.webp` | হারকিউলিস সাইকেল | catalogue | |
+| `cycle-13.webp` | হিরো কালো ও নীল সাইকেল | catalogue | |
+| `cycle-14.webp` | স্ট্রাইডার হ্যারিস | catalogue | |
+| `cycle-15.webp` | স্ট্রাইডার হ্যাট-ট্রিক | catalogue | |
+| `cycle-16.webp` | গ্যাং লাল সাইকেল | catalogue | |
+| `cycle-17.webp` | বিএসএ লেডিবার্ড ডিভা | catalogue | |
+| `cycle-18.webp` | হিরো কালো ও কমলা সাইকেল | catalogue | |
+| `cycle-19.webp` | টর্নেডো কালো ও কমলা সাইকেল | catalogue | |
+| `cycle-20.webp` | হারকিউলিস টপ গিয়ার ডিফেন্ডার FX DD | shop | Your own photograph of the Hercules in the shop. |
+| `cycle-21.webp` | হারকিউলিস টপ গিয়ার ডিফেন্ডার FX DD (২য় ছবি) | shop | Second view of the same Hercules. |
+| `cycle-22.webp` | টাটা স্ট্রাইডার Harris-X IC DD (২য় ছবি) | shop | Second view — a green bike in the shop. Confirm it is this model. |
+| `cycle-23.webp` | টাটা স্ট্রাইডার Harris-X IC DD | catalogue | |
+| `cycle-24.jpg` | স্ট্রাইডার ইলেকট্রিক সাইকেল | shop | Your own photograph of the electric cycle. |
+
+All 24 supplied photographs are used. Two of them are extra views in the product galleries:
+`cycle-21.webp` is the second picture of the **Hercules Top Gear Defender FX DD**, and `cycle-22.webp` is the
+second picture of the **Tata Stryder Harris-X IC DD**. Check both as well.
+
+The About page gallery uses six of your own photographs:
+
+| File | Caption on the site |
+|---|---|
+| `storefront.webp` | কোলাঘাটে আমাদের দোকানের সামনে |
+| `showroom-row.webp` | দোকানের ভেতরের সাইকেল |
+| `bicycle-display.webp` | সাইকেলের প্রদর্শনী |
+| `stryder-corner.webp` | দোকানের একটি কোণ |
+| `kids-and-city.webp` | বাচ্চাদের সাইকেলের অংশ |
+| `workshop.webp` | মেরামতের জায়গা |
+
+### If you replace a photograph
+
+Run `npm run images` afterwards. It regenerates the small 400 px and 800 px versions (a phone should
+never download the full-size picture) and rewrites `src/config/photoVariants.ts`. The build will fail if
+you forget: `scripts/generate-seo.ts` checks that every catalogue photograph exists.
 
 ## Product record template — documentation only
 
@@ -59,7 +129,11 @@ All routine settings live in **`src/config/shop.ts`**. Do not publish a detail m
 }
 ```
 
-The website lists cycles only — there is no accessory catalog, accessories page or accessory category. Product records have **no image fields** — product cards are text-only by design, so a missing photograph never leaves an empty placeholder.
+The website lists cycles only — there is no accessory catalog, accessories page or accessory category.
+Product records carry two optional image fields: `photoUrl` (the picture shown on the card and the
+product page) and `photoKind` (`'shop'` for your own photograph, `'catalogue'` for the brand's picture).
+A cycle without `photoUrl` shows an icon panel instead of a broken image, so a missing photograph never
+leaves an empty hole in the grid.
 
 ## Before announcing the website
 
@@ -68,10 +142,11 @@ The website lists cycles only — there is no accessory catalog, accessories pag
 3. Check the Bengali and English versions on a small Android phone.
 4. Test WhatsApp, phone and Google Maps using the shop’s actual devices. **Do not send test messages to customers.**
 5. Confirm that no fictional products, offers, reviews, social links or business claims appear.
-6. Deploy a preview, verify every route after refresh, then configure the final domain.
-7. Enable indexing and rebuild; check `/robots.txt`, `/sitemap.xml`, canonical URLs and structured data.
-8. Add the published URL to the genuine Google Business Profile.
-9. Keep stock, prices, hours and offers up to date. Unknown information should go back to `null`, not a guessed value.
+6. Walk the shop with the **photo review table** above and fix the `cycle-05` mismatch.
+7. Deploy a preview, verify every route after refresh, then configure the final domain.
+8. Enable indexing and rebuild; check `/robots.txt`, `/sitemap.xml`, canonical URLs and structured data.
+9. Add the published URL to the genuine Google Business Profile.
+10. Keep stock, prices, hours and offers up to date. Unknown information should go back to `null`, not a guessed value.
 
 **No public deployment, real WhatsApp delivery, verified product inventory, or confirmed appointment is claimed by this project build.**
 

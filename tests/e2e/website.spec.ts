@@ -125,16 +125,22 @@ test('real catalog UI filters, searches, sorts and creates product enquiries', a
   await expect(page.locator('.product-card')).toHaveCount(1);
   await expect(page.locator('.product-card')).toContainText('পরীক্ষামূলক শিশুদের সাইকেল');
   await expect(page.locator('.product-card')).toContainText('দাম জানতে যোগাযোগ করুন');
-  await expect(page.locator('.product-card')).toContainText('স্টক জানতে যোগাযোগ করুন');
+  // The card no longer repeats "contact us for stock" on every cycle; the
+  // enquiry button asks for both price and stock in one go.
+  await expect(page.locator('.product-card').first()).not.toContainText('স্টক জানতে যোগাযোগ করুন');
   await page.getByRole('button', { name: 'ফিল্টার মুছুন' }).click();
   await page.getByLabel('আপনার বাজেট', { exact: true }).selectOption('5000-10000');
   await expect(page).toHaveURL(/budget=5000-10000/);
   await expect(page).not.toHaveURL(/q=/);
-  await expect(page.locator('.product-card')).toHaveCount(1);
-  await expect(page.locator('.product-card')).toContainText('সিটি');
+  // The cycle with a confirmed price comes first; the one whose price is not
+  // confirmed yet is still listed, behind a clear note.
+  await expect(page.locator('.product-card')).toHaveCount(2);
+  await expect(page.locator('.product-card h3').first()).toContainText('সিটি');
+  await expect(page.locator('.catalog-pending-note')).toContainText('দাম বা গিয়ার');
   await page.getByRole('button', { name: 'ফিল্টার মুছুন' }).click();
   await page.getByLabel('গিয়ারের পছন্দ', { exact: true }).selectOption('non-geared');
-  await expect(page.locator('.product-card')).toHaveCount(1);
+  await expect(page.locator('.product-card')).toHaveCount(2);
+  await expect(page.locator('.product-card h3').first()).toContainText('সিটি');
   await page.getByRole('button', { name: 'ফিল্টার মুছুন' }).click();
   await page.getByLabel('সাজিয়ে দেখুন', { exact: true }).selectOption('price-desc');
   await expect(page.locator('.product-card h3').last()).toContainText('শিশুদের');
@@ -150,7 +156,9 @@ test('real catalog UI filters, searches, sorts and creates product enquiries', a
   await expect(page.locator('h1')).toHaveText('পরীক্ষামূলক সিটি সাইকেল');
   await page.locator('.site-header').getByRole('button', { name: 'EN', exact: true }).click();
   await expect(page.locator('h1')).toHaveText('Test City Bicycle');
-  expect(await text(page.locator('.product-detail-enquiry a').getAttribute('href'))).toContain('Test City Bicycle');
+  expect(await text(page.locator('.product-detail-enquiry a[target="_blank"]').getAttribute('href'))).toContain('Test City Bicycle');
+  // A second, one-tap way to reach the shop from the same page.
+  await expect(page.locator('.product-detail-enquiry a[href^="tel:"]')).toHaveAttribute('href', 'tel:+917076884950');
   await page.goto('/cycles?category=student');
   await expect(page.getByRole('heading', { name: 'No matches this time' })).toBeVisible();
 });
@@ -234,7 +242,9 @@ test('quiz supports navigation, skipping height, safe empty results and sharing 
   await quiz.getByRole('button', { name: 'পরের ধাপ' }).click();
   await quiz.getByRole('radio', { name: 'গিয়ার ছাড়া', exact: true }).check();
   await quiz.getByRole('button', { name: 'ফলাফল দেখুন' }).click();
-  await expect(page.getByRole('heading', { name: 'সঠিক তথ্য ছাড়া সাইকেল বাছছি না' })).toBeVisible();
+  await expect(page.locator('.quiz-result-heading h2')).toContainText('আপনার খোঁজের');
+  await expect(page.locator('.quiz-pending-note')).toBeVisible();
+  await expect(page.locator('.quiz-results .product-card').first()).toBeVisible();
   await expect(page.locator('.quiz-summary')).toContainText('উচ্চতা জানি না');
   await expect(page.locator('.quiz-result-actions a')).toBeVisible();
   const message = await text(page.locator('.quiz-result-actions a').getAttribute('href'));
@@ -328,18 +338,36 @@ test('supplied images load and pages do not produce application errors', async (
     expect(broken, path).toEqual([]);
     const photographs = await page.evaluate(() => Array.from(document.images)
       .map(img => new URL(img.currentSrc || img.src, location.origin).pathname));
-    if (path === '/') expect(photographs).toEqual([
-      '/images/kanchan-team-hero.jpeg',
-      '/images/cycles/cycle-24.jpg', // Homepage showcase.
-      // Featured premium models appear in the homepage featured row.
-      '/images/cycles/cycle-20.webp', '/images/cycles/cycle-23.webp', '/images/cycles/cycle-24.jpg',
-    ]);
+    if (path === '/') {
+      expect(photographs[0]).toBe('/images/kanchan-team-hero.webp');
+      // Homepage showcase plus the featured premium row.
+      expect(photographs.filter(photo => photo.startsWith('/images/cycles/'))).toHaveLength(4);
+      expect(photographs.every(photo => photo.startsWith('/images/'))).toBe(true);
+    }
     else if (path === '/cycles') {
       expect(photographs).toHaveLength(22);
       expect(photographs.every(photo => photo.startsWith('/images/cycles/'))).toBe(true);
+    } else if (path === '/about') {
+      // The About page shows the real shop gallery.
+      expect(photographs).toHaveLength(6);
+      expect(photographs.every(photo => photo.startsWith('/images/shop/')), photographs.join(', ')).toBe(true);
     } else expect(photographs, path).toEqual([]);
   }
   expect(errors).toEqual([]);
+
+  // On a phone the catalogue must serve the small variants, not the
+  // full-size photographs: that is the difference between a fast page and a
+  // customer who gives up on the connection.
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/cycles');
+  await page.locator('h1').waitFor();
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+  await expect.poll(async () => page.evaluate(() => Array.from(document.images)
+    .filter(img => (img.currentSrc || img.src).includes('-400.')).length), { timeout: 20000 }).toBe(22);
+  const mobilePhotos = await page.evaluate(() => Array.from(document.images)
+    .map(img => new URL(img.currentSrc || img.src, location.origin).pathname));
+  expect(mobilePhotos).toHaveLength(22);
+  expect(mobilePhotos.every(photo => /-400\./.test(photo)), mobilePhotos.join(', ')).toBe(true);
 });
 
 test('the new team hero image loads on desktop and phones', async ({ page }) => {
@@ -351,7 +379,7 @@ test('the new team hero image loads on desktop and phones', async ({ page }) => 
     await expect(hero).toHaveAttribute('alt', /কাঞ্চন সাইকেল স্টোর্সে দুই দোকানকর্মী/);
     await expect.poll(() => hero.evaluate((img: HTMLImageElement) => img.naturalWidth)).toBeGreaterThan(0);
     expect(await hero.evaluate((img: HTMLImageElement) => new URL(img.currentSrc).pathname)).toBe(
-      width === 390 ? '/images/kanchan-team-hero-mobile.webp' : '/images/kanchan-team-hero.jpeg',
+      width === 390 ? '/images/kanchan-team-hero-mobile.webp' : '/images/kanchan-team-hero.webp',
     );
     await expect(page.locator('.hero-actions').getByRole('link').first()).toBeVisible();
   }

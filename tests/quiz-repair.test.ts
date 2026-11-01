@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { emptyAnswers, recommendProducts, validateQuizStep } from '../src/lib/quiz';
+import { emptyAnswers, recommendMatches, recommendProducts, validateQuizStep } from '../src/lib/quiz';
 import { emptyRepair, localToday, normalizePhone, validateRepair } from '../src/lib/repair';
 import { fixtureProducts } from './fixtures';
 const answers = { rider: 'child', age: '8', height: '', budget: 'under-5000', use: 'school', gear: 'non-geared' };
@@ -10,8 +10,12 @@ describe('safe recommendations', () => {
     expect(validateQuizStep(2, { ...emptyAnswers, height: '500' })).toBe('quiz.errorHeight');
     expect(validateQuizStep(2, emptyAnswers)).toBeNull();
   });
-  it('never recommends an unknown-price bicycle for a fixed budget', () => {
-    expect(recommendProducts(fixtureProducts, answers)).toEqual([]);
+  it('offers an unknown-price bicycle for a budget but marks the price as unconfirmed', () => {
+    // Hiding it told the customer the shop had nothing; the flag keeps it honest.
+    const matches = recommendMatches(fixtureProducts, answers);
+    expect(matches.map(match => match.product.id)).toEqual(['test-kids']);
+    expect(matches[0].status).toBe('unconfirmed');
+    expect(matches[0].pending).toContain('budget');
     expect(recommendProducts([], answers)).toEqual([]);
   });
   it('uses verified category, budget and gearing when available', () => {
@@ -23,7 +27,13 @@ describe('safe recommendations', () => {
     expect(validateQuizStep(2, { ...answers, height: '9'.repeat(2_000_000) })).toBe('quiz.errorHeight');
   });
   it('does not infer fit when height is supplied without manufacturer measurements', () => {
-    expect(recommendProducts(fixtureProducts, { ...answers, rider: 'adult', age: '30', height: '190', budget: '5000-10000' })).toEqual([]);
+    // The cycle is offered, but it is never presented as a confirmed fit.
+    const matches = recommendMatches(fixtureProducts, { ...answers, rider: 'child', age: '8', height: '120', budget: 'unsure' });
+    expect(matches.map(match => match.product.id)).toEqual(['test-kids']);
+    expect(matches[0].status).toBe('unconfirmed');
+    expect(matches[0].pending).toContain('height');
+    // A cycle whose published rider height excludes the rider is still excluded.
+    expect(recommendMatches(fixtureProducts, { ...answers, rider: 'adult', age: '30', height: '190', budget: '5000-10000' })).toEqual([]);
   });
   it('does not recommend out-of-stock products', () => {
     expect(recommendProducts(fixtureProducts, { ...answers, rider: 'adult', age: '30', budget: '10000-20000', gear: 'geared', use: 'mixed' })).toEqual([]);
@@ -31,17 +41,22 @@ describe('safe recommendations', () => {
 });
 describe('repair enquiry validation', () => {
   const valid = { ...emptyRepair, name: 'পরীক্ষা নাম', phone: '7076884950', bikeType: 'city', service: 'brakes', date: '2026-10-30', time: '10:30' };
-  it('requires every booking detail but not optional notes', () => {
-    expect(Object.keys(validateRepair(emptyRepair, '2026-10-29'))).toHaveLength(6);
+  it('requires the contact details but not the optional date, time or notes', () => {
+    expect(Object.keys(validateRepair(emptyRepair, '2026-10-29')).sort()).toEqual(['bikeType', 'name', 'phone', 'service']);
     expect(validateRepair(valid, '2026-10-29')).toEqual({});
+    // A customer who only wants a price must not be blocked by a date picker.
+    expect(validateRepair({ ...valid, date: '', time: '' }, '2026-10-29')).toEqual({});
   });
   it('rejects past and impossible dates', () => {
     expect(validateRepair({ ...valid, date: '2026-10-28' }, '2026-10-29').date).toBe('form.errorDate');
     expect(validateRepair({ ...valid, date: '2026-02-30' }, '2026-01-01').date).toBe('form.errorDate');
   });
-  it('accepts Bengali digits and international formatting', () => {
+  it('accepts Bengali digits and every way a customer writes a mobile number', () => {
     expect(normalizePhone('৭০৭৬৮৮৪৯৫০')).toBe('7076884950');
     expect(validateRepair({ ...valid, phone: '+91 70768 84950' }, '2026-10-29')).toEqual({});
+    expect(validateRepair({ ...valid, phone: '91 70768 84950' }, '2026-10-29')).toEqual({});
+    expect(validateRepair({ ...valid, phone: '07076884950' }, '2026-10-29')).toEqual({});
+    expect(validateRepair({ ...valid, phone: '70768 84950' }, '2026-10-29')).toEqual({});
     expect(validateRepair({ ...valid, phone: 'call me' }, '2026-10-29').phone).toBe('form.errorPhone');
   });
   it('builds a local calendar date rather than a UTC-shifted date', () => {

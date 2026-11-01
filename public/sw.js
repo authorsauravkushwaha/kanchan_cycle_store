@@ -34,7 +34,8 @@ const PRECACHE = [
   `${BASE}icons/icon-512.png`,
   `${BASE}icons/icon-maskable-512.png`,
   `${BASE}icons/apple-touch-icon.png`,
-  `${BASE}images/kanchan-store-hero.jpeg`,
+  `${BASE}images/kanchan-team-hero.jpeg`,
+  `${BASE}images/kanchan-team-hero-mobile.webp`,
   ...PRECACHE_ASSETS.map(path => `${BASE}${path}`),
 ];
 

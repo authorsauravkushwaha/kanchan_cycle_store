@@ -329,7 +329,8 @@ test('supplied images load and pages do not produce application errors', async (
     const photographs = await page.evaluate(() => Array.from(document.images)
       .map(img => new URL(img.currentSrc || img.src, location.origin).pathname));
     if (path === '/') expect(photographs).toEqual([
-      '/images/kanchan-store-hero.jpeg',
+      '/images/kanchan-team-hero.jpeg',
+      '/images/cycles/cycle-24.jpg', // Homepage showcase.
       // Featured premium models appear in the homepage featured row.
       '/images/cycles/cycle-20.webp', '/images/cycles/cycle-23.webp', '/images/cycles/cycle-24.jpg',
     ]);
@@ -339,4 +340,19 @@ test('supplied images load and pages do not produce application errors', async (
     } else expect(photographs, path).toEqual([]);
   }
   expect(errors).toEqual([]);
+});
+
+test('the new team hero image loads on desktop and phones', async ({ page }) => {
+  for (const width of [1440, 390]) {
+    await page.setViewportSize({ width, height: 844 });
+    await page.goto('/');
+    const hero = page.locator('.hero-backdrop-image');
+    await expect(hero).toBeVisible();
+    await expect(hero).toHaveAttribute('alt', /কাঞ্চন সাইকেল স্টোর্সে দুই দোকানকর্মী/);
+    await expect.poll(() => hero.evaluate((img: HTMLImageElement) => img.naturalWidth)).toBeGreaterThan(0);
+    expect(await hero.evaluate((img: HTMLImageElement) => new URL(img.currentSrc).pathname)).toBe(
+      width === 390 ? '/images/kanchan-team-hero-mobile.webp' : '/images/kanchan-team-hero.jpeg',
+    );
+    await expect(page.locator('.hero-actions').getByRole('link').first()).toBeVisible();
+  }
 });

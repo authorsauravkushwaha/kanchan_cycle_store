@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { ArrowDown, ArrowRight, ArrowUpRight, Bike, Check, MapPin, MessageCircle, Wrench } from 'lucide-react';
+import { ArrowDown, ArrowRight, Bike, Check, MessageCircle, Wrench } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { asset, productPhotos, shop } from '../config/shop';
 import { suppliedCycles } from '../config/cycles';
@@ -13,7 +13,7 @@ export function HeroSection() {
   return <>
     <section className="hero-neu" aria-labelledby="hero-title" data-scroll-scene="hero">
       <div className="hero-backdrop">
-        <img className="hero-backdrop-image" src={asset(shop.heroPhoto.src)} alt={l(shop.heroPhoto.alt)} width={shop.heroPhoto.width} height={shop.heroPhoto.height} fetchPriority="high" decoding="async" />
+        <picture><source media="(max-width: 760px) and (min-height: 521px)" srcSet={asset('/images/kanchan-team-hero-mobile.webp')} /><img className="hero-backdrop-image" src={asset(shop.heroPhoto.src)} alt={l(shop.heroPhoto.alt)} width={shop.heroPhoto.width} height={shop.heroPhoto.height} fetchPriority="high" decoding="async" /></picture>
         <span className="hero-backdrop-scrim" aria-hidden="true" />
       </div>
       <div className="container hero-neu-grid">
@@ -25,7 +25,6 @@ export function HeroSection() {
           <p className="hero-note"><span><Check size={13} strokeWidth={2.5} aria-hidden="true" /></span>{t('hero.note')}</p>
           <a href="#about-store" className="hero-scroll-cue"><span className="scroll-cue-icon"><ArrowDown size={16} aria-hidden="true" /></span>{l({ bn: 'স্ক্রল করুন। নতুন পথ দেখুন।', en: 'A little scroll. A new perspective.' })}</a>
         </div>
-        <HeroCaption />
       </div>
       <div className="container hero-bottom-line"><span>{l({ bn: 'ছোট্ট দোকান। অনেকটা পথ।', en: 'A LOCAL SHOP. A WORLD OF POSSIBILITIES.' })}</span><span aria-hidden="true">{l({ bn: 'কোলাঘাট · পশ্চিমবঙ্গ', en: 'KOLAGHAT · WEST BENGAL' })}<span className="tiny-cross">+</span></span></div>
     </section>
@@ -39,24 +38,6 @@ export function HeroSection() {
   </>;
 }
 
-/**
- * The owner's photograph now bleeds across the whole first screen, so the
- * caption floats over the image instead of framing it. The alt text above
- * carries the same story for screen readers.
- */
-function HeroCaption() {
-  const { l } = useLanguage();
-  return <aside className="hero-caption" aria-label={l({ bn: 'দোকান পরিচিতি', en: 'About the shop' })}>
-    <span className="hero-caption-role">{l({ bn: 'দোকানের মালিক', en: 'THE SHOPKEEPER' })}</span>
-    <strong>{l(shop.heroPhoto.caption)}</strong>
-    <span className="hero-caption-place"><MapPin size={12} aria-hidden="true" />{l({ bn: 'কোলাঘাট, পশ্চিমবঙ্গ', en: 'Kolaghat, West Bengal' })}</span>
-    <Link to="/about" className="hero-caption-link">
-      <span>{l({ bn: 'আমাদের কথা জানুন', en: 'Meet the store' })}</span>
-      <ArrowUpRight size={16} aria-hidden="true" />
-    </Link>
-  </aside>;
-}
-
 /** The premium electric cycle photographed for the shop — shown on the home stage. */
 export function RideShowcase() {
   const { t, l } = useLanguage();
@@ -65,11 +46,11 @@ export function RideShowcase() {
   return <section className="section ride-showcase" aria-labelledby="ride-title" data-scroll-scene="ride">
     <div className="container ride-showcase-grid">
       <div className="ride-showcase-copy" data-reveal>
-        <p className="eyebrow"><span />{l({ bn: 'সাইকেলটি ঘুরিয়ে দেখুন', en: 'A CLOSER LOOK AT THE RIDE' })}</p>
-        <h2 id="ride-title">{l({ bn: 'সব দিক থেকে দেখে নিন', en: 'Every angle before you decide' })}</h2>
+        <p className="eyebrow"><span />{l({ bn: 'সাইকেলটি দেখে নিন', en: 'A CLOSER LOOK AT THE RIDE' })}</p>
+        <h2 id="ride-title">{l({ bn: 'পছন্দের সাইকেলটি দেখুন', en: 'A closer look at the ride' })}</h2>
         <p>{l({
-          bn: 'স্ট্রাইডার ইলেকট্রিক সাইকেলটি সব দিক থেকে ঘুরিয়ে দেখুন। রেঞ্জ, গতি, দাম ও স্টক দোকানে জানতে হবে।',
-          en: 'Turn the Stryder electric cycle for a 360° look. Range, speed, price and stock — ask at the shop.',
+          bn: 'স্ট্রাইডার ইলেকট্রিক সাইকেলের ছবিটি দেখুন। রেঞ্জ, গতি, দাম ও স্টক দোকানে জানতে হবে।',
+          en: 'Explore the photograph of the Stryder electric cycle. Range, speed, price and stock — ask at the shop.',
         })}</p>
         <Link to="/cycles" className="btn btn-secondary">{t('action.viewCycles')}<ArrowRight size={17} aria-hidden="true" /></Link>
       </div>

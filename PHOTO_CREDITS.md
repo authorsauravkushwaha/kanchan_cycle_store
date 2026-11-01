@@ -1,6 +1,6 @@
 # Photographs on this website
 
-The shop portrait and the 23 product photos in `public/images/cycles/` were
+The shop team banner (with a mobile crop) and the 23 product photos in `public/images/cycles/` were
 supplied by the shop for use on the website. The product photos appear in the
 cycle catalogue and on their detail pages. Some were cropped to remove excess
 blank space and converted to WebP for faster loading.

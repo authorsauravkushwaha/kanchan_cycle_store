@@ -27,13 +27,13 @@ test('the bicycle can be rotated and reset without changing shop content', async
   await page.goto('/');
   await page.locator('.site-header').getByRole('button', { name: 'EN', exact: true }).click();
   const scene = page.locator('.cycle-scene');
-  await expect(scene.locator('.scene-view-label')).toHaveText('Side view');
-  await scene.getByRole('button', { name: 'Rotate bicycle view' }).click();
-  await expect(scene.locator('.scene-view-label')).toHaveText('Reverse three-quarter view');
+  await expect(scene.locator('.scene-view-label')).toHaveText('Straight photo');
+  await scene.getByRole('button', { name: 'Tilt bicycle photo' }).click();
+  await expect(scene.locator('.scene-view-label')).toHaveText('Tilted right');
   await expect(scene).toHaveAttribute('style', /--view-angle: 24deg/);
-  await scene.getByRole('button', { name: 'Reset bicycle view' }).click();
-  await expect(scene.locator('.scene-view-label')).toHaveText('Side view');
-  await expect(scene.getByRole('button', { name: 'Reset bicycle view' })).toBeDisabled();
+  await scene.getByRole('button', { name: 'Reset bicycle photo' }).click();
+  await expect(scene.locator('.scene-view-label')).toHaveText('Straight photo');
+  await expect(scene.getByRole('button', { name: 'Reset bicycle photo' })).toBeDisabled();
   await expect(page.locator('h1')).toContainText('Every Journey Begins With the Right Bicycle.');
 });
 
@@ -43,14 +43,14 @@ test('pause stops decorative motion, persists, and resume restores it', async ({
   await page.getByRole('button', { name: 'Pause animations' }).click();
   await expect(page.locator('html')).toHaveAttribute('data-motion', 'reduced');
   await expect(page.getByRole('button', { name: 'Resume animations' })).toHaveAttribute('aria-pressed', 'true');
-  await expect(page.getByRole('button', { name: 'Rotate bicycle view' })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Tilt bicycle photo' })).toBeDisabled();
   await scrollTo(page, 350);
-  await expect(page.locator('.wheel-spokes').first()).toHaveCSS('transform', 'none');
+  await expect(page.locator('.scene-spin')).toHaveCSS('transform', 'none');
   await page.reload();
   await expect(page.locator('html')).toHaveAttribute('data-motion', 'reduced');
   await page.getByRole('button', { name: 'Resume animations' }).click();
   await expect(page.locator('html')).toHaveAttribute('data-motion', 'full');
-  await expect(page.getByRole('button', { name: 'Rotate bicycle view' })).toBeEnabled();
+  await expect(page.getByRole('button', { name: 'Tilt bicycle photo' })).toBeEnabled();
 });
 
 test('the operating system reduced-motion preference is respected without hiding content', async ({ page }) => {
@@ -64,7 +64,7 @@ test('the operating system reduced-motion preference is respected without hiding
   await expect(card).toHaveCSS('transform', 'none');
   await expect(card).toHaveCSS('opacity', '1');
   await expect(card).toBeVisible();
-  await expect(page.locator('.wheel-spokes').first()).toHaveCSS('transform', 'none');
+  await expect(page.locator('.scene-spin')).toHaveCSS('transform', 'none');
 });
 
 test('lazy-loaded routes receive scroll reveals and pointer tilt', async ({ page }) => {

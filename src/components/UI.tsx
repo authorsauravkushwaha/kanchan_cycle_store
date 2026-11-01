@@ -14,7 +14,12 @@ export function WhatsAppButton({ message, children, variant = 'primary', classNa
 }) {
   const { t, l } = useLanguage();
   const href = whatsappHref(message || l({ bn: 'নমস্কার, আমি কাঞ্চন সাইকেল স্টোর্সের সাইকেল ও পরিষেবা সম্পর্কে জানতে চাই।', en: 'Hello, I’d like to know about the bicycles and services at Kanchan Cycle Stores.' }));
-  if (!href) return null;
+  // A WhatsApp link that cannot be built must never make the button vanish:
+  // the customer would be left with no way to reach the shop. Fall back to a
+  // phone call instead.
+  if (!href) return <a className={`btn btn-${variant} ${className}`} href={phoneHref()} onClick={() => track('phone_click', { placement, productId, serviceId })}>
+    <Phone size={19} aria-hidden="true" /><span>{t('action.call')}</span>
+  </a>;
   return <a className={`btn btn-${variant} ${className}`} href={href} target="_blank" rel="noopener noreferrer" onClick={() => track(event, { placement, productId, serviceId })}>
     <MessageCircle size={19} aria-hidden="true" /><span>{children || t('action.whatsapp')}</span><span className="sr-only"> ({t('action.openWhatsApp')})</span>
   </a>;

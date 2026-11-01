@@ -13,7 +13,7 @@ export function HeroSection() {
   return <>
     <section className="hero-neu" aria-labelledby="hero-title" data-scroll-scene="hero">
       <div className="hero-backdrop">
-        <picture><source media="(max-width: 760px) and (min-height: 521px)" srcSet={asset('/images/kanchan-team-hero-mobile.webp')} /><img className="hero-backdrop-image" src={asset(shop.heroPhoto.src)} alt={l(shop.heroPhoto.alt)} width={shop.heroPhoto.width} height={shop.heroPhoto.height} fetchPriority="high" decoding="async" /></picture>
+        <picture><source media="(max-width: 760px) and (min-height: 521px)" srcSet={asset('/images/kanchan-team-hero-mobile.webp')} /><source media="(min-width: 761px)" type="image/webp" srcSet={asset('/images/kanchan-team-hero.webp')} /><img className="hero-backdrop-image" src={asset(shop.heroPhoto.src)} alt={l(shop.heroPhoto.alt)} width={shop.heroPhoto.width} height={shop.heroPhoto.height} fetchPriority="high" decoding="async" /></picture>
         <span className="hero-backdrop-scrim" aria-hidden="true" />
       </div>
       <div className="container hero-neu-grid">
@@ -23,6 +23,7 @@ export function HeroSection() {
           <p className="hero-description">{t('hero.description')}</p>
           <div className="hero-actions"><Link to="/cycles" className="btn btn-yellow hero-explore">{t('action.viewCycles')}<ArrowRight size={18} aria-hidden="true" /></Link><DirectionsButton className="hero-ghost" /></div>
           <p className="hero-note"><span><Check size={13} strokeWidth={2.5} aria-hidden="true" /></span>{t('hero.note')}</p>
+          <p className="hero-badge">{t('hero.badge1')} {t('hero.badge2')}</p>
           <a href="#about-store" className="hero-scroll-cue"><span className="scroll-cue-icon"><ArrowDown size={16} aria-hidden="true" /></span>{l({ bn: 'স্ক্রল করুন। নতুন পথ দেখুন।', en: 'A little scroll. A new perspective.' })}</a>
         </div>
       </div>

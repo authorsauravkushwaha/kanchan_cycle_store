@@ -110,13 +110,25 @@ Budget and planning guidance is in
 **[docs/SALES_PLAYBOOK.md](docs/SALES_PLAYBOOK.md)** — Google Business Profile,
 WhatsApp Business, reviews, seasonal stock, and the 30-day plan.
 
+The customer-loss review is in
+**[docs/CUSTOMER_LOSS_AUDIT.md](docs/CUSTOMER_LOSS_AUDIT.md)** — the top 100
+mistakes that were costing the shop customers, what was fixed in the code, and
+the short list that only the owner can close.
+
 ## Catalogue and unconfirmed information
 
-The catalogue includes 23 product photographs supplied by the shop across 21
-bicycles, including the Hercules Top Gear Defender FX DD and Tata Stryder
-Harris-X IC DD premium models. Prices and availability are not guessed, and the
-supplied specifications are shown in each product description. The shop can
-confirm current details directly.
+The catalogue lists 22 cycles and uses all 24 photographs supplied by the shop,
+including the Hercules Top Gear Defender FX DD and Tata Stryder Harris-X IC DD
+premium models. Nineteen cycles show the brand's catalogue picture and three show
+your own shop photographs; every product page says which one it is. Prices and
+availability are not guessed, and the supplied specifications are shown in each
+product description. The shop can confirm current details directly.
+
+A filter never hides a cycle because the shop has not confirmed a price, stock
+status or gearing yet — the cycle is listed and flagged instead, so the
+catalogue can never look empty. See
+**[docs/CUSTOMER_LOSS_AUDIT.md](docs/CUSTOMER_LOSS_AUDIT.md)** for the full
+review of what was costing customers, and the live checklist on `/owner`.
 
 Add products in either of two ways:
 

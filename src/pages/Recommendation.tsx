@@ -6,7 +6,7 @@ import { shop } from '../config/shop';
 import { useCatalog } from '../inventory';
 import { useLanguage } from '../i18n';
 import type { TranslationKey } from '../i18n';
-import { answerLabel, emptyAnswers, quizFields, recommendProducts, validateQuizStep } from '../lib/quiz';
+import { answerLabel, emptyAnswers, quizFields, recommendMatches, validateQuizStep } from '../lib/quiz';
 import type { QuizAnswers } from '../lib/quiz';
 import { productUrl, track } from '../lib/business';
 import { SEO } from '../components/SEO';
@@ -23,7 +23,9 @@ export default function Recommendation() {
   const [error, setError] = useState<TranslationKey | null>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const { products } = useCatalog();
-  const matches = step === 6 ? recommendProducts(products, answers) : [];
+  const matchList = step === 6 ? recommendMatches(products, answers) : [];
+  const matches = matchList.map(match => match.product);
+  const pendingMatches = matchList.filter(match => match.status === 'unconfirmed').length;
   const update = (field: keyof QuizAnswers, value: string) => { setAnswers(previous => ({ ...previous, [field]: value })); setError(null); };
   const advance = (skipHeight = false) => {
     const nextAnswers = skipHeight ? { ...answers, height: '' } : answers;
@@ -56,6 +58,6 @@ export default function Recommendation() {
         {step === 5 && <div className="quiz-choices">{(['geared', 'non-geared', 'unsure'] as const).map(value => <Choice key={value} name="gear" value={value} selected={answers.gear} onChange={gear => update('gear', gear)} label={value === 'geared' ? t('catalog.geared') : value === 'non-geared' ? t('catalog.nongeared') : t('quiz.gearUnsure')} />)}</div>}
         {error && <p className="field-error quiz-error" id="quiz-error" role="alert">{t(error)}</p>}
         <div className="quiz-navigation">{step > 0 ? <button type="button" className="btn btn-secondary" onClick={back}><ArrowLeft size={17} aria-hidden="true" />{t('action.previous')}</button> : <span />}<div>{step === 2 && <button type="button" className="btn btn-text" onClick={() => advance(true)}>{t('quiz.skipHeight')}</button>}<button type="submit" className="btn btn-primary">{step === 5 ? t('quiz.seeResults') : t('action.next')}<ArrowRight size={18} aria-hidden="true" /></button></div></div>
-      </form><p className="quiz-privacy">{t('quiz.privacy')}</p></div> : <div className="quiz-results"><div className="quiz-result-heading"><span className="success-icon"><Sparkles size={27} aria-hidden="true" /></span><p className="eyebrow">{t('quiz.completed')}</p><h2 ref={headingRef} tabIndex={-1}>{matches.length ? t('quiz.resultTitle') : t('quiz.noMatchTitle')}</h2><p>{matches.length ? t('quiz.matchText') : t('quiz.noMatchText')}</p></div><div className="quiz-summary"><h3>{t('quiz.summary')}</h3><dl>{summary.map(item => <div key={item.field}><dt>{item.label}</dt><dd>{item.display}</dd></div>)}</dl></div>{matches.length > 0 && <ProductGrid products={matches} />}<Notice>{t('quiz.fit')}</Notice><div className="quiz-result-actions"><WhatsAppButton message={quizMessage} placement="quiz-results">{t('quiz.sendAnswers')}</WhatsAppButton><button className="btn btn-secondary" onClick={reset}><RotateCcw size={17} aria-hidden="true" />{t('action.reset')}</button></div></div>}
+      </form><p className="quiz-privacy">{t('quiz.privacy')}</p></div> : <div className="quiz-results"><div className="quiz-result-heading"><span className="success-icon"><Sparkles size={27} aria-hidden="true" /></span><p className="eyebrow">{t('quiz.completed')}</p><h2 ref={headingRef} tabIndex={-1}>{matches.length ? t('quiz.resultTitle') : t('quiz.noMatchTitle')}</h2><p>{matches.length ? t('quiz.matchText') : t('quiz.noMatchText')}</p>{pendingMatches > 0 && <p className="quiz-pending-note">{t('quiz.matchPendingText')}</p>}</div><div className="quiz-summary"><h3>{t('quiz.summary')}</h3><dl>{summary.map(item => <div key={item.field}><dt>{item.label}</dt><dd>{item.display}</dd></div>)}</dl></div>{matches.length > 0 && <ProductGrid products={matches} />}<Notice>{t('quiz.fit')}</Notice><div className="quiz-result-actions"><WhatsAppButton message={quizMessage} placement="quiz-results">{t('quiz.sendAnswers')}</WhatsAppButton><button type="button" className="btn btn-secondary" onClick={reset}><RotateCcw size={17} aria-hidden="true" />{t('action.reset')}</button></div></div>}
   </div></section></>;
 }

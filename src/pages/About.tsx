@@ -1,4 +1,5 @@
-import { Bike, Wrench } from 'lucide-react';
+import { Bike, Info, Wrench } from 'lucide-react';
+import { asset } from '../config/shop';
 import { addressLines, shop } from '../config/shop';
 import { useLanguage } from '../i18n';
 import { SEO } from '../components/SEO';
@@ -38,6 +39,14 @@ export default function About() {
     <section className="section about-promise"><div className="container about-promise-grid">
       <span className="about-promise-icon" aria-hidden="true"><Bike size={34} strokeWidth={1.3} /></span>
       <div><h2>{t('about.valuesTitle')}</h2><p>{l({ bn: 'আপনার প্রয়োজন বুঝে, বাজেট মিলিয়ে, সামনে দেখে সাইকেল বেছে নিন। দাম, মডেল বা পরিষেবা নিশ্চিত না হলে আমরা অনুমান করে কিছু লিখি না — সরাসরি দোকানে জিজ্ঞাসা করাই সবচেয়ে ভালো।', en: 'Choose a cycle after we understand what you need, match it to your budget and let you see it in person. If a price, model or service is not confirmed, we do not guess — asking the shop directly is always best.' })}</p></div>
+    </div></section>
+    <section className="section about-gallery-section"><div className="container">
+      <SectionHeading eyebrow={t('about.galleryHeading')} title={t('about.photosTitle')} description={t('about.photosText')} />
+      <div className="about-gallery">{shop.shopPhotos.map(photo => <figure className="about-gallery-item" key={photo.src}>
+        <img src={asset(photo.smallSrc)} srcSet={`${asset(photo.smallSrc)} 400w, ${asset(photo.src)} 800w`} sizes="(max-width: 760px) 92vw, 46vw" alt={l(photo.alt)} width={photo.smallWidth} height={Math.round(photo.smallWidth * photo.height / photo.width)} loading="lazy" decoding="async" />
+        <figcaption>{l(photo.caption)}</figcaption>
+      </figure>)}</div>
+      <p className="about-gallery-note"><Info size={15} aria-hidden="true" />{t('about.galleryNote')}</p>
     </div></section>
     <MapSection />
     <FinalCTA />

@@ -23,8 +23,10 @@ export default function Shortlist() {
   const [cleared, setCleared] = useState(false);
   const id = useId();
 
+  // The shop needs a link back to the site, even before the owner has set
+  // websiteUrl: the visitor's own origin is the real one in production.
   const message = useMemo(() => shortlistMessage(entries, {
-    language, name, area, note, siteUrl: shop.websiteUrl,
+    language, name, area, note, siteUrl: shop.websiteUrl || window.location.origin,
   }), [entries, language, name, area, note]);
   const href = whatsappHref(message);
   const total = shortlistTotal(entries);
@@ -33,7 +35,7 @@ export default function Shortlist() {
   return <>
     <SEO title={t('list.title')} description="seo.listDescription" />
     <PageHero eyebrow={t('list.eyebrow')} title={t('list.title')} description={t('list.description')}>
-      <p className="list-device-note"><Heart size={15} aria-hidden="true" />{t('list.privacy')}</p>
+      <p className="list-device-note"><Heart size={15} aria-hidden="true" />{t('list.privacy')} <span className="list-device-saved">{t('list.savedOnDevice')}</span></p>
     </PageHero>
     <section className="section list-section"><div className="container">
       {cleared && entries.length === 0 && <p className="inline-success" role="status"><Check size={16} aria-hidden="true" />{t('list.cleared')}</p>}

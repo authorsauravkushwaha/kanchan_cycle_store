@@ -20,7 +20,7 @@ export default function Services() {
         ? <ServiceList services={confirmed} detailed />
         : <EmptyState icon={Wrench} title={t('services.askTitle')} description={t('services.notice')}><WhatsAppButton placement="services-empty" /></EmptyState>}
       <Notice positive>{t('services.confirmedNotice')}</Notice>
-      <div className="services-ask"><div className="services-ask-heading"><h2>{t('services.askTitle')}</h2><p>{t('services.notice')}</p></div><ServiceList services={enquiries} detailed /></div>
+      <div className="services-ask"><div className="services-ask-heading"><h2>{t('services.askTitle')}</h2><p>{t('services.notice')}</p><a className="btn btn-secondary" href="#repair-form">{t('action.repairForm')}</a></div><ServiceList services={enquiries} detailed /></div>
     </div></section>
     <section className="section repair-form-section" id="repair-form"><div className="container repair-form-layout">
       <div className="repair-form-intro"><p className="eyebrow"><span />{t('services.formEyebrow')}</p><h2>{t('services.formTitle')}</h2><p>{t('services.formDescription')}</p>

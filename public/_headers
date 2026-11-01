@@ -19,5 +19,14 @@
   Cache-Control: public, max-age=0, must-revalidate
   Content-Type: application/manifest+json
 
+# Photographs and icons are not content-hashed, so they get a week of caching
+# plus a week of stale-while-revalidate. Without this every product photo was
+# downloaded again on every visit, which is slow on a weak connection.
+/images/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+
+/icons/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+
 /assets/*
   Cache-Control: public, max-age=31536000, immutable

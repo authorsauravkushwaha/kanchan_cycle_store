@@ -6,6 +6,7 @@ import { useLanguage } from '../i18n';
 import { SEO } from '../components/SEO';
 import { Notice } from '../components/UI';
 import { draftsToCatalogJson, draftsToCsv, emptyDraft, MAX_DRAFTS, MAX_DRAFT_IMPORT_BYTES, MAX_DRAFT_STORAGE_BYTES, normalizeDraftSlug, parseDrafts, validateDraft } from '../lib/stockDesk';
+import { launchChecks, launchSummary } from '../lib/launchReadiness';
 import type { DraftProduct } from '../lib/stockDesk';
 
 const DRAFT_KEY = 'kanchan-owner-draft-v1';
@@ -68,6 +69,9 @@ export default function OwnerDesk() {
     catch { setStatus(l({ bn: 'কপি করা যায়নি। ডাউনলোড করে নিন।', en: 'Could not copy. Use the download button instead.' })); }
   };
 
+  const checks = useMemo(() => launchChecks(), []);
+  const summary = useMemo(() => launchSummary(checks), [checks]);
+
   const csv = useMemo(() => draftsToCsv(drafts), [drafts]);
   const json = useMemo(() => draftsToCatalogJson(drafts), [drafts]);
 
@@ -97,6 +101,19 @@ export default function OwnerDesk() {
           en: 'It is not a secure admin panel — there is no password, so use it on your own phone. Turn on Supabase to publish stock to everyone (see SUPABASE.md).',
         })}
       </Notice>
+
+      <section className="owner-readiness">
+        <h2><AlertTriangle size={19} aria-hidden="true" />{l({ bn: 'লক্ষ্যকারীদের জন্য প্রস্তুতি', en: 'Ready for customers?' })}</h2>
+        <p className="muted small-note">{l({
+          bn: 'এই তালিকা সাইটের বর্তমান সেটিং থেকেই তৈরি। যেগুলো না ঠিক, সেগুলো ঠিক না করলে ক্রেতা আসে না বা এসেও ফিরে যায়।',
+          en: 'This list is generated from the live site settings. Anything listed here is what stops a customer from finding the shop or from buying.',
+        })}</p>
+        <p className="owner-readiness-score">{l({ bn: '{blockers}টি বাধা, {warnings}টি পরামর্শ', en: '{blockers} blocking, {warnings} to improve' }).replace('{blockers}', String(summary.blockers)).replace('{warnings}', String(summary.warnings))}</p>
+        <ul className="owner-checks-list">{checks.map(check => <li key={check.id} className={`owner-check owner-check-${check.severity}`}>
+          <span className="owner-check-badge">{check.severity === 'blocker' ? l({ bn: 'বাধা', en: 'Blocking' }) : l({ bn: 'পরামর্শ', en: 'Improve' })}</span>
+          <div><strong>{l(check.title)}</strong><p>{l(check.detail)}</p><small>{l(check.action)}</small></div>
+        </li>)}</ul>
+      </section>
 
       <div className="owner-stats">
         <div><strong>{drafts.length}</strong><span>{l({ bn: 'খসড়া', en: 'drafts' })}</span></div>

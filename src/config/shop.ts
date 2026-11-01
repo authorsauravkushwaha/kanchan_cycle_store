@@ -1,4 +1,6 @@
 import { suppliedCycles } from './cycles.ts';
+import { categoryDefinitions } from './categories.ts';
+import { photoSrcSets } from './photoVariants.ts';
 
 /**
  * কাঞ্চন সাইকেল স্টোর্স — the single owner-configuration file.
@@ -56,6 +58,12 @@ export interface Product {
    */
   photoUrl?: string | null;
   photoUrls?: string[];
+  /**
+   * Where the picture came from. 'shop' = photographed in the shop, 'catalogue' =
+   * the brand's own picture. Saying so keeps the website honest: a customer
+   * should never think a studio picture is the exact bicycle on the floor.
+   */
+  photoKind?: 'shop' | 'catalogue';
 }
 export interface Service {
   id: string;
@@ -103,6 +111,43 @@ export const shop = {
     alt: { bn: 'কাঞ্চন সাইকেল স্টোর্সে দুই দোকানকর্মী', en: 'Two members of the Kanchan Cycle Stores team inside the shop' },
     caption: { bn: 'কাঞ্চন সাইকেল স্টোর্স, কোলাঘাট', en: 'Kanchan Cycle Stores, Kolaghat' },
   },
+  /**
+   * Photographs of the shop itself, taken by the owner. They are the strongest
+   * trust signal a neighbourhood shop has: a customer can see the door, the
+   * rows of cycles and the workshop before deciding to visit.
+   */
+  shopPhotos: [
+    {
+      src: '/images/shop/storefront.webp', smallSrc: '/images/shop/storefront-480.webp', smallWidth: 480, width: 960, height: 1200,
+      alt: { bn: 'রাতের বেলা জ্বলন্ত সাইনবোর্ডসহ কাঞ্চন সাইকেল স্টোর্সের সামনের দিক', en: 'The front of Kanchan Cycle Stores at night with its lit signboard' },
+      caption: { bn: 'কোলাঘাটে আমাদের দোকানের সামনে', en: 'Our shopfront in Kolaghat' },
+    },
+    {
+      src: '/images/shop/showroom-row.webp', smallSrc: '/images/shop/showroom-row-400.webp', smallWidth: 400, width: 800, height: 600,
+      alt: { bn: 'দোকানের ভেতরে সারি সারি সাজানো সাইকেল', en: 'Rows of cycles arranged inside the shop' },
+      caption: { bn: 'দোকানের ভেতরের সাইকেল', en: 'Cycles inside the shop' },
+    },
+    {
+      src: '/images/shop/bicycle-display.webp', smallSrc: '/images/shop/bicycle-display-400.webp', smallWidth: 400, width: 800, height: 600,
+      alt: { bn: 'জ্বলন্ত সাইনবোর্ডের সামনে সাজানো সাইকেলের প্রদর্শনী', en: 'Cycles displayed in front of the lit shop sign' },
+      caption: { bn: 'সাইকেলের প্রদর্শনী', en: 'On display' },
+    },
+    {
+      src: '/images/shop/stryder-corner.webp', smallSrc: '/images/shop/stryder-corner-400.webp', smallWidth: 400, width: 800, height: 600,
+      alt: { bn: 'দোকানের এক কোণে রাখা মাউন্টেন সাইকেল', en: 'A mountain cycle standing in a corner of the shop' },
+      caption: { bn: 'দোকানের একটি কোণ', en: 'A corner of the shop' },
+    },
+    {
+      src: '/images/shop/kids-and-city.webp', smallSrc: '/images/shop/kids-and-city-400.webp', smallWidth: 400, width: 800, height: 600,
+      alt: { bn: 'দোকানের দেয়ালে ঝোলানো বাচ্চাদের সাইকেল', en: 'Children’s cycles hanging on the shop wall' },
+      caption: { bn: 'বাচ্চাদের সাইকেলের অংশ', en: 'Our children’s cycles' },
+    },
+    {
+      src: '/images/shop/workshop.webp', smallSrc: '/images/shop/workshop-400.webp', smallWidth: 400, width: 800, height: 600,
+      alt: { bn: 'মেরামতের যন্ত্রপাতি ও সাইকেল নিয়ে দোকানের ওয়ার্কশপ', en: 'The workshop with tools and a cycle' },
+      caption: { bn: 'মেরামতের জায়গা', en: 'Where the repairs happen' },
+    },
+  ] as ShopPhoto[],
   contact: {
     // Supplied by the business owner in the project brief.
     phone: '+917076884950',
@@ -140,16 +185,7 @@ export const shop = {
   socialLinks: [] as { label: string; url: string }[],
   // null disables all analytics network requests. See README for consent rules.
   analytics: { endpoint: null as string | null },
-  categories: [
-    { id: 'kids', name: { bn: 'বাচ্চাদের সাইকেল', en: 'Kids’ cycles' }, subtitle: { bn: 'ছোট্ট পথচলার শুরু', en: 'Little rides, big smiles' }, availabilityConfirmed: false },
-    { id: 'student', name: { bn: 'স্টুডেন্ট সাইকেল', en: 'Student cycles' }, subtitle: { bn: 'স্কুল থেকে কলেজের পথে', en: 'For the everyday journey' }, availabilityConfirmed: false },
-    { id: 'city', name: { bn: 'দৈনন্দিন ব্যবহারের সাইকেল', en: 'Everyday city cycles' }, subtitle: { bn: 'চেনা পথে প্রতিদিন', en: 'Make the daily ride yours' }, availabilityConfirmed: false },
-    { id: 'geared', name: { bn: 'গিয়ার সাইকেল', en: 'Geared cycles' }, subtitle: { bn: 'পথ বদলাক, উৎসাহ নয়', en: 'A little more adventure' }, availabilityConfirmed: false },
-    // Premium models are sold through the shop, but stock and shop prices still
-    // need confirming in person, so availabilityConfirmed stays false.
-    { id: 'premium', name: { bn: 'প্রিমিয়াম সাইকেল', en: 'Premium cycles' }, subtitle: { bn: 'বাছাই করা উন্নত মডেল', en: 'Hand-picked, higher-spec models' }, availabilityConfirmed: false },
-    { id: 'electric', name: { bn: 'ইলেকট্রিক সাইকেল', en: 'Electric cycles' }, subtitle: { bn: 'নতুন ধরনের পথচলা', en: 'Explore a different ride' }, availabilityConfirmed: false },
-  ] as Category[],
+  categories: categoryDefinitions,
   /** Owner-supplied photos; price and stock remain unconfirmed. */
   catalog: suppliedCycles as Product[],
   services: [
@@ -180,6 +216,18 @@ export const shop = {
 export const asset = (path: string): string => {
   if (/^https:\/\//i.test(path)) return path;
   return `${import.meta.env.BASE_URL}${path.replace(/^\/+/, '')}`;
+};
+/**
+ * The `srcset` for a catalogue photograph, so a phone downloads a small file
+ * instead of the full-size one. Undefined for remote (Supabase) photographs.
+ */
+export const photoSrcSet = (src: string): string | undefined => {
+  const entry = photoSrcSets[src];
+  if (!entry) return undefined;
+  return entry.split(', ').map(part => {
+    const [path, descriptor] = part.split(' ');
+    return `${asset(path)} ${descriptor}`;
+  }).join(', ');
 };
 export const productPhotos = (product: Product): string[] => {
   const urls = [

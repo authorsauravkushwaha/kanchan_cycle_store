@@ -14,7 +14,9 @@ const VERSION = 'kanchan-v1';
 const SHELL_CACHE = `${VERSION}-shell`;
 const ASSET_CACHE = `${VERSION}-assets`;
 const IMAGE_CACHE = `${VERSION}-images`;
-const MAX_IMAGES = 24;
+/* The catalogue alone is 24 photographs; a smaller cache evicted them and
+   the shop re-downloaded every picture on each visit. */
+const MAX_IMAGES = 80;
 
 /* Registration scope keeps every URL correct when hosted under a sub-path. */
 const SCOPE = new URL(self.registration.scope);

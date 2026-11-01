@@ -2,6 +2,8 @@ import { useId, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { ArrowUpRight, MoveHorizontal, RotateCcw } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { asset } from '../config/shop';
+import type { Localized } from '../config/shop';
 import { useLanguage } from '../i18n';
 import { useMotion } from './MotionExperience';
 
@@ -73,7 +75,7 @@ export function BicycleArtwork() {
   </svg>;
 }
 
-export function CycleScene() {
+export function CycleScene({ photos = [], edition }: { photos?: string[]; edition?: Localized }) {
   const { l } = useLanguage();
   const { enabled } = useMotion();
   const [angle, setAngle] = useState(0);
@@ -82,12 +84,19 @@ export function CycleScene() {
     l({ bn: 'পাশের দৃশ্য', en: 'Side view' }),
     l({ bn: 'উল্টো দিকের দৃশ্য', en: 'Reverse three-quarter view' }),
   ];
+  const coverPhoto = photos[0];
   return <div className="cycle-scene" data-tilt="" style={{ '--view-angle': `${enabled ? angle * 24 : 0}deg` } as CSSProperties}>
     <div className="scene-orbit orbit-one" aria-hidden="true" /><div className="scene-orbit orbit-two" aria-hidden="true" />
     <span className="scene-coordinate" aria-hidden="true">22.4452° N<br />87.8752° E</span>
-    <div className="scene-edition" aria-hidden="true"><span>THE EVERYDAY</span><strong>ride.</strong><span className="edition-line" /></div>
+    <div className="scene-edition" aria-hidden="true"><span>{l(edition ?? { bn: 'প্রতিদিনের রাইড', en: 'THE EVERYDAY RIDE' })}</span><strong>ride.</strong><span className="edition-line" /></div>
     <div className="scene-platform" aria-hidden="true"><span /></div>
-    <div className="scene-bicycle"><BicycleArtwork /></div>
+    <div className="scene-bicycle">
+      {coverPhoto ? (
+        <div className="scene-spin" aria-hidden="true"><img className="scene-photo" src={asset(coverPhoto)} alt={l({ bn: 'স্ট্রাইডার ইলেকট্রিক সাইকেল', en: 'Stryder electric cycle' })} loading="lazy" decoding="async" /></div>
+      ) : (
+        <BicycleArtwork />
+      )}
+    </div>
     <Link to="/recommendation" className="scene-float scene-float-top"><span className="scene-float-icon"><ArrowUpRight size={21} /></span><span><small>{l({ bn: 'আপনার পছন্দে', en: 'MADE FOR YOU' })}</small><strong>{l({ bn: 'আপনার পরের সাইকেল', en: 'Your next chapter' })}</strong></span></Link>
     <div className="scene-float scene-float-bottom"><span className="scene-mini-wheel" aria-hidden="true" /><span><strong>{l({ bn: 'দুই চাকা। নতুন পথ।', en: 'Two wheels. Endless possibilities.' })}</strong><small>{l({ bn: 'পথচলার আনন্দে', en: 'FIND YOUR EVERYDAY FREEDOM' })}</small></span></div>
     <div className="scene-toolbar">
@@ -95,6 +104,6 @@ export function CycleScene() {
       <button type="button" className="scene-rotate" onClick={() => setAngle(previous => previous === 1 ? -1 : previous + 1)} disabled={!enabled} aria-label={l({ bn: 'সাইকেলের দেখার কোণ বদলান', en: 'Rotate bicycle view' })}><MoveHorizontal size={15} /><span>{l({ bn: 'ঘুরিয়ে দেখুন', en: 'Rotate view' })}</span></button>
       <button type="button" className="scene-reset" onClick={() => setAngle(0)} disabled={!enabled || angle === 0} aria-label={l({ bn: 'সাইকেলের দৃশ্য আগের অবস্থায়', en: 'Reset bicycle view' })}><RotateCcw size={14} /></button>
     </div>
-    <span className="scene-disclaimer">{l({ bn: 'সাইকেলটি একটি শৈল্পিক নকশা', en: 'Bicycle shown is an illustration' })}</span>
+    <span className="scene-disclaimer">{l({ bn: 'আসল পণ্যের ছবি — ঘুরিয়ে ৩৬০ ডিগ্রি দেখুন', en: 'Product photograph — rotate for a 360° view' })}</span>
   </div>;
 }

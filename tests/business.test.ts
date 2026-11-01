@@ -18,7 +18,7 @@ describe('contact configuration', () => {
   });
   it('keeps unconfirmed hours, prices, inventory, offers and reviews unpublished', () => {
     expect(shop.hours.confirmed).toBe(false);
-    expect(shop.catalog).toHaveLength(21);
+    expect(shop.catalog).toHaveLength(22);
     expect(shop.catalog.every(product => product.price === null && product.availability === null)).toBe(true);
     expect(validateCatalog(shop.catalog, shop.categories.map(c => c.id))).toEqual([]);
     expect(shop.offers).toEqual([]);
@@ -44,10 +44,10 @@ describe('contact configuration', () => {
     expect(harris.specifications).toMatchObject({ geared: false, frameSize: '17 in', wheelSize: '26 in', brakes: 'Dual disc' });
     expect(harris.descriptionEn).toContain('26 × 2.35 inch nylon tyres');
     expect(productPhotos(harris)).toEqual(['/images/cycles/cycle-23.webp', '/images/cycles/cycle-22.webp']);
-    // All 23 supplied photographs belong to exactly one bicycle record.
+    // All 24 supplied photographs belong to exactly one bicycle record.
     const allPhotos = shop.catalog.flatMap(product => productPhotos(product));
-    expect(allPhotos).toHaveLength(23);
-    expect(new Set(allPhotos).size).toBe(23);
+    expect(allPhotos).toHaveLength(24);
+    expect(new Set(allPhotos).size).toBe(24);
   });
   it('uses the exact supplied coordinates and postal address', () => {
     expect(shop.coordinates).toEqual({ latitude: 22.4452382, longitude: 87.8751764 });

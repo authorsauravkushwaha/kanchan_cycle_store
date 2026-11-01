@@ -79,12 +79,11 @@ test('category links, supplied catalog, phone, directions and embedded map are c
     await page.locator(`.category-card[href="/cycles?category=${category}"]`).click();
     await expect(page).toHaveURL(new RegExp(`category=${category}`));
     await expect(page.getByLabel('সাইকেলের ধরন', { exact: true })).toHaveValue(category);
-    if (category === 'electric') await expect(page.locator('.empty-state')).toBeVisible();
-    else await expect(page.locator('.product-card').first()).toBeVisible();
+    await expect(page.locator('.product-card').first()).toBeVisible();
   }
   await page.goto('/cycles');
-  await expect(page.locator('.product-card')).toHaveCount(21);
-  await expect(page.locator('.product-card-photo img')).toHaveCount(21);
+  await expect(page.locator('.product-card')).toHaveCount(22);
+  await expect(page.locator('.product-card-photo img')).toHaveCount(22);
   await page.locator('.product-card h3 a').first().click();
   await expect(page.locator('.product-detail-photo img')).toBeVisible();
   await expect(page.locator('.product-detail-photo img')).toHaveAttribute('src', /cycle-20\.webp$/);
@@ -332,10 +331,10 @@ test('supplied images load and pages do not produce application errors', async (
     if (path === '/') expect(photographs).toEqual([
       '/images/kanchan-store-hero.jpeg',
       // Featured premium models appear in the homepage featured row.
-      '/images/cycles/cycle-20.webp', '/images/cycles/cycle-23.webp',
+      '/images/cycles/cycle-20.webp', '/images/cycles/cycle-23.webp', '/images/cycles/cycle-24.jpg',
     ]);
     else if (path === '/cycles') {
-      expect(photographs).toHaveLength(21);
+      expect(photographs).toHaveLength(22);
       expect(photographs.every(photo => photo.startsWith('/images/cycles/'))).toBe(true);
     } else expect(photographs, path).toEqual([]);
   }

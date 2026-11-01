@@ -1,7 +1,8 @@
 import { lazy, Suspense } from 'react';
 import { ArrowDown, ArrowRight, ArrowUpRight, Bike, Check, MapPin, MessageCircle, Wrench } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { asset, shop } from '../config/shop';
+import { asset, productPhotos, shop } from '../config/shop';
+import { suppliedCycles } from '../config/cycles';
 import { useLanguage } from '../i18n';
 import { CallButton, DirectionsButton, TextLink, WhatsAppButton } from './UI';
 const CycleScene = lazy(() => import('./CycleScene').then(module => ({ default: module.CycleScene })));
@@ -56,21 +57,23 @@ function HeroCaption() {
   </aside>;
 }
 
-/** The illustrated bicycle gets its own stage once the portrait leads the hero. */
+/** The premium electric cycle photographed for the shop — shown on the home stage. */
 export function RideShowcase() {
   const { t, l } = useLanguage();
+  const showcase = suppliedCycles.find(product => product.category === 'electric' && product.featured);
+  const photos = showcase ? productPhotos(showcase) : [];
   return <section className="section ride-showcase" aria-labelledby="ride-title" data-scroll-scene="ride">
     <div className="container ride-showcase-grid">
       <div className="ride-showcase-copy" data-reveal>
         <p className="eyebrow"><span />{l({ bn: 'সাইকেলটি ঘুরিয়ে দেখুন', en: 'A CLOSER LOOK AT THE RIDE' })}</p>
         <h2 id="ride-title">{l({ bn: 'সব দিক থেকে দেখে নিন', en: 'Every angle before you decide' })}</h2>
         <p>{l({
-          bn: 'স্ক্রল করলে চাকা ঘোরে, আর নিচের বোতামে চাপ দিলে সাইকেলটি ঘুরে যায়। এটি একটি শৈল্পিক নকশা—আসল সাইকেল, দাম ও স্টক দোকানে এসে দেখে নিন।',
-          en: 'Scroll to spin the wheels, or use the button to turn the illustration. It is a design study — see the real cycles, prices and stock at the shop.',
+          bn: 'স্ট্রাইডার ইলেকট্রিক সাইকেলটি সব দিক থেকে ঘুরিয়ে দেখুন। রেঞ্জ, গতি, দাম ও স্টক দোকানে জানতে হবে।',
+          en: 'Turn the Stryder electric cycle for a 360° look. Range, speed, price and stock — ask at the shop.',
         })}</p>
         <Link to="/cycles" className="btn btn-secondary">{t('action.viewCycles')}<ArrowRight size={17} aria-hidden="true" /></Link>
       </div>
-      <Suspense fallback={<div className="cycle-scene" aria-hidden="true"><div className="scene-orbit" /><div className="scene-platform" /></div>}><CycleScene /></Suspense>
+      <Suspense fallback={<div className="cycle-scene" aria-hidden="true"><div className="scene-orbit" /><div className="scene-platform" /></div>}><CycleScene photos={photos} edition={{ bn: 'ইলেকট্রিক রাইড', en: 'THE ELECTRIC RIDE' }} /></Suspense>
     </div>
   </section>;
 }

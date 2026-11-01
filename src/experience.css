@@ -164,6 +164,16 @@ html[lang='bn'] .hero-caption strong { font-size: 19px; font-weight: 600; }
 .scene-rotate:hover, .scene-reset:hover { box-shadow: var(--neo-inset); }
 .scene-disclaimer { position: absolute; right: 0; bottom: -8px; font-size: 8px; color: var(--muted); }
 
+/* The real product photograph turns inside the scene for a 360° look. It spins
+   slowly on its own, pauses when the visitor points at it, and keeps the manual
+   rotate control working on top of the automatic turn. */
+.scene-spin { position: absolute; inset: 0; display: grid; place-items: center; }
+.scene-photo { width: min(72%, 470px); height: auto; display: block; filter: drop-shadow(12px 14px 22px #00000040); pointer-events: auto; }
+html[data-motion='full'] .scene-spin { animation: scene-turn 22s linear infinite; }
+.scene-spin:hover { animation-play-state: paused; }
+@keyframes scene-turn { to { transform: rotateY(360deg); } }
+html[data-motion='reduced'] .scene-spin { animation: none; }
+
 /* The illustrated bicycle keeps its interactive stage below the hero. */
 .ride-showcase { position: relative; overflow: hidden; border-bottom: 1px solid #d8e0d3; background: radial-gradient(ellipse at 71% 48%, #f5f7ef 0, transparent 58%), var(--surface); }
 .ride-showcase-grid { display: grid; grid-template-columns: .82fr 1.18fr; align-items: center; gap: 48px; }

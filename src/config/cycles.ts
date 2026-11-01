@@ -65,6 +65,23 @@ const premiumCycles: Product[] = [
     photoUrl: '/images/cycles/cycle-23.webp',
     photoUrls: ['/images/cycles/cycle-23.webp', '/images/cycles/cycle-22.webp'],
   },
+  {
+    id: 'stryder-electric-cycle',
+    slug: 'stryder-electric-cycle',
+    kind: 'cycle',
+    nameBn: 'স্ট্রাইডার ইলেকট্রিক সাইকেল',
+    nameEn: 'Stryder electric cycle',
+    category: 'electric',
+    brand: 'Stryder',
+    price: null,
+    descriptionBn: 'স্ট্রাইডার ইলেকট্রিক সাইকেল, ব্যাটারি সহ। রেঞ্জ, গতি, চার্জিং সময়, দাম ও স্টক দোকানে জানতে হবে।',
+    descriptionEn: 'Stryder electric cycle with battery. Range, speed, charging time, price and stock are confirmed at the shop — contact the shop for details.',
+    specifications: { geared: null, frameSize: null, wheelSize: null, brakes: null, riderHeightCm: null, intendedUse: null },
+    availability: null,
+    featured: true,
+    photoUrl: '/images/cycles/cycle-24.jpg',
+    photoUrls: ['/images/cycles/cycle-24.jpg'],
+  },
 ];
 
 /** Old consolidated Defender slugs redirect to the single geared Defender listing. */

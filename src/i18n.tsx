@@ -265,6 +265,27 @@ const bn = {
   'list.addMore': 'আরও সাইকেল দেখুন',
   'list.shopThisList': 'এই তালিকা নিয়ে দোকানে আসুন',
   'list.callAbout': 'তালিকা নিয়ে কল করুন',
+
+  /* Delico — the food-delivery app promoted across the website. */
+  'delico.button': 'Delico-তে খাবার অর্ডার করুন',
+  'delico.buttonShort': 'Delico অ্যাপ',
+  'delico.buttonTiny': 'Delico',
+  'delico.download': 'Delico অ্যাপ ডাউনলোড করুন',
+  'delico.playStore': 'Google Play থেকে নিন',
+  'delico.visitSite': 'delicoapp.com দেখুন',
+  'delico.opensExternal': 'নতুন ট্যাবে খুলবে',
+  'delico.banner': 'খিদে পেয়েছে? Delico অ্যাপে খাবার অর্ডার করুন।',
+  'delico.section.eyebrow': 'কোলাঘাটে খাবার ডেলিভারি',
+  'delico.section.title': 'সাইকেল এখানে, খাবারের অর্ডার Delico-তে',
+  'delico.section.description': 'Delico একটি ফুড ডেলিভারি অ্যাপ। অ্যাপটি খুলে রেস্তোরাঁর মেনু দেখুন, পছন্দের খাবার বেছে নিন, তারপর অর্ডার করুন।',
+  'delico.section.1.title': 'অ্যাপটি নিন',
+  'delico.section.1.text': 'delicoapp.com খুলে Delico অ্যাপটি নামিয়ে নিন।',
+  'delico.section.2.title': 'মেনু দেখুন',
+  'delico.section.2.text': 'রেস্তোরাঁর মেনু আর দাম অ্যাপের ভেতরেই দেখা যায়।',
+  'delico.section.3.title': 'অর্ডার করুন',
+  'delico.section.3.text': 'খাবার বেছে নিয়ে অ্যাপেই অর্ডার শেষ করুন।',
+  'delico.section.note': 'Delico একটি আলাদা অ্যাপ ও সংস্থা। মেনু, দাম, অর্ডার ও ডেলিভারি সংক্রান্ত সব বিষয় তারাই জানাবে — এই দোকান সেসবের দায়িত্বে নেই।',
+  'delico.footerHeading': 'খাবার ডেলিভারি',
 } as const;
 
 const en: Record<keyof typeof bn, string> = {
@@ -530,6 +551,27 @@ const en: Record<keyof typeof bn, string> = {
   'list.addMore': 'See more cycles',
   'list.shopThisList': 'Bring this list to the shop',
   'list.callAbout': 'Call about this list',
+
+  /* Delico — the food-delivery app promoted across the website. */
+  'delico.button': 'Order food on Delico',
+  'delico.buttonShort': 'Delico app',
+  'delico.buttonTiny': 'Delico',
+  'delico.download': 'Download the Delico app',
+  'delico.playStore': 'Get it on Google Play',
+  'delico.visitSite': 'Visit delicoapp.com',
+  'delico.opensExternal': 'Opens in a new tab',
+  'delico.banner': 'Feeling hungry? Order food on the Delico app.',
+  'delico.section.eyebrow': 'FOOD DELIVERY IN KOLAGHAT',
+  'delico.section.title': 'Cycles here. Food orders on Delico.',
+  'delico.section.description': 'Delico is a food-delivery app. Open it, browse restaurant menus, pick what you like and place your order.',
+  'delico.section.1.title': 'Get the app',
+  'delico.section.1.text': 'Open delicoapp.com and download the Delico app.',
+  'delico.section.2.title': 'Browse the menu',
+  'delico.section.2.text': 'Restaurant menus and prices are shown inside the app.',
+  'delico.section.3.title': 'Place your order',
+  'delico.section.3.text': 'Choose your food and complete the order in the app.',
+  'delico.section.note': 'Delico is a separate app and company. It answers for the menu, prices, orders and delivery — this shop is not responsible for them.',
+  'delico.footerHeading': 'Food delivery',
 };
 
 export type TranslationKey = keyof typeof bn;

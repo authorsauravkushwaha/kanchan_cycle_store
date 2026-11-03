@@ -9,6 +9,7 @@ import { EmptyState, SectionHeading, TextLink, WhatsAppButton } from '../compone
 import { ProductGrid } from '../components/ProductCard';
 import { useCatalog } from '../inventory';
 import { MapSection } from '../components/MapSection';
+import { DelicoSection } from '../components/DelicoSection';
 
 export default function Home() {
   const { t, l } = useLanguage();
@@ -64,6 +65,7 @@ export default function Home() {
     {offers.length > 0 && <section className="section"><div className="container"><SectionHeading title={t('offers.current')} /><div className="offers-grid">{offers.map(offer => <article className="offer-card" key={offer.id}><h3>{l(offer.title)}</h3><p>{l(offer.description)}</p>{offer.validUntil && <small>{t('offers.validUntil', { date: offer.validUntil })}</small>}</article>)}</div></div></section>}
     {offers.length === 0 && <MaintenanceTips />}
     <section className="section visit-section"><div className="container"><SectionHeading eyebrow={t('home.visit.eyebrow')} title={t('home.visit.title')} description={t('home.visit.description')} /><div className="visit-grid">{visitIcons.map((Icon, index) => <div className="visit-item" key={index} data-reveal><span className="visit-number" aria-hidden="true">0{index + 1}</span><Icon size={27} strokeWidth={1.4} aria-hidden="true" /><p>{t(`home.visit.${index + 1}` as 'home.visit.1')}</p></div>)}</div><p className="visit-note"><Check size={16} aria-hidden="true" />{t('home.visit.note')}</p></div></section>
+    <DelicoSection />
     <MapSection />
     <ReviewSection />
     <FinalCTA />

@@ -11,7 +11,14 @@ export const productUrl = (slug: string) => {
   return `${base.replace(/\/+$/, '')}/cycles/${encodeURIComponent(slug)}`;
 };
 
-export type AnalyticsEvent = 'whatsapp_click' | 'phone_click' | 'directions_click' | 'product_enquiry_click' | 'repair_enquiry_submit' | 'quiz_complete' | 'source_shared' | 'shortlist_add' | 'shortlist_share' | 'install_prompt';
+export const delicoHref = (): string | null => {
+  const url = shop.delico.url;
+  // Only a real HTTPS destination may be published; a broken promo button that
+  // leads nowhere is worse than no button at all.
+  return /^https:\/\//i.test(url) ? url : null;
+};
+
+export type AnalyticsEvent = 'whatsapp_click' | 'phone_click' | 'directions_click' | 'product_enquiry_click' | 'repair_enquiry_submit' | 'quiz_complete' | 'source_shared' | 'shortlist_add' | 'shortlist_share' | 'install_prompt' | 'delico_click';
 /** No analytics requests by default. Consent is explicit; enquiry content is never sent. */
 export function track(event: AnalyticsEvent, context?: { productId?: string; serviceId?: string; placement?: string }) {
   if (!shop.analytics.endpoint) return;

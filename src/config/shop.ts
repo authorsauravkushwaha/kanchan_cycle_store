@@ -183,6 +183,30 @@ export const shop = {
     indexingEnabled: false,
   },
   socialLinks: [] as { label: string; url: string }[],
+  /**
+   * Delico — the Kolaghat food-delivery app the shop promotes to visitors.
+   * Every Delico button, banner and section reads from this block, so the
+   * owner can change the link once or switch the whole promotion off with
+   * `enabled: false`. These are external links: they open in a new tab so a
+   * customer never loses their place on this website.
+   *
+   * Delico is a separate business. Do not publish prices, delivery times or
+   * menu items as if this shop confirmed them — the same honesty rule that
+   * applies to cycles applies here.
+   */
+  delico: {
+    enabled: true,
+    name: 'Delico',
+    /** The website every Delico button points at. */
+    url: 'https://delicoapp.com/',
+    playStoreUrl: 'https://play.google.com/store/apps/details?id=com.delicorestuarant',
+    domainDisplay: 'delicoapp.com',
+    tagline: { bn: 'খাবার অর্ডার করুন, দরজায় পৌঁছে যাবে', en: 'Order food, delivered to your door' },
+    description: {
+      bn: 'Delico কোলাঘাটের একটি ফুড ডেলিভারি অ্যাপ। অ্যাপটিতে রেস্তোরাঁর মেনু দেখে খাবার অর্ডার করা যায়।',
+      en: 'Delico is a food-delivery app from Kolaghat. Browse restaurant menus and order food inside the app.',
+    },
+  },
   // null disables all analytics network requests. See README for consent rules.
   analytics: { endpoint: null as string | null },
   categories: categoryDefinitions,

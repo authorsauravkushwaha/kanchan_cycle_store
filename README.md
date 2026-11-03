@@ -162,6 +162,31 @@ or English messages. Product messages include the product name and a real page
 URL; repair and shortlist messages state that nothing is booked until the shop
 replies.
 
+### Delico food-delivery promotion
+
+The website advertises **Delico**, the Kolaghat food-delivery app, and every
+button links to **<https://delicoapp.com/>**. All of it reads from the `delico`
+block in **`src/config/shop.ts`**:
+
+| Field | What it controls |
+| --- | --- |
+| `enabled` | Master switch. `false` removes every Delico strip, button, panel and footer block at once. |
+| `url` | The destination of every Delico button. Must be HTTPS or the buttons hide themselves. |
+| `playStoreUrl` | The "Get it on Google Play" button shown beside the main one. |
+| `tagline`, `description` | Bilingual copy used in the footer panel. |
+
+Where the promotion appears: a slim strip under the announcement bar on **every
+page**, a button in the desktop header, a button in the mobile drawer, a panel on
+the **home page** (`#delico`), and a block in the **footer** of every page.
+Clicks fire the `delico_click` analytics event, which stays dormant until an
+analytics endpoint and consent are configured.
+
+Delico is a **separate business**, so the panel states plainly that menus, prices,
+orders and delivery are Delico's responsibility. Follow the same honesty rule the
+catalogue uses: do not publish dishes, prices or delivery times this shop has not
+confirmed. No external images or scripts are loaded for the promotion, so the
+site's strict Content-Security-Policy is unchanged.
+
 ## Environment variables
 
 All optional; the site is fully functional without them.

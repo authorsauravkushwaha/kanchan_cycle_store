@@ -1007,3 +1007,79 @@ html[lang='bn'] .install-kicker { letter-spacing: .4px; text-transform: none; fo
 .services-ask-heading .btn { margin-top: 14px; }
 .related-products > .btn { margin-top: 18px; }
 .home-shop-signature .text-link { margin-top: 8px; font-size: 13px; }
+
+/* ---------- Delico food-delivery app promotion ----------
+   Delico is a separate Kolaghat business this website advertises. Its button is
+   deliberately warm-orange so a customer can tell it apart from the shop's own
+   green actions at a glance, while still sitting inside the same design. */
+:root {
+  --delico: #e8590c;
+  --delico-700: #c24807;
+  --delico-soft: #fff3e9;
+  --delico-line: #f3ccb0;
+  --delico-ink: #7a3a12;
+}
+.btn-delico { background: var(--delico); color: #fff; border-color: var(--delico); font-weight: 700; box-shadow: 0 10px 24px -16px #7a2d00cc; }
+.btn-delico:hover { background: var(--delico-700); border-color: var(--delico-700); color: #fff; box-shadow: 0 14px 28px -16px #7a2d00b3; }
+.btn-delico-outline { background: transparent; color: var(--delico-700); border-color: var(--delico-line); }
+.btn-delico-outline:hover { background: var(--delico-soft); border-color: var(--delico); color: var(--delico-700); }
+
+/* Slim sitewide strip, just under the shop's own announcement bar. */
+.delico-strip { background: var(--delico-soft); border-bottom: 1px solid var(--delico-line); color: var(--delico-ink); font-size: 12px; line-height: 1.5; }
+.delico-strip .container { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; min-height: 36px; padding-block: 6px; text-align: center; }
+.delico-strip svg { color: var(--delico); }
+.delico-strip-cta { font-weight: 800; color: var(--delico-700); white-space: nowrap; text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1.5px; }
+.delico-strip:hover .delico-strip-cta { color: #8f3603; }
+
+.header-delico { min-height: 42px; padding: 9px 14px; font-size: 12.5px; border-radius: 10px; }
+
+/* Homepage advertisement panel. */
+.delico-section { padding-block: 30px 86px; }
+.delico-panel { display: grid; grid-template-columns: 1.05fr .95fr; gap: 40px; align-items: start; padding: 40px; background: linear-gradient(140deg, #fff8f2, #ffffff 62%); border: 1px solid var(--delico-line); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); }
+.delico-heading { margin-bottom: 24px; }
+.delico-heading h2 { color: var(--delico-ink); }
+.delico-heading .eyebrow { color: var(--delico-700); }
+.delico-heading .eyebrow > span:first-child:empty { background: var(--delico); opacity: 1; }
+.delico-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.delico-note { margin-top: 20px; padding: 12px 15px; background: #fdf6ef; border: 1px dashed var(--delico-line); border-radius: var(--radius-sm); font-size: 12.5px; line-height: 1.75; color: #8a5a35; }
+.delico-steps { display: grid; gap: 12px; }
+.delico-step { position: relative; display: flex; align-items: flex-start; gap: 14px; padding: 16px 18px; background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); }
+.delico-step-icon { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; flex: none; border-radius: 11px; background: var(--delico-soft); color: var(--delico); }
+.delico-step-index { position: absolute; top: 13px; right: 17px; font-size: 12px; font-weight: 800; letter-spacing: .6px; color: var(--delico-line); }
+.delico-step > div { display: grid; gap: 3px; padding-right: 26px; }
+.delico-step > div > strong { font-size: 14.5px; color: var(--green-dark); }
+.delico-step > div > span { font-size: 13px; line-height: 1.7; color: var(--muted); }
+.delico-step-footnote { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; padding: 13px 18px; background: var(--delico-soft); border: 1px solid var(--delico-line); border-radius: var(--radius); font-size: 13px; color: #8a5a35; }
+.delico-step-footnote a { font-weight: 800; color: var(--delico-700); text-decoration: underline; text-underline-offset: 4px; }
+.delico-step-footnote a:hover { color: #8f3603; }
+
+/* Footer advertisement — every page ends with it. */
+.footer-delico { display: flex; align-items: center; gap: 22px; padding: 24px 26px; margin-bottom: 6px; background: #ffffff0d; border: 1px solid #ffffff1f; border-radius: var(--radius); }
+.footer-delico-mark { display: flex; align-items: center; justify-content: center; width: 46px; height: 46px; flex: none; border-radius: 13px; background: var(--delico); color: #fff; }
+.footer-delico-copy { flex: 1; min-width: 0; }
+.footer-delico-copy h2 { font-size: 12px; letter-spacing: 1.4px; text-transform: uppercase; font-weight: 800; color: #ffb37a; margin-bottom: 7px; }
+html[lang='bn'] .footer-delico-copy h2 { letter-spacing: 0; text-transform: none; font-size: 13.5px; }
+.footer-delico-copy p { font-size: 12.5px; line-height: 1.8; color: #b0c1ad; max-width: 62ch; }
+.footer-delico-copy .footer-delico-tagline { margin-top: 5px; color: #dbe7d8; }
+.footer-delico-actions { display: flex; flex-wrap: wrap; gap: 10px; flex: none; }
+.footer-delico-actions .btn { min-height: 46px; font-size: 13px; }
+.footer-delico .btn-delico-outline { color: #ffd7bb; border-color: #ffffff3d; }
+.footer-delico .btn-delico-outline:hover { background: #ffffff14; border-color: #ffffff66; color: #fff; }
+
+@media (max-width: 1040px) {
+  /* The drawer button and the sitewide strip keep the app reachable on phones
+     without crowding the small-screen header. */
+  .header-delico { display: none; }
+  .delico-panel { grid-template-columns: 1fr; gap: 28px; padding: 30px; }
+  .footer-delico { flex-direction: column; align-items: stretch; gap: 18px; }
+  .footer-delico-actions .btn { flex: 1 1 200px; }
+}
+@media (max-width: 560px) {
+  .delico-section { padding-block: 14px 62px; }
+  .delico-panel { padding: 22px 18px; border-radius: var(--radius); }
+  .delico-actions .btn { width: 100%; }
+  .delico-step { padding: 14px; }
+  .delico-step > div { padding-right: 22px; }
+  .delico-strip { font-size: 11px; }
+  .delico-strip .container { min-height: 32px; gap: 6px; }
+}

@@ -1,14 +1,15 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
-import { ArrowRight, ArrowUp, ArrowUpRight, Bike, Clock3, Heart, MapPin, Menu, Phone, X } from 'lucide-react';
+import { ArrowRight, ArrowUp, ArrowUpRight, Bike, Clock3, Download, Heart, MapPin, Menu, Phone, UtensilsCrossed, X } from 'lucide-react';
 import { addressLines, shop } from '../config/shop';
 import { useLanguage } from '../i18n';
 import type { TranslationKey } from '../i18n';
-import { phoneHref, track } from '../lib/business';
+import { delicoHref, phoneHref, track } from '../lib/business';
 import { useShortlist } from '../shortlist';
-import { CallButton, DirectionsButton, Logo, ShareButton, WhatsAppButton } from './UI';
+import { CallButton, DelicoButton, DirectionsButton, Logo, ShareButton, WhatsAppButton } from './UI';
 import { ArrivalNotice, OfflineBanner, UpdateToast } from './AppStatus';
+import { DelicoStrip } from './DelicoSection';
 import { InstallHelpButton, InstallPrompt } from './Install';
 import { MotionExperience, useMotion } from './MotionExperience';
 
@@ -52,7 +53,7 @@ function MobileNavigation({ open, onClose }: { open: boolean; onClose: () => voi
     <div className="drawer-inner">
       <div className="drawer-top"><span className="drawer-label"><Bike size={23} aria-hidden="true" />{l(shop.name)}</span><button type="button" className="icon-button" onClick={onClose} aria-label={t('nav.close')} autoFocus><X size={23} /></button></div>
       <nav aria-label={t('nav.primary')} className="drawer-links">{navigation.map(item => <NavLink key={item.to} to={item.to} end={item.to === '/'} onClick={onClose}>{t(item.key)}<ArrowUpRight size={18} aria-hidden="true" /></NavLink>)}<NavLink to="/list" onClick={onClose}>{t('list.nav')}{count > 0 && <span className="drawer-count">{count}</span>}<ArrowUpRight size={18} aria-hidden="true" /></NavLink><NavLink to="/recommendation" onClick={onClose}>{t('nav.quiz')}<ArrowUpRight size={18} aria-hidden="true" /></NavLink><InstallHelpButton className="drawer-install" /></nav>
-      <div className="drawer-bottom"><LanguageSwitcher /><WhatsAppButton className="w-full" /><DirectionsButton variant="text" /><a href={phoneHref()} className="drawer-phone" onClick={() => track('phone_click')}><Phone size={16} aria-hidden="true" />{shop.contact.phoneDisplay}</a><p>{shop.hours.confirmed ? l(shop.hours.display) : t('common.hoursPending')}</p><ShareButton className="drawer-share" /></div>
+      <div className="drawer-bottom">{shop.delico.enabled && delicoHref() && <DelicoButton variant="delico" className="w-full drawer-delico" placement="mobile-drawer" />}<LanguageSwitcher /><WhatsAppButton className="w-full" /><DirectionsButton variant="text" /><a href={phoneHref()} className="drawer-phone" onClick={() => track('phone_click')}><Phone size={16} aria-hidden="true" />{shop.contact.phoneDisplay}</a><p>{shop.hours.confirmed ? l(shop.hours.display) : t('common.hoursPending')}</p><ShareButton className="drawer-share" /></div>
     </div>
   </dialog>;
 }
@@ -72,10 +73,11 @@ function Header() {
   return <>
     <a className="skip-link" href="#main-content">{t('nav.skip')}</a>
     {shop.announcement.enabled && <div className="announcement"><Link to="/cycles" className="container"><Bike size={14} aria-hidden="true" /><span>{l(shop.announcement.text)}</span><ArrowRight size={13} aria-hidden="true" /></Link></div>}
+    <DelicoStrip />
     <header className="site-header"><div className="container header-inner">
       <Logo light />
       <nav className="desktop-nav" aria-label={t('nav.primary')}>{navigation.map(item => <NavLink key={item.to} to={item.to} end={item.to === '/'}>{t(item.key)}</NavLink>)}</nav>
-      <div className="header-actions"><LanguageSwitcher /><ShortlistLink className="header-list-desktop" /><WhatsAppButton variant="small" className="header-whatsapp" placement="header"><span className="header-whatsapp-label">{t('action.whatsappShort')}</span></WhatsAppButton><button type="button" className="icon-button mobile-menu-button" aria-label={t('nav.open')} aria-expanded={open} aria-controls="mobile-navigation" onClick={() => setOpen(true)}><Menu size={23} /></button></div>
+      <div className="header-actions"><LanguageSwitcher /><ShortlistLink className="header-list-desktop" /><DelicoButton variant="delico" short className="header-delico" placement="header" /><WhatsAppButton variant="small" className="header-whatsapp" placement="header"><span className="header-whatsapp-label">{t('action.whatsappShort')}</span></WhatsAppButton><button type="button" className="icon-button mobile-menu-button" aria-label={t('nav.open')} aria-expanded={open} aria-controls="mobile-navigation" onClick={() => setOpen(true)}><Menu size={23} /></button></div>
     </div></header>
     <MobileNavigation open={open} onClose={() => setOpen(false)} />
   </>;
@@ -92,6 +94,30 @@ function MobileActionBar() {
     </NavLink>
   </nav>;
 }
+/**
+ * The footer advertisement for Delico. Every page ends with it, so the app is
+ * promoted sitewide rather than only from the homepage.
+ * Renders nothing when the promotion is switched off in config/shop.ts.
+ */
+function DelicoFooter() {
+  const { t, l } = useLanguage();
+  const href = delicoHref();
+  if (!shop.delico.enabled || !href) return null;
+  return <div className="footer-delico">
+    <span className="footer-delico-mark" aria-hidden="true"><UtensilsCrossed size={22} strokeWidth={1.6} /></span>
+    <div className="footer-delico-copy">
+      <h2>{t('delico.footerHeading')} — {shop.delico.name}</h2>
+      <p>{l(shop.delico.description)}</p>
+      <p className="footer-delico-tagline">{l(shop.delico.tagline)}</p>
+    </div>
+    <div className="footer-delico-actions">
+      <DelicoButton variant="delico" placement="footer" />
+      <a className="btn btn-delico-outline" href={shop.delico.playStoreUrl} target="_blank" rel="noopener noreferrer">
+        <Download size={17} aria-hidden="true" /><span>{t('delico.playStore')}</span>
+      </a>
+    </div>
+  </div>;
+}
 function Footer() {
   const { t, l, language } = useLanguage();
   const { enabled } = useMotion();
@@ -102,6 +128,7 @@ function Footer() {
       <div className="footer-contact"><h2>{t('footer.contact')}</h2><a href={phoneHref()} onClick={() => track('phone_click')}><Phone size={16} aria-hidden="true" />{shop.contact.phoneDisplay}</a><p><MapPin size={17} aria-hidden="true" /><span>{addressLines(language).join(', ')}</span></p><DirectionsButton variant="text" short />{shop.contact.email && <a href={`mailto:${shop.contact.email}`}>{shop.contact.email}</a>}</div>
       <div className="footer-hours"><h2>{t('common.hours')}</h2><p className={shop.hours.confirmed ? 'verified-hours' : 'unconfirmed-hours'}><Clock3 size={17} aria-hidden="true" />{l(shop.hours.display)}</p>{!shop.hours.confirmed && <p className="hours-caveat">{l(shop.hours.caveat)}</p>}<p className="footer-hours-note">{t('common.hoursPending')}</p><WhatsAppButton variant="text" placement="footer">{t('action.whatsappShort')}<ArrowUpRight size={15} aria-hidden="true" /></WhatsAppButton>{shop.socialLinks.length > 0 && <div className="footer-socials">{shop.socialLinks.filter(link => /^https:\/\//.test(link.url)).map(link => <a key={link.url} href={link.url} target="_blank" rel="noopener noreferrer">{link.label}<ArrowUpRight size={14} aria-hidden="true" /></a>)}</div>}</div>
     </div>
+    <DelicoFooter />
     <div className="footer-bottom"><p>© {new Date().getFullYear()} {l(shop.name)}. {t('footer.rights')}</p><div><Link to="/privacy">{t('footer.privacy')}</Link><Link to="/about#our-shop">{t('footer.shopInfo')}</Link><LanguageSwitcher /><InstallHelpButton className="footer-install" /><ShareButton label={t('share.action')} /><button type="button" onClick={() => window.scrollTo({ top: 0, behavior: enabled ? 'smooth' : 'instant' })} className="back-top" aria-label={t('footer.backTop')}><ArrowUp size={17} /></button></div></div>
   </div></footer>;
 }

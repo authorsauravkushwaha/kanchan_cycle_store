@@ -1,11 +1,11 @@
-import { ArrowRight, ArrowUpRight, Bike, Check, MapPin, MessageCircle, Phone, SearchX, Share2 } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Bike, Check, MapPin, MessageCircle, Phone, SearchX, Share2, UtensilsCrossed } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { shop } from '../config/shop';
 import { useLanguage } from '../i18n';
-import { phoneHref, track, whatsappHref } from '../lib/business';
+import { delicoHref, phoneHref, track, whatsappHref } from '../lib/business';
 import type { AnalyticsEvent } from '../lib/business';
 
 export function WhatsAppButton({ message, children, variant = 'primary', className = '', placement = 'general', event = 'whatsapp_click', productId, serviceId }: {
@@ -32,6 +32,31 @@ export function CallButton({ variant = 'secondary', short = false }: { variant?:
   const { t } = useLanguage();
   return <a className={`btn btn-${variant}`} href={phoneHref()} onClick={() => track('phone_click')}><Phone size={18} aria-hidden="true" />{short ? t('action.callShort') : t('action.call')}</a>;
 }
+/**
+ * Promotes Delico, the Kolaghat food-delivery app, and links to
+ * https://delicoapp.com/. Always an external link opened in a new tab so a
+ * customer never loses their place on the shop's own website.
+ *
+ * Renders nothing when the owner switches the promotion off in config/shop.ts,
+ * or when the configured link is not a usable HTTPS address — a button that
+ * leads nowhere is worse than no button.
+ */
+export function DelicoButton({ variant = 'primary', short = false, tiny = false, className = '', placement = 'general', children, icon = true }: {
+  variant?: 'primary' | 'secondary' | 'yellow' | 'text' | 'small' | 'delico'; short?: boolean; tiny?: boolean;
+  className?: string; placement?: string; children?: ReactNode; icon?: boolean;
+}) {
+  const { t } = useLanguage();
+  const href = delicoHref();
+  if (!shop.delico.enabled || !href) return null;
+  const label = children || t(tiny ? 'delico.buttonTiny' : short ? 'delico.buttonShort' : 'delico.button');
+  return <a className={`btn btn-${variant} btn-delico ${className}`} href={href} target="_blank" rel="noopener noreferrer" onClick={() => track('delico_click', { placement })}>
+    {icon && <UtensilsCrossed size={18} aria-hidden="true" />}
+    <span>{label}</span>
+    <ArrowUpRight className="btn-end-icon" size={16} aria-hidden="true" />
+    <span className="sr-only"> ({t('delico.opensExternal')})</span>
+  </a>;
+}
+
 export function TextLink({ to, children, className = '' }: { to: string; children: ReactNode; className?: string }) {
   return <Link to={to} className={`text-link ${className}`}>{children}<ArrowRight size={18} aria-hidden="true" /></Link>;
 }

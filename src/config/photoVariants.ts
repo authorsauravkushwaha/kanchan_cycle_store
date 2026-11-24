@@ -27,7 +27,22 @@ export const photoSrcSets: Record<string, string> = {
   "/images/cycles/cycle-21.webp": "/images/cycles/cycle-21-400.webp 400w, /images/cycles/cycle-21-800.webp 800w, /images/cycles/cycle-21.webp 1200w",
   "/images/cycles/cycle-22.webp": "/images/cycles/cycle-22-400.webp 400w, /images/cycles/cycle-22-800.webp 800w, /images/cycles/cycle-22.webp 1200w",
   "/images/cycles/cycle-23.webp": "/images/cycles/cycle-23-400.webp 400w, /images/cycles/cycle-23-800.webp 800w, /images/cycles/cycle-23.webp 1288w",
-  "/images/cycles/cycle-24.jpg": "/images/cycles/cycle-24-400.jpg 400w, /images/cycles/cycle-24-800.jpg 800w, /images/cycles/cycle-24.jpg 900w"
+  "/images/cycles/cycle-24.jpg": "/images/cycles/cycle-24-400.jpg 400w, /images/cycles/cycle-24-800.jpg 800w, /images/cycles/cycle-24.jpg 900w",
+  "/images/cycles/cycle-25.webp": "/images/cycles/cycle-25-400.webp 400w, /images/cycles/cycle-25-800.webp 800w, /images/cycles/cycle-25.webp 1200w",
+  "/images/cycles/cycle-26.webp": "/images/cycles/cycle-26-400.webp 400w, /images/cycles/cycle-26-800.webp 800w, /images/cycles/cycle-26.webp 1200w",
+  "/images/cycles/cycle-27.webp": "/images/cycles/cycle-27-400.webp 400w, /images/cycles/cycle-27-800.webp 800w, /images/cycles/cycle-27.webp 1200w",
+  "/images/cycles/cycle-28.webp": "/images/cycles/cycle-28-400.webp 400w, /images/cycles/cycle-28-800.webp 800w, /images/cycles/cycle-28.webp 1200w",
+  "/images/cycles/cycle-29.webp": "/images/cycles/cycle-29-400.webp 400w, /images/cycles/cycle-29-800.webp 800w, /images/cycles/cycle-29.webp 1200w",
+  "/images/cycles/cycle-30.webp": "/images/cycles/cycle-30-400.webp 400w, /images/cycles/cycle-30-800.webp 800w, /images/cycles/cycle-30.webp 1200w",
+  "/images/cycles/cycle-31.webp": "/images/cycles/cycle-31-400.webp 400w, /images/cycles/cycle-31-800.webp 800w, /images/cycles/cycle-31.webp 1200w",
+  "/images/cycles/cycle-32.webp": "/images/cycles/cycle-32-400.webp 400w, /images/cycles/cycle-32-800.webp 800w, /images/cycles/cycle-32.webp 1200w",
+  "/images/cycles/cycle-33.webp": "/images/cycles/cycle-33-400.webp 400w, /images/cycles/cycle-33-800.webp 800w, /images/cycles/cycle-33.webp 1200w",
+  "/images/cycles/cycle-34.webp": "/images/cycles/cycle-34-400.webp 400w, /images/cycles/cycle-34-800.webp 800w, /images/cycles/cycle-34.webp 1200w",
+  "/images/cycles/cycle-35.webp": "/images/cycles/cycle-35-400.webp 400w, /images/cycles/cycle-35-800.webp 800w, /images/cycles/cycle-35.webp 1200w",
+  "/images/cycles/cycle-36.webp": "/images/cycles/cycle-36-400.webp 400w, /images/cycles/cycle-36-800.webp 800w, /images/cycles/cycle-36.webp 1200w",
+  "/images/cycles/cycle-37.webp": "/images/cycles/cycle-37-400.webp 400w, /images/cycles/cycle-37-800.webp 800w, /images/cycles/cycle-37.webp 1200w",
+  "/images/cycles/cycle-38.webp": "/images/cycles/cycle-38-400.webp 400w, /images/cycles/cycle-38-800.webp 800w, /images/cycles/cycle-38.webp 1200w",
+  "/images/cycles/cycle-39.webp": "/images/cycles/cycle-39-400.webp 400w, /images/cycles/cycle-39-800.webp 800w, /images/cycles/cycle-39.webp 1200w"
 };
 
 /** The `srcset` for a catalogue photograph, or undefined for remote images. */

@@ -21,6 +21,10 @@ decals, basket, carrier, backrest and training wheels stay as they appear in the
 supplied picture — and each cycle has its own picture; none is shared between two
 products.
 
+A one-page review sheet of the fifteen new pictures is kept at
+`docs/new-cycles-review.jpg` so the owner can check each cycle against the
+counter.
+
 These pictures are AI-cleaned renders, not photographs taken in the shop. They
 are labelled `photoKind: 'catalogue'` on the website, so each product page tells
 the customer it is a catalogue picture rather than the exact bicycle standing on

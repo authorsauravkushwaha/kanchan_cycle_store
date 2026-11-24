@@ -345,7 +345,7 @@ test('supplied images load and pages do not produce application errors', async (
       expect(photographs.every(photo => photo.startsWith('/images/'))).toBe(true);
     }
     else if (path === '/cycles') {
-      expect(photographs).toHaveLength(22);
+      expect(photographs).toHaveLength(32);
       expect(photographs.every(photo => photo.startsWith('/images/cycles/'))).toBe(true);
     } else if (path === '/about') {
       // The About page shows the real shop gallery.
@@ -363,10 +363,10 @@ test('supplied images load and pages do not produce application errors', async (
   await page.locator('h1').waitFor();
   await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
   await expect.poll(async () => page.evaluate(() => Array.from(document.images)
-    .filter(img => (img.currentSrc || img.src).includes('-400.')).length), { timeout: 20000 }).toBe(22);
+    .filter(img => (img.currentSrc || img.src).includes('-400.')).length), { timeout: 20000 }).toBe(32);
   const mobilePhotos = await page.evaluate(() => Array.from(document.images)
     .map(img => new URL(img.currentSrc || img.src, location.origin).pathname));
-  expect(mobilePhotos).toHaveLength(22);
+  expect(mobilePhotos).toHaveLength(32);
   expect(mobilePhotos.every(photo => /-400\./.test(photo)), mobilePhotos.join(', ')).toBe(true);
 });
 

@@ -117,10 +117,13 @@ the short list that only the owner can close.
 
 ## Catalogue and unconfirmed information
 
-The catalogue lists 22 cycles and uses all 24 photographs supplied by the shop,
-including the Hercules Top Gear Defender FX DD and Tata Stryder Harris-X IC DD
-premium models. Nineteen cycles show the brand's catalogue picture and three show
-your own shop photographs; every product page says which one it is. Prices and
+The catalogue lists 32 cycles: the 22 earlier models plus 10 Gang and shop
+children's and city cycles added from the owner's November 2026 pictures (Lil
+Fairy in three colours, Four BMX in two colours, Vroom 20, Minnie, Tiana, Alice
+and a teal floral city cycle). Twenty-nine cycles show a catalogue picture and
+three show your own shop photographs; every product page says which one it is.
+The ten new pictures are cleaned studio renders prepared from the owner's photos
+and the brand's posters — see `PHOTO_CREDITS.md`. Prices and
 availability are not guessed, and the supplied specifications are shown in each
 product description. The shop can confirm current details directly.
 

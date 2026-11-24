@@ -18,7 +18,7 @@ All routine settings live in **`src/config/shop.ts`**. Do not publish a detail m
 |---|---|---|
 | Opening hours | Supplied 9 AM–9 PM daily is recorded, **not shown publicly** | Confirm the interpretation, then set `hours.confirmed: true`. Update days/times/display text if different. |
 | WhatsApp ownership | Links use the supplied number | Send a real test enquiry and confirm the shop receives it. No message was sent during development. |
-| Bicycle catalog | 22 cycles, **no price and no stock status confirmed yet**. Every cycle says "ask the shop". | Add verified names, brands, specifications, prices and stock. This is the single biggest reason a customer leaves the site. |
+| Bicycle catalog | 32 cycles, **no price and no stock status confirmed yet**. Every cycle says "ask the shop". | Add verified names, brands, specifications, prices and stock. This is the single biggest reason a customer leaves the site. |
 | Cycle photographs | 24 photographs across 22 cycles. 19 cycles show the brand's catalogue picture and 3 cycles show your own shop photographs (the Brooks ride-on, the Hercules Defender and the electric cycle). Each product page says which one it is. | Walk the shop once with the photo list below and check every model against its picture. |
 | Repair services | Six possible topics, all marked as requiring availability confirmation | Set `confirmed: true` only for services actually offered. Add a price only when verified. |
 | Shop photographs | The homepage hero is the team photograph `kanchan-team-hero.jpeg` (two shop workers, captioned "কাঞ্চন সাইকেল স্টোর্স, কোলাঘাট"). Six real photographs of the shop — storefront, showroom, display, corner, children's cycles, workshop — are on the About page. | Check the hero crop on a desktop, a tablet, a portrait phone and a phone held sideways. Check that the About gallery captions match what each picture really shows. Replace any picture that misleads. |
@@ -78,8 +78,18 @@ cycle that is in the shop.
 | `cycle-22.webp` | টাটা স্ট্রাইডার Harris-X IC DD (২য় ছবি) | shop | Second view — a green bike in the shop. Confirm it is this model. |
 | `cycle-23.webp` | টাটা স্ট্রাইডার Harris-X IC DD | catalogue | |
 | `cycle-24.jpg` | স্ট্রাইডার ইলেকট্রিক সাইকেল | shop | Your own photograph of the electric cycle. |
+| `cycle-25.webp` | গ্যাং লিল ফেয়ারি (গোলাপি) | catalogue | Studio render from your Gang poster. Confirm it is in stock. |
+| `cycle-26.webp` | গ্যাং লিল ফেয়ারি (নীল) | catalogue | Studio render from your Gang poster. |
+| `cycle-27.webp` | গ্যাং লিল ফেয়ারি (বেগুনি) | catalogue | Studio render from your Gang poster. |
+| `cycle-28.webp` | গ্যাং ফোর বিএমএক্স (সায়ান) | catalogue | Studio render from your Gang poster. |
+| `cycle-29.webp` | গ্যাং ফোর বিএমএক্স (লাল) | catalogue | Studio render from your Gang poster. |
+| `cycle-30.webp` | গ্যাং ভ্রুম ২০ | catalogue | Studio render from your Gang poster. |
+| `cycle-31.webp` | মিন্নি শিশুদের সাইকেল | catalogue | Studio render of the pink Minnie cycle photographed in the shop. |
+| `cycle-32.webp` | গ্যাং টিয়ানা | catalogue | Studio render from your Gang poster. |
+| `cycle-33.webp` | গ্যাং অ্যালিস | catalogue | Studio render from your Gang poster. |
+| `cycle-34.webp` | গ্যাং ফুলের নকশার সিটি সাইকেল (টিল) | catalogue | Studio render from your Gang poster. The model's name is not printed on the frame — please confirm it. |
 
-All 24 supplied photographs are used. Two of them are extra views in the product galleries:
+All 34 catalogue photographs are used; none is shared between two products. Two of the earlier pictures are extra views in the product galleries:
 `cycle-21.webp` is the second picture of the **Hercules Top Gear Defender FX DD**, and `cycle-22.webp` is the
 second picture of the **Tata Stryder Harris-X IC DD**. Check both as well.
 

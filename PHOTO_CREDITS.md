@@ -9,7 +9,7 @@ to WebP for faster loading.
 The Stryder electric cycle photograph (`cycle-24.jpg`) is taken from the
 supplier's listing shared by the owner; it is not a shop photograph.
 
-## Studio renders added in November 2026 (`cycle-25`–`cycle-34`)
+## Studio renders added in November 2026 (`cycle-25`–`cycle-39`)
 
 The owner supplied more cycle pictures: photographs taken on the shop floor and
 render-style posters published by the Gang brand (SK Bikes). For each of those

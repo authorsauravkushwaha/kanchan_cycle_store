@@ -18,7 +18,7 @@ describe('contact configuration', () => {
   });
   it('keeps unconfirmed hours, prices, inventory, offers and reviews unpublished', () => {
     expect(shop.hours.confirmed).toBe(false);
-    expect(shop.catalog).toHaveLength(32);
+    expect(shop.catalog).toHaveLength(37);
     expect(shop.catalog.every(product => product.price === null && product.availability === null)).toBe(true);
     expect(validateCatalog(shop.catalog, shop.categories.map(c => c.id))).toEqual([]);
     expect(shop.offers).toEqual([]);
@@ -46,8 +46,8 @@ describe('contact configuration', () => {
     expect(productPhotos(harris)).toEqual(['/images/cycles/cycle-23.webp', '/images/cycles/cycle-22.webp']);
     // Every catalogue photograph belongs to exactly one bicycle record.
     const allPhotos = shop.catalog.flatMap(product => productPhotos(product));
-    expect(allPhotos).toHaveLength(34);
-    expect(new Set(allPhotos).size).toBe(34);
+    expect(allPhotos).toHaveLength(39);
+    expect(new Set(allPhotos).size).toBe(39);
   });
   it('uses the exact supplied coordinates and postal address', () => {
     expect(shop.coordinates).toEqual({ latitude: 22.4452382, longitude: 87.8751764 });

@@ -37,7 +37,12 @@ export const photoSrcSets: Record<string, string> = {
   "/images/cycles/cycle-31.webp": "/images/cycles/cycle-31-400.webp 400w, /images/cycles/cycle-31-800.webp 800w, /images/cycles/cycle-31.webp 1200w",
   "/images/cycles/cycle-32.webp": "/images/cycles/cycle-32-400.webp 400w, /images/cycles/cycle-32-800.webp 800w, /images/cycles/cycle-32.webp 1200w",
   "/images/cycles/cycle-33.webp": "/images/cycles/cycle-33-400.webp 400w, /images/cycles/cycle-33-800.webp 800w, /images/cycles/cycle-33.webp 1200w",
-  "/images/cycles/cycle-34.webp": "/images/cycles/cycle-34-400.webp 400w, /images/cycles/cycle-34-800.webp 800w, /images/cycles/cycle-34.webp 1200w"
+  "/images/cycles/cycle-34.webp": "/images/cycles/cycle-34-400.webp 400w, /images/cycles/cycle-34-800.webp 800w, /images/cycles/cycle-34.webp 1200w",
+  "/images/cycles/cycle-35.webp": "/images/cycles/cycle-35-400.webp 400w, /images/cycles/cycle-35-800.webp 800w, /images/cycles/cycle-35.webp 1200w",
+  "/images/cycles/cycle-36.webp": "/images/cycles/cycle-36-400.webp 400w, /images/cycles/cycle-36-800.webp 800w, /images/cycles/cycle-36.webp 1200w",
+  "/images/cycles/cycle-37.webp": "/images/cycles/cycle-37-400.webp 400w, /images/cycles/cycle-37-800.webp 800w, /images/cycles/cycle-37.webp 1200w",
+  "/images/cycles/cycle-38.webp": "/images/cycles/cycle-38-400.webp 400w, /images/cycles/cycle-38-800.webp 800w, /images/cycles/cycle-38.webp 1200w",
+  "/images/cycles/cycle-39.webp": "/images/cycles/cycle-39-400.webp 400w, /images/cycles/cycle-39-800.webp 800w, /images/cycles/cycle-39.webp 1200w"
 };
 
 /** The `srcset` for a catalogue photograph, or undefined for remote images. */

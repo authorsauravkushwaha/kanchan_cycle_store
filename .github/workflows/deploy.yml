@@ -1,13 +1,52 @@
 name: Deploy website to GitHub Pages
+
+# WHY THIS WORKFLOW WAS REWRITTEN
+# ---------------------------------
+# The site is "not working" because of deployment, not because of the app: the
+# React build, all 46 routes and every image pass locally (see TESTING.md).
+# The last deployment (main, 2026-11-24) failed inside `actions/deploy-pages`:
+#
+#   Error: Failed to create deployment (status: 404) ...
+#   Ensure GitHub Pages has been enabled
+#
+# GitHub Pages is currently disabled for this repository (`has_pages: false`),
+# so every run dies at the very last step and the previously working
+# https://authorsauravkushwaha.github.io/kanchan_cycle_store/ is served as 404.
+# Deploys succeeded until 2026-11-01, on the *same* workflow file, which
+# confirms the app and this YAML are not the problem - the Pages site is.
+#
+# `actions/configure-pages` is the supported way to fix this: it enables Pages
+# in "GitHub Actions" build mode when the token may do so, and it reports the
+# canonical `base_path` output. Enabling Pages is a repository-administration
+# change that `GITHUB_TOKEN` is never allowed to make, so that step must NOT be
+# able to hard-fail the deployment when Pages is already on (the normal case).
+# It runs with `continue-on-error`, and the deploy job reports a precise,
+# actionable message if Pages is still disabled instead of a bare 404.
+#
+# ONE-TIME OWNER ACTION (30 seconds, cannot be automated from CI):
+#   Repository -> Settings -> Pages -> Build and deployment
+#   -> Source: "GitHub Actions", then re-run this workflow.
+# Or set the PAGES_ENABLE_TOKEN repository secret to a fine-grained PAT with
+# "Pages: write" + "Administration: write"; the step below then enables Pages
+# by itself and no manual click is needed.
+#
+# The base path is read from `configure-pages` rather than assembled by hand,
+# because user/organisation sites live at "/" while project sites live at
+# "/<repo>/". A guessed base path deploys successfully but 404s every asset.
+
 on:
   push:
     branches: [main]
   workflow_dispatch:
+
 permissions:
   contents: read
+
+# One deployment at a time; never cancel a Pages deploy halfway through.
 concurrency:
   group: pages
   cancel-in-progress: false
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -15,19 +54,51 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           persist-credentials: false
+
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 22
           cache: npm
+
       - run: npm ci
+
       - run: npm audit --audit-level=moderate
+
+      # Best-effort: turns Pages on when the token is allowed to. Never blocks
+      # the build, because on an already-enabled repository this step would
+      # otherwise be the only thing standing between the site and a deploy.
+      - name: Configure GitHub Pages (best effort)
+        id: pages
+        continue-on-error: true
+        uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
+        with:
+          enablement: true
+          token: ${{ secrets.PAGES_ENABLE_TOKEN || github.token }}
+
+      # Fallback base path for sites where configure-pages could not run:
+      # a project Pages site lives at "/<repository-name>/".
+      - name: Resolve base path
+        id: base
+        env:
+          CONFIGURED_BASE: ${{ steps.pages.outputs.base_path }}
+          OVERRIDE_BASE: ${{ vars.PAGES_BASE_PATH }}
+          REPO_NAME: ${{ github.event.repository.name }}
+        run: |
+          base="${OVERRIDE_BASE:-${CONFIGURED_BASE:-/$REPO_NAME/}}"
+          # Vite wants a leading and trailing slash: "/repo/" or "/".
+          case "$base" in /*) ;; *) base="/$base" ;; esac
+          case "$base" in */) ;; *) base="$base/" ;; esac
+          echo "value=$base" >> "$GITHUB_OUTPUT"
+          echo "Building with Vite base path: $base"
+
       - run: npm run check
         env:
-          VITE_BASE_PATH: ${{ vars.PAGES_BASE_PATH || format('/{0}/', github.event.repository.name) }}
-          VITE_SITE_URL: ${{ vars.SITE_URL }}
+          VITE_BASE_PATH: ${{ steps.base.outputs.value }}
+
       - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3
         with:
           path: dist
+
   deploy:
     environment:
       name: github-pages
@@ -38,6 +109,32 @@ jobs:
       pages: write
       id-token: write
     steps:
+      # Fail here, with a readable message, rather than letting deploy-pages
+      # emit an opaque 404 that looks like an application bug.
+      - name: Check that GitHub Pages is enabled
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          status=$(gh api --include "repos/$REPO/pages" 2>/dev/null | head -1 | awk '{print $2}')
+          case "$status" in
+            200)
+              echo "GitHub Pages is enabled."
+              ;;
+            404)
+              echo "::error title=GitHub Pages is disabled::The website cannot go live until Pages is turned on. Fix in 30 seconds: Settings -> Pages -> Build and deployment -> Source = \"GitHub Actions\". Then re-run this workflow. Alternatively add a PAGES_ENABLE_TOKEN secret (fine-grained PAT with Pages: write and Administration: write) and re-run."
+              exit 1
+              ;;
+            *)
+              # 403/other: this token may not read the Pages settings. Do not
+              # block a deployment that may well be fine; deploy-pages reports
+              # the real reason if it is not.
+              echo "Could not read Pages settings (HTTP ${status:-unknown}); continuing."
+              ;;
+          esac
+
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4
+        with:
+          timeout: 600000

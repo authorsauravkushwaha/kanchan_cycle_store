@@ -69,14 +69,17 @@ export function PwaProvider({ children }: { children: ReactNode }) {
     window.addEventListener('appinstalled', onInstalled);
     window.addEventListener('online', goOnline);
     window.addEventListener('offline', goOffline);
-    const media = window.matchMedia('(display-mode: standalone)');
-    media.addEventListener?.('change', onDisplayMode);
+    // `matchMedia` is missing in some embedded/legacy webviews and in test
+    // environments. Throw there and this effect aborts the mount, which
+    // blanks the whole page - so treat it as an optional API.
+    const media = typeof window.matchMedia === 'function' ? window.matchMedia('(display-mode: standalone)') : null;
+    media?.addEventListener?.('change', onDisplayMode);
     return () => {
       window.removeEventListener('beforeinstallprompt', onPrompt);
       window.removeEventListener('appinstalled', onInstalled);
       window.removeEventListener('online', goOnline);
       window.removeEventListener('offline', goOffline);
-      media.removeEventListener?.('change', onDisplayMode);
+      media?.removeEventListener?.('change', onDisplayMode);
     };
   }, []);
 

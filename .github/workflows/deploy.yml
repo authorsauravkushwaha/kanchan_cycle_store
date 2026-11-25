@@ -121,15 +121,11 @@ jobs:
             200)
               echo "GitHub Pages is enabled."
               ;;
-            404)
-              echo "::error title=GitHub Pages is disabled::The website cannot go live until Pages is turned on. Fix in 30 seconds: Settings -> Pages -> Build and deployment -> Source = \"GitHub Actions\". Then re-run this workflow. Alternatively add a PAGES_ENABLE_TOKEN secret (fine-grained PAT with Pages: write and Administration: write) and re-run."
-              exit 1
-              ;;
-            *)
-              # 403/other: this token may not read the Pages settings. Do not
-              # block a deployment that may well be fine; deploy-pages reports
-              # the real reason if it is not.
-              echo "Could not read Pages settings (HTTP ${status:-unknown}); continuing."
+            404|403|*)
+              # GITHUB_TOKEN can sometimes not read Pages settings even when
+              # Pages is enabled. Do not block a deployment that may be fine;
+              # actions/deploy-pages will report the real reason if it is not.
+              echo "Could not confirm Pages settings (HTTP ${status:-unknown}); continuing to deploy-pages."
               ;;
           esac
 

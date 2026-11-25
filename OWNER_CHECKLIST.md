@@ -31,6 +31,26 @@ All routine settings live in **`src/config/shop.ts`**. Do not publish a detail m
 | Analytics | No endpoint, no tracking requests | Optional: configure a privacy-appropriate HTTPS endpoint and update the privacy policy before collecting consent. |
 | Announcement | Generic contact invitation, no offer claim | Edit the bilingual text or set `announcement.enabled: false`. |
 
+## Putting the website online (one-time, 30 seconds)
+
+The site is published by the **Deploy website to GitHub Pages** workflow. It
+builds, tests and uploads the site on every push to `main`. One repository
+setting is still needed before the public address works:
+
+1. Open **Settings → Pages**.
+2. Under **Build and deployment → Source**, choose **GitHub Actions**.
+3. Re-run **Actions → Deploy website to GitHub Pages → Run workflow**.
+
+The address is <https://authorsauravkushwaha.github.io/kanchan_cycle_store/>.
+Until that source is set, the deployment job stops with a message saying Pages
+is disabled, because GitHub refuses to publish a Pages site that has not been
+switched on. This cannot be done from the build itself: turning Pages on is a
+repository-administration change that the workflow's built-in token is not
+allowed to make. If you would rather not click it, add a repository secret
+named `PAGES_ENABLE_TOKEN` holding a fine-grained personal access token with
+**Pages: write** and **Administration: write**; the workflow then enables Pages
+by itself.
+
 ## The launch blockers — in the order they cost you customers
 
 The full list of 100 findings, with evidence and what was fixed, is in
@@ -158,7 +178,7 @@ leaves an empty hole in the grid.
 4. Test WhatsApp, phone and Google Maps using the shop’s actual devices. **Do not send test messages to customers.**
 5. Confirm that no fictional products, offers, reviews, social links or business claims appear.
 6. Walk the shop with the **photo review table** above and fix the `cycle-05` mismatch.
-7. Deploy a preview, verify every route after refresh, then configure the final domain.
+7. Set **Settings → Pages → Source = GitHub Actions**, deploy, verify every route after refresh, then configure the final domain (see "Putting the website online" above).
 8. Enable indexing and rebuild; check `/robots.txt`, `/sitemap.xml`, canonical URLs and structured data.
 9. Add the published URL to the genuine Google Business Profile.
 10. Keep stock, prices, hours and offers up to date. Unknown information should go back to `null`, not a guessed value.

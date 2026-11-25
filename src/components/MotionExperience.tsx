@@ -178,7 +178,10 @@ export function MotionExperience() {
   }, [pathname, enabled]);
 
   useEffect(() => {
-    if (!enabled || !matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+    // Optional API: without it the tilt effect is simply unavailable, rather
+    // than throwing inside the effect and blanking the page.
+    const finePointer = typeof matchMedia === 'function' && matchMedia('(hover: hover) and (pointer: fine)').matches;
+    if (!enabled || !finePointer) return;
     const main = document.getElementById('main-content');
     if (!main) return;
     let active: HTMLElement | null = null;

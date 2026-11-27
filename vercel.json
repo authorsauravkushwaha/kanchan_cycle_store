@@ -4,7 +4,7 @@
   "framework": "vite",
   "rewrites": [
     {
-      "source": "/((?!images/|assets/|icons/|favicon\\.svg$|robots\\.txt$|sitemap\\.xml$|route-restore\\.js$|pages-redirect\\.js$|404\\.html$|sw\\.js$|manifest\\.webmanifest$|offline\\.html$|offline\\.css$|_headers$|\\.well-known/).*)",
+      "source": "/((?!images/|assets/|icons/|video/|favicon\\.svg$|robots\\.txt$|sitemap\\.xml$|route-restore\\.js$|pages-redirect\\.js$|404\\.html$|sw\\.js$|manifest\\.webmanifest$|offline\\.html$|offline\\.css$|_headers$|\\.well-known/).*)",
       "destination": "/index.html"
     }
   ],

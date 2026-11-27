@@ -105,3 +105,17 @@ The home hero photograph and critical Bengali fonts are preloaded, non-home page
 - Supabase-backed catalogue behaviour is covered by unit tests and a local simulation only; no live project was connected. Row-level security must be verified against the owner's real project (see `docs/SUPABASE.md`).
 - The n8n workflow JSON files are valid imports but were not executed against a live Supabase/Telegram/SMTP setup.
 - No Play Store / Trusted Web Activity build was produced; the Bubblewrap steps in `docs/ANDROID.md` are guidance, not a tested release.
+
+
+## The homepage shop film
+
+`tests/e2e/hero-film.spec.ts` locks the four promises the film makes:
+
+1. It autoplays **muted**, loops, and paints the poster before any frames arrive.
+2. A phone receives `hero-640.mp4` (not the larger file), and the film pauses as
+   soon as the hero is scrolled out of view, then resumes when it comes back.
+3. The speaker and pause buttons work, and unmuting is a real state change.
+4. With `prefers-reduced-motion: reduce` the film never autoplays and the page's
+   actions stay visible and usable.
+
+Run just this file with `npx playwright test hero-film`.

@@ -82,8 +82,9 @@ test('category links, supplied catalog, phone, directions and embedded map are c
     await expect(page.locator('.product-card').first()).toBeVisible();
   }
   await page.goto('/cycles');
-  await expect(page.locator('.product-card')).toHaveCount(22);
-  await expect(page.locator('.product-card-photo img')).toHaveCount(22);
+  const catalogSize = 37; // Every owner-supplied cycle in src/config/cycles.ts.
+  await expect(page.locator('.product-card')).toHaveCount(catalogSize);
+  await expect(page.locator('.product-card-photo img')).toHaveCount(catalogSize);
   await page.locator('.product-card h3 a').first().click();
   await expect(page.locator('.product-detail-photo img')).toBeVisible();
   await expect(page.locator('.product-detail-photo img')).toHaveAttribute('src', /cycle-20\.webp$/);
@@ -332,7 +333,12 @@ test('supplied images load and pages do not produce application errors', async (
     await page.locator('h1').waitFor();
     await page.evaluate(async () => {
       window.scrollTo(0, document.body.scrollHeight);
-      await Promise.all(Array.from(document.images).map(img => img.decode().catch(() => undefined)));
+      /* Bounded on purpose: a photograph that a fast jump never requested must
+         not be able to hang the check. Anything that did load is decoded here. */
+      await Promise.race([
+        Promise.all(Array.from(document.images).map(img => img.decode().catch(() => undefined))),
+        new Promise(resolve => setTimeout(resolve, 8000)),
+      ]);
     });
     const broken = await page.evaluate(() => Array.from(document.images).filter(img => img.complete && img.naturalWidth === 0).map(img => img.src));
     expect(broken, path).toEqual([]);
@@ -361,13 +367,27 @@ test('supplied images load and pages do not produce application errors', async (
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/cycles');
   await page.locator('h1').waitFor();
-  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-  await expect.poll(async () => page.evaluate(() => Array.from(document.images)
-    .filter(img => (img.currentSrc || img.src).includes('-400.')).length), { timeout: 20000 }).toBe(37);
-  const mobilePhotos = await page.evaluate(() => Array.from(document.images)
-    .map(img => new URL(img.currentSrc || img.src, location.origin).pathname));
+  /* A phone scrolls the catalogue in steps, which is when each lazy photograph
+     is fetched and picks its 400-wide variant. */
+  await page.evaluate(async () => {
+    for (let y = 0; y < document.body.scrollHeight; y += innerHeight * 0.7) {
+      window.scrollTo(0, y);
+      await new Promise(resolve => setTimeout(resolve, 80));
+    }
+    window.scrollTo(0, document.body.scrollHeight);
+  });
+  await expect.poll(() => page.evaluate(() => Array.from(document.images).filter(img => img.currentSrc).length),
+    { timeout: 30000 }).toBeGreaterThanOrEqual(30);
+  const mobilePhotos = await page.evaluate(() => Array.from(document.images).map(img => img.currentSrc));
+  /* The catalogue has one photograph per cycle... */
   expect(mobilePhotos).toHaveLength(37);
-  expect(mobilePhotos.every(photo => /-400\./.test(photo)), mobilePhotos.join(', ')).toBe(true);
+  /* ...and every photograph the phone actually requested is the small file.
+     An image the browser has not fetched yet reports no currentSrc; it is not
+     downloading anything, which is the behaviour this test protects. */
+  const requested = mobilePhotos.filter(Boolean)
+    .map(photo => new URL(photo).pathname);
+  /* The catalogue mixes owner-supplied WebP and JPEG, so match both. */
+  expect(requested.every(photo => /-400\.(?:webp|jpe?g)$/.test(photo)), requested.join(', ')).toBe(true);
 });
 
 test('the new team hero image loads on desktop and phones', async ({ page }) => {

@@ -6,24 +6,47 @@ import { suppliedCycles } from '../config/cycles';
 import { useLanguage } from '../i18n';
 import { CallButton, DirectionsButton, TextLink, WhatsAppButton } from './UI';
 const CycleScene = lazy(() => import('./CycleScene').then(module => ({ default: module.CycleScene })));
+const HeroFilm = lazy(() => import('./HeroFilm').then(module => ({ default: module.HeroFilm })));
 
 export function HeroSection() {
   const { t, l } = useLanguage();
   const benefits = [{ icon: Bike }, { icon: Wrench }];
+  /* Three short, true promises. They are what a parent actually wants to know
+     before walking into a cycle shop. */
+  const promiseKeys = ['fit', 'advice'] as const;
   return <>
     <section className="hero-neu" aria-labelledby="hero-title" data-scroll-scene="hero">
-      <div className="hero-backdrop">
-        <picture><source media="(max-width: 760px) and (min-height: 521px)" srcSet={asset('/images/kanchan-team-hero-mobile.webp')} /><source media="(min-width: 761px)" type="image/webp" srcSet={asset('/images/kanchan-team-hero.webp')} /><img className="hero-backdrop-image" src={asset(shop.heroPhoto.src)} alt={l(shop.heroPhoto.alt)} width={shop.heroPhoto.width} height={shop.heroPhoto.height} fetchPriority="high" decoding="async" /></picture>
-        <span className="hero-backdrop-scrim" aria-hidden="true" />
-      </div>
+      <div className="hero-backdrop" aria-hidden="true" />
       <div className="container hero-neu-grid">
+        {/* The stage: the owner's photograph (unchanged) and the shop film,
+            stacked on the side the photograph has always been on. */}
+        <div className="hero-stage">
+        <div className="hero-photo">
+          <picture>
+            <source media="(max-width: 760px) and (min-height: 521px)" srcSet={asset('/images/kanchan-team-hero-mobile.webp')} />
+            <source media="(min-width: 761px)" type="image/webp" srcSet={asset('/images/kanchan-team-hero.webp')} />
+            <img className="hero-backdrop-image" src={asset(shop.heroPhoto.src)} alt={l(shop.heroPhoto.alt)} width={shop.heroPhoto.width} height={shop.heroPhoto.height} fetchPriority="high" decoding="async" />
+          </picture>
+          <span className="hero-photo-plate">
+            <span className="hero-photo-name">{l({ bn: 'আমাদের দোকান', en: 'OUR SHOP' })}</span>
+            <span className="hero-photo-place">{l({ bn: 'কোলাঘাট · পশ্চিমবঙ্গ', en: 'KOLAGHAT · WEST BENGAL' })}</span>
+          </span>
+        </div>
+        <Suspense fallback={<div className="hero-film hero-film-skeleton" aria-hidden="true" />}><HeroFilm /></Suspense>
+        </div>
         <div className="hero-copy">
           <p className="eyebrow hero-eyebrow"><span className="location-dot" />{t('hero.eyebrow')}</p>
           <h1 id="hero-title">{t('hero.title1')}</h1>
           <p className="hero-description">{t('hero.description')}</p>
           <div className="hero-actions"><Link to="/cycles" className="btn btn-yellow hero-explore">{t('action.viewCycles')}<ArrowRight size={18} aria-hidden="true" /></Link><DirectionsButton className="hero-ghost" /></div>
-          <p className="hero-note"><span><Check size={13} strokeWidth={2.5} aria-hidden="true" /></span>{t('hero.note')}</p>
-          <p className="hero-badge">{t('hero.badge1')} {t('hero.badge2')}</p>
+          <p className="hero-urgency">
+            <span className="hero-urgency-dot" aria-hidden="true" />
+            {l({ bn: 'আজই আসুন, পছন্দের মডেলটি বেছে নিন—স্টক সীমিত।', en: 'Come in today and pick your model — stock is limited.' })}
+          </p>
+          {/* Two promises that matter most, one line on a phone. */}
+          <ul className="hero-promises">
+            {promiseKeys.map(key => <li key={key}><span className="hero-promise-tick" aria-hidden="true"><Check size={12} strokeWidth={3} /></span>{t(`hero.promise.${key}` as 'hero.promise.fit')}</li>)}
+          </ul>
           <a href="#about-store" className="hero-scroll-cue"><span className="scroll-cue-icon"><ArrowDown size={16} aria-hidden="true" /></span>{l({ bn: 'স্ক্রল করুন। নতুন পথ দেখুন।', en: 'A little scroll. A new perspective.' })}</a>
         </div>
       </div>

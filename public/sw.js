@@ -7,8 +7,9 @@
  *  2. Call, WhatsApp and directions keep working from the cached offline page.
  *  3. New deployments replace the cache cleanly (no permanently stale catalog).
  *
- * It only stores the app shell, the owner-uploaded hero image and the offline
- * fallback. No enquiry, shortlist or personal data is ever cached here.
+ * It only stores the app shell, the owner's photograph, the shop film's poster
+ * (and the film itself once it has been watched) and the offline fallback. No
+ * enquiry, shortlist or personal data is ever cached here.
  */
 const VERSION = 'kanchan-v1';
 const SHELL_CACHE = `${VERSION}-shell`;
@@ -23,6 +24,9 @@ const SCOPE = new URL(self.registration.scope);
 const BASE = SCOPE.pathname;
 const INDEX_URL = BASE;
 const OFFLINE_URL = `${BASE}offline.html`;
+/* Where the shop film lives. Declared after BASE so this file can never throw
+   before it registers. */
+const VIDEO_PREFIX = `${BASE}video/`;
 /* Replaced at build time with every hashed JS/CSS file, so pages the visitor has
    not opened yet still work offline. Empty here keeps `public/sw.js` valid. */
 const PRECACHE_ASSETS = [];
@@ -36,8 +40,12 @@ const PRECACHE = [
   `${BASE}icons/icon-512.png`,
   `${BASE}icons/icon-maskable-512.png`,
   `${BASE}icons/apple-touch-icon.png`,
-  `${BASE}images/kanchan-team-hero.jpeg`,
+  `${BASE}images/kanchan-team-hero.webp`,
   `${BASE}images/kanchan-team-hero-mobile.webp`,
+  /* Only the still frame of the shop film is precached. The film itself is a few
+     megabytes and would make the first install slow on a phone connection; it is
+     cached (up to 210 MB in total) the first time it is actually watched. */
+  `${BASE}video/hero-poster.webp`,
   ...PRECACHE_ASSETS.map(path => `${BASE}${path}`),
 ];
 
@@ -87,7 +95,7 @@ async function cacheFirst(request) {
   try {
     const response = await fetch(request);
     if (response && response.ok && response.type === 'basic') {
-      const isImage = request.destination === 'image';
+      const isImage = request.destination === 'image' || new URL(request.url).pathname.startsWith(VIDEO_PREFIX);
       const cache = await caches.open(isImage ? IMAGE_CACHE : ASSET_CACHE);
       await cache.put(request, response.clone());
       if (isImage) await trimCache(IMAGE_CACHE, MAX_IMAGES);
@@ -122,6 +130,14 @@ self.addEventListener('fetch', event => {
   if (request.method !== 'GET') return;
   const url = new URL(request.url);
   if (!isSameOrigin(url)) return;
+  /* The browser fetches video in byte ranges, and a media element gives up with
+     a format error if a range request is answered from a whole-file cache entry.
+     So the shop film is never touched here: the host's own cache headers (see
+     _headers) look after it, and if it is missing offline the poster stays. */
+  if (request.destination === 'video' || request.headers.get('range') || url.pathname.startsWith(VIDEO_PREFIX)) {
+    if (url.pathname.endsWith('.webp') || url.pathname.endsWith('.jpg')) event.respondWith(cacheFirst(request));
+    return;
+  }
   if (request.mode === 'navigate') {
     event.respondWith(handleNavigate(event));
     return;

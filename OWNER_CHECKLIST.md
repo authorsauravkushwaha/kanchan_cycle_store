@@ -21,7 +21,7 @@ All routine settings live in **`src/config/shop.ts`**. Do not publish a detail m
 | Bicycle catalog | 37 cycles, **no price and no stock status confirmed yet**. Every cycle says "ask the shop". | Add verified names, brands, specifications, prices and stock. This is the single biggest reason a customer leaves the site. |
 | Cycle photographs | 24 photographs across 22 cycles. 19 cycles show the brand's catalogue picture and 3 cycles show your own shop photographs (the Brooks ride-on, the Hercules Defender and the electric cycle). Each product page says which one it is. | Walk the shop once with the photo list below and check every model against its picture. |
 | Repair services | Six possible topics, all marked as requiring availability confirmation | Set `confirmed: true` only for services actually offered. Add a price only when verified. |
-| Shop photographs | The homepage hero is the team photograph `kanchan-team-hero.jpeg` (two shop workers, captioned "কাঞ্চন সাইকেল স্টোর্স, কোলাঘাট"). Six real photographs of the shop — storefront, showroom, display, corner, children's cycles, workshop — are on the About page. | Check the hero crop on a desktop, a tablet, a portrait phone and a phone held sideways. Check that the About gallery captions match what each picture really shows. Replace any picture that misleads. |
+| Shop photo and shop film | The homepage first screen shows the team photograph `kanchan-team-hero.webp` **unchanged** on the left and your shop film on the right. Six more real photographs of the shop — storefront, showroom, display, corner, children's cycles, workshop — are on the About page. | Check both the photograph and the film on a desktop, a tablet, a portrait phone and a phone held sideways. The film is silent until a visitor taps the speaker; confirm that is what you want, and confirm the About gallery captions match each picture. |
 | Offers | No discounts published; useful buying tips shown | Add only genuine, owner-approved offers with `verified: true`. |
 | Reviews | No names, ratings or testimonials fabricated | Supply authentic reviews with permission and a genuine source URL, or a real review link. |
 | Production domain | `websiteUrl: null`; preview noindex | Set the actual HTTPS URL after deployment. |
@@ -30,6 +30,23 @@ All routine settings live in **`src/config/shop.ts`**. Do not publish a detail m
 | Email / social profiles | Omitted | Optional: add only real, actively used details. |
 | Analytics | No endpoint, no tracking requests | Optional: configure a privacy-appropriate HTTPS endpoint and update the privacy policy before collecting consent. |
 | Announcement | Generic contact invitation, no offer claim | Edit the bilingual text or set `announcement.enabled: false`. |
+
+## The shop film on the homepage
+
+- [x] Your uploaded `CEMK.mp4` is on the homepage, looping silently on the first screen.
+- [ ] Watch the film through once on your own phone. The web copy uses the
+      7 s–71.5 s section of your upload: the opening title slide, a 1.5 s black
+      gap and the silent ending are cut. Nothing inside the shop was changed.
+- [ ] Sound is **off** by default so phones can autoplay it. A visitor who taps
+      the speaker hears the film's own audio track (only the last few seconds of
+      your upload had any sound, so most of the film is quiet).
+- [ ] If you record a new film, replace both files in `public/video/`
+      (`hero-640.mp4` for phones, `hero-960.mp4` for larger screens) and the
+      first frame as `hero-poster.webp`. Keep each file under about 3 MB for
+      phones — a bigger film means a customer gives up before the shop appears.
+- [ ] The film plays only while the first screen is visible and never inside the
+      phone's "reduce motion" setting. That is deliberate: it protects battery
+      and data, and it is what keeps the page from lagging.
 
 ## Putting the website online (one-time, 30 seconds)
 

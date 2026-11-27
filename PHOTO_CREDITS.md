@@ -34,3 +34,20 @@ customers should contact the shop to confirm those details.
 Brand names and trademarks visible in the photos belong to their respective
 owners. (The Minnie kids cycle is a shop children's cycle with character
 graphics; the character artwork belongs to its owner.)
+
+## The homepage shop film
+
+`public/video/hero-640.mp4` and `public/video/hero-960.mp4` are re-encodes of
+`CEMK.mp4`, uploaded by the shop owner to their own repository
+(<https://github.com/authorsauravkushwaha/ai_automation>). It was recorded inside
+Kanchan Cycle Stores.
+
+The web copies keep the section from 7 s to 71.5 s of the original: the opening
+brand slide, a 1.5 s black gap at 4.8 s and the silent trailing tail are cut, and
+the footage is re-encoded at web bitrates. The shop footage itself is unaltered.
+
+`public/video/hero-poster.webp` is the first frame of that section, used as the
+poster so the hero is never an empty rectangle while the film loads.
+
+The owner's photograph (`public/images/kanchan-team-hero.*`) is used exactly as
+supplied. Only its frame on the homepage is new.

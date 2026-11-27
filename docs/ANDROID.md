@@ -154,9 +154,18 @@ tracking. If the customer installs, the prompt disappears for good.
 | --- | --- | --- |
 | Initial JS (gzip) | ≤ 130 kB | `npm run build` output |
 | Shared + experience CSS (gzip) | ≤ 24 kB | same; tactile shadows and responsive 3D scene styles |
-| Shop portrait | Eager, full-bleed hero background (≈175 kB JPEG) | `kanchan-store-hero.jpeg`; the only photograph on the site |
+| Owner's photograph | Eager, 80 kB WebP (`kanchan-team-hero.webp`), 60 kB on phones | `heroPhoto` in `src/config/shop.ts`; used unretouched |
+| Shop film poster | Preloaded, ≤ 40 kB, painted before anything else on the hero | `public/video/hero-poster.webp` |
+| Shop film | Deferred; ≤ 2.1 MB on phones, ≤ 4.7 MB on larger screens; never loaded on Save-Data or 2G | `public/video/*`, `src/components/HeroFilm.tsx` |
+| Video decoding off-screen | 0 frames | the film pauses when the hero leaves the viewport or the tab is hidden |
 | Fonts | Bengali subset only, 2 weights, woff2 | `src/main.tsx` imports |
 | Third-party requests before consent | 0 | no analytics, map only on request |
 | Lighthouse mobile performance | ≥ 90 | measure; do not assume |
+
+The shop film is the one heavy asset on the site, so it is treated as such: it is
+a separate lazy chunk, its source is attached only after `load`, phones stream the
+640-wide copy, the poster carries the first screen on its own, and the decoder is
+released the moment the visitor scrolls past. A phone on Save-Data never
+downloads it at all.
 
 The owner desk (`/owner`) is a separate 7 kB chunk that customers never download.

@@ -69,6 +69,42 @@ The browser tests use the development-only `@sparticuz/chromium` package, so the
 do not download a browser from an external CDN. Alternatively set `CHROMIUM_PATH`.
 Browser binaries are never part of the website bundle.
 
+## The homepage film
+
+The first screen carries the shop film the owner uploaded, beside the owner's
+photograph (which is used exactly as supplied — no retouching, no replacement).
+
+| File | Purpose |
+| --- | --- |
+| `public/video/hero-640.mp4` | 640×360 copy served to phones (≈1.9 MB) |
+| `public/video/hero-960.mp4` | 960×540 copy served to tablets and desktops (≈4.4 MB) |
+| `public/video/hero-poster.webp` | First frame, preloaded, so the hero is never blank (34 KB) |
+| `src/components/HeroFilm.tsx` | The player: autoplay, loop, sound, visibility, fallbacks |
+| `src/config/shop.ts` → `heroFilm` | Single place to change the film |
+
+It is a re-encode of `CEMK.mp4` from the owner's own GitHub repository, cut to
+its 7 s–71.5 s section: the opening brand slide, a 1.5 s black gap and the silent
+trailing tail are dropped, and the remaining shop footage is encoded at web
+bitrates. Nothing inside the shop was altered.
+
+How it behaves, and why:
+
+- **Autoplays instantly, silently.** `muted` + `playsInline` is the only
+  combination every Android, iOS and desktop browser permits without a tap. The
+  speaker button is the only way sound is ever heard.
+- **Never blocks the page.** It is a lazy-loaded chunk and its source is attached
+  only after the `load` event. The poster (preloaded in `index.html`) is what the
+  customer sees first, usually within a second.
+- **Never wastes a phone.** Save-Data and 2G keep the poster instead of the film;
+  phones stream the 640-wide copy; a screen reader or a reduced-motion setting
+  gets the still frame.
+- **Never decodes unseen video.** An `IntersectionObserver` pauses the film as soon
+  as the hero leaves the viewport, and `visibilitychange` pauses it in a
+  background tab. Scroll position is never intercepted.
+- **Cached once watched.** `public/sw.js` precaches only the poster; the film is
+  stored on first playback (bounded by the image cache's 80 entries), so a repeat
+  visit costs nothing.
+
 ## Routes
 
 `/`, `/cycles`, `/cycles/:slug`, `/services`, `/recommendation`,
@@ -89,6 +125,7 @@ Store listing.
 | `src/pwa.tsx` | Install prompt, update detection, online state, Maps arrival source |
 | `src/components/Install.tsx` | Bottom-sheet install explanation |
 | `scripts/generate-icons.mjs` | Regenerates the icon set with Sharp |
+| `public/video/*` + `src/components/HeroFilm.tsx` | The homepage shop film, its poster and its two file sizes |
 
 The service worker is registered **only in production builds**, so it never
 interferes with development or the Playwright suite.
@@ -236,7 +273,7 @@ src/i18n.tsx                Complete Bengali/English copy
 src/pwa.tsx                 Install, offline and update state
 src/inventory.tsx           Catalogue provider (static, cache, live)
 src/shortlist.tsx           Device-local shortlist provider
-src/components/             Header, footer, cards, filters, forms, map, install UI
+src/components/             Header, footer, cards, filters, forms, map, install UI, hero film
 src/pages/                  Route pages, including Shortlist and OwnerDesk
 src/lib/                    URLs, filtering, quiz, validation, inventory, shortlist, stock desk
 src/styles.css              Tailwind theme and responsive design system

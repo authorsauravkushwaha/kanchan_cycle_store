@@ -93,6 +93,23 @@ export interface Category {
   subtitle: Localized;
   availabilityConfirmed: boolean;
 }
+/**
+ * The owner's shop film. It is a real recording inside Kanchan Cycle Stores —
+ * the rows of cycles, the display, the workshop — so it is allowed to sit beside
+ * the owner's photograph as the first thing a customer sees.
+ */
+export interface ShopFilm {
+  /** The film the shop uploaded. Keep it for provenance; the web copies are cut from it. */
+  source: string;
+  /** Smaller file for phones, larger one for tablets and desktops. */
+  srcSmall: string;
+  srcLarge: string;
+  /** First frame, so the hero is never an empty dark rectangle while loading. */
+  poster: string;
+  /** Seconds of the film, used to time the progress line under the player. */
+  duration: number;
+  caption: Localized;
+}
 
 /** Verified business details, customer services and contact actions. */
 export const shop = {
@@ -111,6 +128,22 @@ export const shop = {
     alt: { bn: 'কাঞ্চন সাইকেল স্টোর্সে দুই দোকানকর্মী', en: 'Two members of the Kanchan Cycle Stores team inside the shop' },
     caption: { bn: 'কাঞ্চন সাইকেল স্টোর্স, কোলাঘাট', en: 'Kanchan Cycle Stores, Kolaghat' },
   },
+  /**
+   * The shop film, recorded inside the store and uploaded by the owner.
+   *
+   * The uploaded master (CEMK.mp4, 75s) is kept in the owner's own GitHub repo.
+   * The two web copies here are that same footage, cut to the 7s–71.5s section:
+   * the opening brand slide and the trailing black/silent tail are removed, and
+   * it is re-encoded at web bitrates. Nothing inside the shop was retouched.
+   */
+  heroFilm: {
+    source: 'https://github.com/authorsauravkushwaha/ai_automation/blob/main/CEMK.mp4',
+    srcSmall: '/video/hero-640.mp4',
+    srcLarge: '/video/hero-960.mp4',
+    poster: '/video/hero-poster.webp',
+    duration: 64.5,
+    caption: { bn: 'কাঞ্চন সাইকেল স্টোর্সের ভিতরে', en: 'Inside Kanchan Cycle Stores' },
+  } as ShopFilm,
   /**
    * Photographs of the shop itself, taken by the owner. They are the strongest
    * trust signal a neighbourhood shop has: a customer can see the door, the

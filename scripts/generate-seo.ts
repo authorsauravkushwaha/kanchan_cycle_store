@@ -81,6 +81,10 @@ for (const pattern of [/hind-siliguri-bengali-400-normal-.*\.woff2$/, /hind-sili
   const file = assets.find(name => pattern.test(name));
   if (file) preloads.push(`<link rel="preload" href="${basePath}assets/${file}" as="font" type="font/woff2" crossorigin>`);
 }
+/* The hero poster is the one image every visitor must see immediately on the
+   first screen. Preloading it (instead of only the fonts) removes the last
+   blank frame before the shop film starts. */
+preloads.push(`<link rel="preload" href="${basePath}video/hero-poster.webp" as="image" type="image/webp" fetchpriority="high">`);
 index = index.replace('</head>', `${preloads.join('\n')}\n</head>`);
 await writeFile(resolve(dist, 'index.html'), index);
 console.log(`Routes: ${routes.length}; base path: ${basePath}; GitHub Pages refresh fallback and critical preloads generated.`);

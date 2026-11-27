@@ -5,6 +5,7 @@
 import { readFile, readdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import assert from 'node:assert/strict';
+import { runInNewContext } from 'node:vm';
 import { loadEnv } from 'vite';
 
 const buildEnv = { ...loadEnv('production', process.cwd(), 'VITE_'), ...process.env };
@@ -44,7 +45,7 @@ for (const [name, value] of Object.entries(headers)) {
 // The SPA rewrite must never shadow the PWA files: a manifest served as HTML
 // silently disables installation, and a shadowed sw.js disables offline support.
 const rewrite = new RegExp(`^${config.rewrites[0].source}$`);
-for (const path of ['/sw.js', '/manifest.webmanifest', '/offline.html', '/offline.css', '/icons/icon-192.png']) {
+for (const path of ['/sw.js', '/manifest.webmanifest', '/offline.html', '/offline.css', '/icons/icon-192.png', '/video/hero-640.mp4', '/video/hero-poster.webp']) {
   assert.ok(!rewrite.test(path), `The SPA rewrite would serve index.html for ${path}`);
 }
 
@@ -61,6 +62,24 @@ assert.ok(manifest.icons.length >= 4, 'Manifest needs regular and maskable icons
 assert.ok(manifest.display === 'standalone', 'Manifest must be installable');
 const sw = await readFile('dist/sw.js', 'utf8');
 assert.ok(sw.includes('isSameOrigin'), 'Service worker must scope caching to this origin');
+/* A media element fetches byte ranges; answering one from a whole-file cache
+   entry makes the film fail with a format error. The film must be left alone. */
+assert.ok(
+  /request\.destination === 'video'/.test(sw) && /request\.headers\.get\('range'\)/.test(sw),
+  'Service worker must not intercept video or byte-range requests',
+);
+// A worker that throws while evaluating simply never registers, and the site
+// silently loses offline support with no error anywhere the owner can see.
+// Evaluate its top level against stub globals, so a temporal-dead-zone mistake
+// (using a const before its declaration) fails the build instead of production.
+try {
+  runInNewContext(sw, {
+    self: { registration: { scope: 'https://shop.example/' }, addEventListener() {}, skipWaiting() {} },
+    URL, Request, Response, fetch() { throw new Error('no network during the check'); }, caches: {}, console,
+  });
+} catch (error) {
+  assert.fail(`dist/sw.js does not evaluate: ${error.message}`);
+}
 assert.ok(!/unsafe-eval/.test(sw));
 assert.ok(await readFile('dist/offline.html', 'utf8').then(text => text.includes('tel:+917076884950')));
 

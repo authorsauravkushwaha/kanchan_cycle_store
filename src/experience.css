@@ -68,36 +68,99 @@ html { scroll-padding-top: 108px; }
 .mobile-drawer { background: var(--surface); }
 .drawer-links a { border-color: var(--line); }
 
-/* Keep the team visible on the left and the live hero actions on the right. */
+/* The first screen: the owner's photograph on the left, the shop film on the
+   right, the words and the two actions in the middle. The dark green plate
+   behind everything keeps all three readable on any screen. */
 .hero-neu {
-  position: relative; isolation: isolate; overflow: hidden;
+  position: relative; isolation: isolate; overflow: clip;
   display: flex; flex-direction: column; justify-content: space-between;
-  min-height: clamp(560px, 80vh, 780px);
-  background: #071d14; color: #f3f8ec;
+  min-height: clamp(600px, 86vh, 820px);
+  /* A solid colour first: if the gradient cannot be painted, the words stay
+     readable instead of landing on the pale page background. */
+  background-color: #0b2d20;
+  background-image:
+    radial-gradient(115% 120% at 78% 8%, #14503a 0%, #0b2d20 46%, #071d14 100%);
+  color: #f3f8ec;
 }
-.hero-backdrop { position: absolute; inset: 0; z-index: -1; overflow: hidden; background: #071d14; }
+.hero-backdrop {
+  position: absolute; inset: 0; z-index: -1; overflow: hidden; background: transparent;
+  /* A single, very soft light source instead of a photograph: cheap to paint,
+     and it never competes with the owner's picture or the film. */
+  background-image:
+    radial-gradient(42% 55% at 12% 22%, #ffffff12 0%, transparent 70%),
+    radial-gradient(38% 48% at 92% 88%, #e8c65c14 0%, transparent 72%);
+}
+.hero-stage { grid-area: stage; display: grid; gap: 14px; align-self: center; min-width: 0; }
+.hero-photo {
+  position: relative; z-index: 4;
+  aspect-ratio: 16 / 9; max-height: 330px;
+  border-radius: 26px; overflow: hidden;
+  border: 1px solid #ffffff26;
+  background: #0a2418;
+  box-shadow: 0 34px 68px -34px #000000cc, 0 2px 0 #ffffff1a inset;
+  /* The photograph itself is untouched; only its frame is new. */
+  animation: hero-photo-in .7s cubic-bezier(.2,.7,.2,1) both;
+}
+.hero-photo picture { display: block; width: 100%; height: 100%; }
 .hero-backdrop-image {
-  width: 100%; height: 100%; object-fit: cover; object-position: 50% 25%;
+  width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%;
   /* A crisp, high-contrast grade gives the owner's portrait a confident editorial presence. */
   filter: saturate(1.08) contrast(1.07);
-  transform: scale(1.01);
+  display: block;
 }
-.hero-backdrop-scrim {
-  position: absolute; inset: 0;
-  background:
-    linear-gradient(90deg, #061a1108 0%, #061a1110 38%, #061a1166 58%, #061a11ef 72%, #061a11f8 100%),
-    linear-gradient(180deg, #061a1133 0%, #061a1100 24%, #061a1100 58%, #061a1199 100%);
+.hero-photo-plate {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 3;
+  display: flex; flex-direction: column; gap: 2px;
+  padding: 40px 20px 15px;
+  background: linear-gradient(180deg, #071d1400 0%, #071d14d9 62%, #071d14f5 100%);
 }
+.hero-photo-name { font-size: 9px; font-weight: 700; letter-spacing: 2.4px; color: var(--yellow); }
+.hero-photo-place { font-size: 11px; font-weight: 600; color: #e9f2e2; }
+@keyframes hero-photo-in { from { opacity: 0; transform: translateY(14px) scale(.985); } to { opacity: 1; transform: none; } }
+
 .hero-neu-grid {
-  flex: 1 1 auto; display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, .8fr);
-  gap: 40px; align-items: center; padding-top: 64px; padding-bottom: 40px;
-  min-height: clamp(500px, 68vh, 680px);
+  flex: 1 1 auto; display: grid;
+  grid-template-columns: minmax(0, 1.04fr) minmax(0, .96fr);
+  grid-template-areas: "stage copy";
+  gap: 40px;
+  align-items: start;
+  padding-top: 36px; padding-bottom: 26px;
+  min-height: clamp(460px, 62vh, 660px);
+  align-content: center;
 }
-.hero-copy { grid-column: 2; position: relative; z-index: 5; max-width: 640px; padding-bottom: 12px; text-shadow: 0 1px 26px #03130c80; }
+.hero-copy { grid-area: copy; position: relative; z-index: 5; align-self: center; max-width: 600px; padding-bottom: 6px; text-shadow: 0 1px 26px #03130c80; }
 .hero-eyebrow { width: fit-content; max-width: 100%; padding: 9px 14px; border-radius: 999px; border: 1px solid #ffffff2e; background: #ffffff14; color: #eaf3e2; box-shadow: none; backdrop-filter: blur(8px); font-size: 9px; letter-spacing: 1.3px; margin-bottom: 25px; }
 .hero-eyebrow > .location-dot:first-child { width: 6px; height: 6px; border-radius: 50%; background: var(--yellow); box-shadow: 0 0 0 3px #ffffff1f; flex-shrink: 0; opacity: 1; }
 .hero-neu h1 { color: #f8fbf3; font-weight: 750; font-size: clamp(44px, 4.6vw, 66px); line-height: 1.06; letter-spacing: -3px; max-width: 11ch; text-wrap: balance; }
 html[lang='bn'] .hero-neu h1 { font-size: clamp(37px, 3.6vw, 51px); line-height: 1.38; letter-spacing: -.7px; max-width: 15ch; font-weight: 600; }
+.hero-promises { display: grid; gap: 9px; margin-top: 16px; }
+.hero-promises li {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 12px; line-height: 1.5; color: #e4eedd; font-weight: 550;
+}
+html[lang='bn'] .hero-promises li { font-size: 12.5px; }
+.hero-promise-tick {
+  display: grid; place-items: center; flex: 0 0 auto;
+  width: 19px; height: 19px; border-radius: 50%;
+  background: #e8c65c1f; color: var(--yellow);
+  border: 1px solid #e8c65c40;
+}
+/* One honest line of urgency, not a fake countdown. */
+.hero-urgency {
+  display: inline-flex; align-items: center; gap: 9px;
+  margin-top: 18px; padding: 8px 14px 8px 11px;
+  border-radius: 999px; border: 1px solid #e8c65c38;
+  background: linear-gradient(90deg, #e8c65c1c, #e8c65c08);
+  font-size: 10.5px; font-weight: 650; letter-spacing: .2px; color: #f6e9b6;
+}
+html[lang='bn'] .hero-urgency { font-size: 11px; }
+.hero-urgency-dot {
+  width: 7px; height: 7px; border-radius: 50%; flex: 0 0 auto;
+  background: var(--yellow); box-shadow: 0 0 0 3px #e8c65c2b;
+  animation: urgency-pulse 2.6s ease-in-out infinite;
+}
+@keyframes urgency-pulse { 0%, 100% { box-shadow: 0 0 0 3px #e8c65c2b; } 50% { box-shadow: 0 0 0 6px #e8c65c0d; } }
+html[data-motion='reduced'] .hero-urgency-dot { animation: none; }
 .hero-neu .hero-description { max-width: 43ch; font-size: 14px; line-height: 1.9; color: #d3e1cb; margin-top: 22px; }
 .hero-actions { margin-top: 27px; gap: 14px; }
 .hero-actions .btn { font-size: 12px; padding-inline: 18px; min-height: 50px; }
@@ -105,28 +168,89 @@ html[lang='bn'] .hero-neu h1 { font-size: clamp(37px, 3.6vw, 51px); line-height:
 .hero-actions .hero-ghost:hover { color: #fff; border-color: #ffffff73; background: #ffffff20; }
 .hero-note { color: #c5d7bb; font-size: 11px; margin-top: 20px; }
 .hero-note > span { background: #ffffff1a; color: var(--yellow); box-shadow: none; }
-.hero-scroll-cue { position: static; display: inline-flex; align-items: center; gap: 11px; margin-top: 35px; color: #b3c8a8; font-size: 10px; letter-spacing: .2px; }
+.hero-scroll-cue { position: static; display: flex; width: fit-content; align-items: center; gap: 11px; margin-top: 20px; color: #b3c8a8; font-size: 10px; letter-spacing: .2px; }
 .scroll-cue-icon { display: grid; place-items: center; width: 31px; height: 41px; border: 1px solid #ffffff2b; border-radius: 18px; background: #ffffff0f; box-shadow: none; color: #f3f8ec; }
 .hero-scroll-cue:hover { color: #fff; }
 .hero-scroll-cue svg { transform: translateY(calc(var(--scene-progress, 0) * 7px)); }
 html[data-scroll-direction='up'] .hero-scroll-cue svg { transform: rotate(180deg) translateY(calc(var(--scene-progress, 0) * 7px)); }
-.hero-caption {
-  position: relative; z-index: 5; justify-self: end; align-self: end;
-  display: flex; flex-direction: column; gap: 7px; width: min(302px, 100%);
-  padding: 22px 24px; border: 1px solid #ffffff29; border-radius: 22px;
-  background: linear-gradient(150deg, #0a2b1dcc, #061a11b8);
-  backdrop-filter: blur(16px) saturate(1.15);
-  box-shadow: 0 24px 54px -34px #000000e6, inset 0 1px 0 #ffffff1a;
-  text-shadow: 0 1px 14px #03130c80; margin-bottom: 12px;
-  /* Keep clear of the floating journey controls pinned to the right edge. */
-  margin-right: clamp(0px, 4vw, 58px);
+/* The shop film: a 16:9 window that keeps its shape before the video arrives,
+   so nothing on the page moves when the picture appears. */
+.hero-film { margin: 0; position: relative; z-index: 4; min-width: 0; }
+.hero-film-frame {
+  position: relative; aspect-ratio: 16 / 9; width: 100%;
+  max-height: min(30vh, 292px);
+  border-radius: 22px; overflow: hidden;
+  border: 1px solid #ffffff24;
+  background: #082016;
+  box-shadow: 0 30px 60px -30px #000000d6, 0 1px 0 #ffffff1f inset;
+  /* The frame never changes size, so its box is measured once. */
+  contain: layout paint;
 }
-.hero-caption-role { font-size: 8.5px; font-weight: 700; letter-spacing: 2.4px; color: var(--yellow); }
-.hero-caption strong { font-size: 17px; line-height: 1.4; font-weight: 650; color: #fbfdf7; }
-html[lang='bn'] .hero-caption strong { font-size: 19px; font-weight: 600; }
-.hero-caption-place { display: inline-flex; align-items: center; gap: 6px; font-size: 10.5px; color: #c3d5b9; }
-.hero-caption-link { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 9px; padding-top: 13px; border-top: 1px solid #ffffff1f; font-size: 9.5px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; color: #eef5e7; min-height: 24px; }
-.hero-caption-link:hover { color: var(--yellow); }
+.hero-film-video {
+  position: absolute; inset: 0; width: 100%; height: 100%; z-index: 2;
+  object-fit: cover; object-position: 50% 45%; display: block;
+  background: #082016;
+  /* Its own compositing layer: the film is never re-rasterised together with the
+     page, so scrolling the long homepage stays at native speed. */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  contain: paint;
+}
+.hero-film-scrim {
+  position: absolute; inset: 0; z-index: 3; pointer-events: none;
+  background:
+    linear-gradient(180deg, #061a1100 52%, #061a1199 100%),
+    linear-gradient(90deg, #061a1173 0%, #061a1100 34%);
+}
+.hero-film-live {
+  position: absolute; top: 13px; left: 14px; z-index: 5;
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 6px 11px; border-radius: 999px;
+  border: 1px solid #ffffff2e; background: #061a11a6;
+  backdrop-filter: blur(8px);
+  font-size: 8px; font-weight: 700; letter-spacing: 1.5px; color: #f2f8ea;
+}
+.hero-film-live > i {
+  width: 6px; height: 6px; border-radius: 50%; background: #ff4d4d;
+  box-shadow: 0 0 0 3px #ff4d4d33;
+  animation: film-pulse 2.4s ease-in-out infinite;
+}
+.hero-film[data-playback='paused'] .hero-film-live > i { animation: none; background: #b8c9ae; }
+@keyframes film-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+.hero-film-controls { position: absolute; right: 12px; bottom: 14px; z-index: 6; display: flex; gap: 7px; }
+.hero-film-button {
+  display: grid; place-items: center; width: 36px; height: 36px;
+  border-radius: 50%; border: 1px solid #ffffff33;
+  background: #061a11b8; color: #f4f9ee;
+  backdrop-filter: blur(8px);
+  transition: background .2s ease, transform .2s ease, border-color .2s ease;
+}
+.hero-film-button:hover { background: #0b2f20e6; border-color: #ffffff5c; }
+.hero-film-button:active { transform: scale(.94); }
+.hero-film-button:disabled { opacity: .35; }
+.hero-film-button:focus-visible { outline: 2px solid var(--yellow); outline-offset: 2px; }
+.hero-film-progress {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 6; height: 3px;
+  background: #ffffff1f; overflow: hidden;
+}
+.hero-film-progress > i {
+  display: block; height: 100%; width: 100%; transform-origin: left center;
+  background: var(--yellow); will-change: transform;
+}
+.hero-film-fallback {
+  /* Bottom-left, clear of the two round buttons. */
+  position: absolute; left: 14px; bottom: 14px; z-index: 5;
+  padding: 5px 10px; border-radius: 999px; background: #061a11b8;
+  font-size: 8px; font-weight: 700; letter-spacing: 1.6px; color: #d8e6cd;
+}
+.hero-film-caption {
+  display: flex; align-items: center; justify-content: space-between; gap: 14px;
+  padding: 11px 3px 0; font-size: 10px; letter-spacing: .3px; color: #b4c9a9;
+}
+.hero-film-caption a { display: inline-flex; align-items: center; gap: 5px; color: #eef5e7; font-weight: 650; }
+.hero-film-caption a:hover { color: var(--yellow); }
+.hero-film-skeleton { aspect-ratio: 16 / 9; max-height: min(30vh, 292px); border-radius: 22px; background: #0a2418; border: 1px solid #ffffff1a; }
+
 .hero-bottom-line { display: flex; justify-content: space-between; gap: 20px; padding-block: 19px; border-top: 1px solid #ffffff26; color: #b9cbaf; font-size: 8px; font-weight: 650; letter-spacing: 1.6px; }
 .tiny-cross { font-size: 18px; margin-left: 24px; color: var(--yellow); }
 .cycle-scene { position: relative; height: 550px; min-width: 0; perspective: 1100px; transform-style: preserve-3d; --tilt-x: 0deg; --tilt-y: 0deg; }
@@ -280,9 +404,10 @@ html[data-motion='reduced'] .scene-spin { animation: none; }
 
 @media (max-width: 1180px) {
   .site-header .desktop-nav a { padding-inline: 8px; }
-  .hero-neu-grid { gap: 26px; }
-  .hero-caption { margin-right: 64px; width: min(286px, 100%); }
+  .hero-neu-grid { gap: 32px; }
   .hero-neu h1 { font-size: 55px; }
+  .hero-stage { gap: 13px; }
+  .hero-photo { max-height: 380px; }
   .cycle-scene { height: 510px; }
   .scene-bicycle { top: 82px; }
   .scene-orbit { width: 360px; height: 360px; top: 65px; }
@@ -296,7 +421,13 @@ html[data-motion='reduced'] .scene-spin { animation: none; }
 }
 @media (max-width: 1040px) {
   .header-inner { height: 76px; }
-  .hero-neu-grid { min-height: clamp(460px, 60vh, 580px); }
+  .hero-neu-grid { min-height: clamp(460px, 60vh, 580px); gap: 26px; }
+  .hero-stage { gap: 12px; }
+  .hero-photo { max-height: 340px; }
+  .hero-promises { gap: 7px; margin-top: 17px; }
+  .hero-promises li { font-size: 11.5px; }
+  .hero-urgency { margin-top: 15px; }
+  .hero-scroll-cue { margin-top: 15px; }
   .hero-neu h1 { font-size: 47px; letter-spacing: -2px; }
   html[lang='bn'] .hero-neu h1 { font-size: 37px; }
   .hero-eyebrow { font-size: 8px; letter-spacing: .6px; }
@@ -323,22 +454,47 @@ html[data-motion='reduced'] .scene-spin { animation: none; }
 @media (max-width: 760px) {
   .section { padding-block: 58px; }
   .header-inner { height: 70px; }
+  /* The header is already 96% opaque, so the blur buys nothing here — and on a
+     mid-range Android it re-blurs the moving film on every frame. Removing it
+     keeps scrolling smooth while the film plays. */
+  .site-header, .site-header.is-scrolled { backdrop-filter: none; background: #e9ede6fa; }
   .hero-neu { min-height: 0; }
-  /* Show both people above the copy on narrow screens. */
-  .hero-backdrop { inset: 0; }
-  .hero-backdrop-image { height: 310px; object-position: 50% 20%; }
-  .hero-backdrop-scrim {
-    background:
-      linear-gradient(180deg, #061a1100 0, #061a1100 160px, #061a11a6 250px, #061a11 310px);
+  /* One column: the real photograph, then the film, then the words and the two
+     actions, in that order — the order a phone reader actually scans. */
+  .hero-neu-grid {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "stage" "copy";
+    gap: 12px; align-items: stretch;
+    padding-top: 14px;
+    padding-bottom: calc(92px + env(safe-area-inset-bottom));
+    min-height: 0;
   }
-  .hero-neu-grid { grid-template-columns: 1fr; gap: 0; align-items: end; padding-top: 285px; padding-bottom: calc(84px + env(safe-area-inset-bottom)); min-height: min(720px, calc(100svh - 96px)); }
+  /* Two compact strips keep the whole promise — who we are, the shop on film,
+     and the headline — inside one phone screen. */
+  .hero-photo { aspect-ratio: 16 / 6.8; max-height: none; border-radius: 18px; }
+  .hero-backdrop-image { object-position: 50% 24%; }
+  .hero-photo-plate { padding: 30px 14px 10px; }
+  .hero-photo-name { font-size: 8px; letter-spacing: 1.9px; }
+  .hero-photo-place { font-size: 10px; }
+  .hero-film-frame, .hero-film-skeleton { aspect-ratio: 16 / 6.9; max-height: none; border-radius: 16px; }
+  .hero-film-live { top: 10px; left: 10px; padding: 5px 9px; font-size: 7px; letter-spacing: 1.1px; }
+  .hero-film-controls { right: 9px; bottom: 11px; gap: 6px; }
+  .hero-film-button { width: 34px; height: 34px; }
+  .hero-film-caption { padding-top: 9px; font-size: 9px; }
+  .hero-film-caption a { font-size: 9px; }
+  .hero-promises { margin-top: 12px; gap: 6px; }
+  .hero-promises li { font-size: 11.5px; }
+  .hero-urgency { margin-top: 13px; padding: 7px 12px 7px 10px; font-size: 10px; }
+  html[lang='bn'] .hero-urgency { font-size: 10.5px; }
   .hero-bottom-line { display: none; }
-  .hero-copy { grid-column: 1; max-width: 540px; }
-  .hero-caption { display: none; }
-  .hero-eyebrow { margin-bottom: 20px; font-size: 8px; }
+  .hero-copy { grid-area: copy; max-width: 540px; margin-top: 6px; }
+  /* The announcement bar already names the town, and the fixed action bar is
+     always one thumb away: on a phone both would only push the headline and
+     the buttons below the fold. */
+  .hero-eyebrow, .hero-scroll-cue { display: none; }
   .hero-neu h1 { font-size: clamp(43px, 8.4vw, 58px); max-width: 12ch; line-height: 1.07; letter-spacing: -2px; }
   html[lang='bn'] .hero-neu h1 { font-size: clamp(35px, 7.5vw, 45px); max-width: 17ch; line-height: 1.4; }
-  .hero-neu .hero-description { font-size: 13px; max-width: 44ch; margin-top: 18px; }
+  .hero-neu .hero-description { font-size: 13px; max-width: 44ch; margin-top: 13px; }
   .hero-actions { flex-direction: row; margin-top: 23px; gap: 12px; }
   .hero-actions .btn { width: auto; font-size: 11px; padding-inline: 15px; min-height: 47px; }
   .hero-note { font-size: 10px; margin-top: 17px; }
@@ -392,6 +548,10 @@ html[data-motion='reduced'] .scene-spin { animation: none; }
 @media (max-width: 420px) {
   .hero-neu h1 { font-size: 43px; }
   html[lang='bn'] .hero-neu h1 { font-size: 35px; }
+  .hero-neu-grid { gap: 13px; padding-top: 18px; }
+  .hero-photo, .hero-film-frame, .hero-film-skeleton { border-radius: 16px; }
+  .hero-film-caption span { display: none; }
+  .hero-film-caption { justify-content: flex-end; }
   .hero-actions { gap: 10px; }
   .hero-actions .btn { font-size: 10px; padding-inline: 12px; gap: 6px; }
   .hero-actions .btn svg { width: 15px; }
@@ -434,32 +594,45 @@ html[data-motion='reduced'] .scene-spin { animation: none; }
 /* Short phones (landscape, or small screens in split view) need a tighter hero:
    the same full-bleed photograph, with secondary cues dropped so the headline
    and both actions stay reachable. */
+/* A short phone (640–720 px tall) has no room for everything. What survives is
+   the two things that decide a visit: the headline and the two actions, both
+   above the fixed call bar. Everything else is on the next scroll. */
 @media (max-width: 760px) and (max-height: 720px) {
-  .hero-neu-grid { padding-top: 275px; padding-bottom: calc(74px + env(safe-area-inset-bottom)); min-height: max(420px, calc(100svh - 150px)); }
+  .hero-neu-grid { padding-top: 12px; padding-bottom: calc(80px + env(safe-area-inset-bottom)); min-height: 0; gap: 10px; }
+  .hero-stage { gap: 9px; }
+  .hero-photo { aspect-ratio: 16 / 6; }
+  .hero-photo-plate, .hero-film-caption, .hero-promises { display: none; }
+  .hero-film-frame { aspect-ratio: 16 / 5.9; }
   .hero-eyebrow { display: none; }
-  .hero-neu h1 { font-size: clamp(30px, 8vw, 40px); line-height: 1.1; letter-spacing: -1.5px; }
+  .hero-neu h1 { font-size: clamp(30px, 8vw, 40px); line-height: 1.1; letter-spacing: -1.5px; margin-top: 4px; }
   html[lang='bn'] .hero-neu h1 { font-size: clamp(27px, 7.2vw, 35px); line-height: 1.32; }
-  .hero-neu .hero-description { font-size: 12.5px; line-height: 1.75; margin-top: 14px; }
-  .hero-actions { margin-top: 17px; flex-direction: row; flex-wrap: nowrap; gap: 10px; }
-  .hero-actions .btn { width: auto; flex: 1 1 0; min-width: 0; min-height: 46px; font-size: 10px; padding-inline: 10px; gap: 6px; }
-  .hero-actions .btn svg { width: 15px; height: 15px; }
-  .hero-note, .hero-scroll-cue { display: none; }
+  .hero-neu .hero-description { display: none; }
+  .hero-actions { margin-top: 16px; flex-direction: row; flex-wrap: nowrap; gap: 9px; }
+  .hero-actions .btn { width: auto; flex: 1 1 0; min-width: 0; min-height: 46px; font-size: 9.5px; padding-inline: 8px; gap: 5px; white-space: nowrap; }
+  .hero-actions .btn svg { width: 14px; height: 14px; flex: 0 0 auto; }
+  .hero-note, .hero-scroll-cue, .hero-urgency { display: none; }
+  /* The floating pause button has nowhere to sit on this screen without covering
+     the two actions. The film keeps its own pause button, and the device's
+     reduced-motion setting is still honoured. */
+  .journey-controls { display: none; }
 }
-
-/* A phone held sideways has almost no height, so the hero sheds its padding and
-   switches to the horizontal scrim: the headline stays on the left, the
-   shopkeeper stays visible on the right, and the actions stay above the bar. */
 @media (max-width: 900px) and (max-height: 520px) {
-  .hero-backdrop { inset: 0; }
-  .hero-backdrop-image { height: 100%; object-position: 50% 30%; }
-  .hero-backdrop-scrim { background: linear-gradient(90deg, #061a1122 0%, #061a1166 35%, #061a11ed 65%, #061a11fa 100%); }
-  .hero-neu-grid { padding-top: 34px; padding-bottom: calc(92px + env(safe-area-inset-bottom)); min-height: 0; }
-  .hero-copy { grid-column: 1 / -1; justify-self: end; max-width: 50%; }
+  .hero-neu-grid {
+    grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
+    grid-template-areas: "stage copy";
+    gap: 10px 16px; padding-top: 12px;
+    padding-bottom: calc(80px + env(safe-area-inset-bottom)); min-height: 0;
+  }
+  .hero-stage { gap: 8px; }
+  .hero-photo { aspect-ratio: 16 / 8; border-radius: 14px; }
+  .hero-film-frame { aspect-ratio: 16 / 8.4; border-radius: 14px; }
+  .hero-photo-plate, .hero-film-caption { display: none; }
+  .hero-copy { max-width: none; }
   .hero-eyebrow { display: none; }
-  .hero-neu h1 { font-size: clamp(26px, 4.6vw, 34px); line-height: 1.14; letter-spacing: -1px; max-width: 16ch; }
-  html[lang='bn'] .hero-neu h1 { font-size: clamp(23px, 4vw, 29px); line-height: 1.36; max-width: 19ch; }
-  .hero-neu .hero-description { font-size: 11.5px; line-height: 1.7; margin-top: 10px; max-width: 46ch; }
-  .hero-actions { margin-top: 14px; gap: 9px; }
+  .hero-neu h1 { font-size: clamp(24px, 4.4vw, 32px); line-height: 1.14; letter-spacing: -1px; max-width: 20ch; }
+  html[lang='bn'] .hero-neu h1 { font-size: clamp(22px, 3.8vw, 28px); line-height: 1.34; max-width: 24ch; }
+  .hero-neu .hero-description { font-size: 11.5px; line-height: 1.7; margin-top: 9px; max-width: 62ch; }
+  .hero-actions { margin-top: 13px; gap: 9px; }
   .hero-actions .btn { width: auto; min-height: 42px; font-size: 10px; padding-inline: 12px; }
   .hero-note, .hero-scroll-cue { display: none; }
 }
@@ -473,6 +646,8 @@ html[data-motion='reduced'] .scene-bicycle { transform: rotateZ(-3deg); transiti
 html[data-motion='reduced'] .scene-float-top { transform: rotate(3deg); }
 html[data-motion='reduced'] .scene-float-bottom { transform: rotate(-3deg); }
 html[data-motion='reduced'] .wheel-spokes, html[data-motion='reduced'] .cycle-crank, html[data-motion='reduced'] .journey-dial, html[data-motion='reduced'] .scene-mini-wheel::before { transform: none; }
+html[data-motion='reduced'] .hero-photo { animation: none; }
+html[data-motion='reduced'] .hero-film-live > i { animation: none; }
 html[data-motion='reduced'] .scene-orbit { transform: none; }
 html[data-motion='reduced'] .scene-edition { transform: none; }
 html[data-motion='reduced'] .hero-scroll-cue svg { transform: none; }

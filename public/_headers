@@ -28,5 +28,11 @@
 /icons/*
   Cache-Control: public, max-age=604800, stale-while-revalidate=86400
 
+# The shop film and its poster. Not content-hashed, so a week of caching keeps a
+# returning customer from downloading 4 MB again on a phone connection.
+/video/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+  Accept-Ranges: bytes
+
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
